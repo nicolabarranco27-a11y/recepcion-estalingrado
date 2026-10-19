@@ -132,8 +132,19 @@ Todo el contenido se renderiza con `textContent` (a prueba de XSS). Si
 administradores se crean en Supabase (Authentication → Users) y se habilitan
 insertando su UUID en la tabla `admins` (ver `supabase/schema.sql`).
 
-Verificado con pruebas automatizadas jsdom y Chromium real (ver abajo y en
-`DOCUMENTACION.md`).
+### Cómo entrar al panel
+
+Dirección directa (guardala en favoritos):
+
+<https://nicolabarranco27-a11y.github.io/recepcion-estalingrado/admin.html>
+
+No hay botón desde la página pública a propósito, para que un visitante no la
+encuentre. Para no escribirla cada vez:
+
+- **Computadora:** abrir esa dirección y usar la estrella del navegador
+  (Marcadores → "Panel Estalingrado").
+- **Celular:** menú del navegador → "Agregar a la pantalla de inicio" (queda
+  como un ícono más, igual que una app).
 
 Verificado con pruebas automatizadas jsdom y Chromium real (ver abajo y en
 `DOCUMENTACION.md`).
@@ -214,11 +225,14 @@ institucional.
       real desde el formulario con estados y honeypot, panel `admin.html`
       (login, lista, filtros, detalle, notas, CSV), `robots.txt` y suites
       nuevas en verde. `git init` + primer commit local.
-- [ ] **Configurar Supabase (lo hace el usuario):** crear el proyecto, pegar
-      URL + anon key en `js/config.js`, ejecutar `supabase/schema.sql`, crear el
-      usuario admin e insertar su UUID en `admins`. Guía:
-      `supabase/INSTRUCCIONES.md`.
-- [ ] Probar el envío y el panel contra el proyecto Supabase real.
+- [x] **Configurar Supabase (19/10/2026):** proyecto `estalingrado-corp` (São
+      Paulo) creado, URL + anon key en `js/config.js`, `supabase/schema.sql`
+      ejecutado, usuario admin `nbmn38@gmail.com` (Auto Confirm) e insertado su
+      UUID en `public.admins`. Guía: `supabase/INSTRUCCIONES.md`.
+- [x] Probar el envío y el panel contra el proyecto Supabase real: envío desde
+      la página publicada y login + solicitud visible en `/admin.html`.
+      Comprobado además que RLS rechaza escrituras inválidas y que el público no
+      puede leer la tabla.
 - [x] Subir el repositorio a GitHub:
       <https://github.com/nicolabarranco27-a11y/recepcion-estalingrado>
       (público, rama `main`). GitHub Pages **activado** desde `main`:

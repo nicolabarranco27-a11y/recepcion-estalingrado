@@ -212,3 +212,41 @@ Pendiente del usuario:
    repo público recepcion-estalingrado.)
 
 - FIN DE LA SESIÓN: se detiene y se espera la revisión del usuario.
+
+============================================================
+SESIÓN 10 - 19/10/2026 - Supabase conectado y probado en vivo
+============================================================
+Objetivo: dejar la recepción enviando de verdad a Supabase y el panel admin
+funcionando contra el proyecto real, guiando al usuario (principiante) paso a
+paso.
+
+Hecho:
+- Proyecto Supabase del usuario: "estalingrado-corp" (ref ndiljaxvcbratynvivir).
+  La anon key que compartió se validó (rol "anon" y ref coincidentes) y la URL
+  correcta es la base sin /rest/v1/.
+- js/config.js completado con url + anonKey (commit 660d79a). Pages lo publicó
+  (verificado: el archivo servido contiene el proyecto nuevo, portada HTTP 200).
+- El usuario ejecutó supabase/schema.sql en el SQL Editor: "Success. No rows
+  returned". Comprobado desde afuera con la anon key: la tabla solicitudes ya
+  existe; la lectura pública devuelve 0 filas; inserciones inválidas
+  (notas_internas, estado "cerrada", servicio fuera de la lista) se rechazan con
+  401 -> RLS activa y limitando correctamente.
+- Verificación en vivo con Playwright (script temporal): config.js cargado,
+  botón "Enviar solicitud" habilitado y 0 errores de consola.
+- Error del usuario y corrección: creó el admin con "Invite", y el correo caía
+  en localhost:3000 (página caída). Solución: borrar el usuario invitado y usar
+  Authentication -> Users -> Add user -> "Create new user" con Auto Confirm.
+  UID 5cc30f4b-cead-4901-8620-05f59a2aaf9c, correo nbmn38@gmail.com, insertado
+  en public.admins. Probado de punta a punta: envío desde la página publicada,
+  login en /admin.html y solicitud visible en la lista.
+- Documentado el acceso al panel (sin enlace público por diseño): sección nueva
+  "Cómo entrar al panel" en README con la dirección directa y el atajo de
+  favoritos / agregar a inicio.
+
+Pendiente:
+- Apagar "Allow new users to sign up" en Authentication (recomendado).
+- Opcional: Site URL en Authentication -> URL Configuration para evitar la
+  página caída en correos de Supabase.
+- Dominio propio, correo oficial y revisión visual humana del checklist.
+
+- FIN DE LA SESIÓN: se detiene y se espera la revisión del usuario.
