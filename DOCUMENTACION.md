@@ -57,7 +57,7 @@ la Etapa 1). Este proyecto no modifica ni depende de sus archivos.
 | 4 | Auditoría en navegador real (Chromium/Playwright) a 1440/390/360 px; suites jsdom (63 aserciones) y Playwright en verde; **bug corregido**: cambiar de servicio en pasos 2/3 dejaba el resumen obsoleto (la tarjeta ahora reinicia el paso correspondiente). | Hecha |
 | 5 (19/10/2026) | Fondo dinámico con red de orbes flotantes (canvas que imita la página institucional); **desduplicación** de la selección de servicio (se elimina el paso 1 del formulario: los radios, "Continuar" y su error; la selección vive solo en las tarjetas de `#servicios`); documentación completa (`DOCUMENTACION.md` + `bitacora.txt`). Corregido tras revisión del usuario: se quitó el aviso y la línea informativa agregados de más (la única función del formulario es despliegarse al tocar una tarjeta). | Hecha |
 | 6 (19/10/2026) | Tipografía y formulario más legibles e intuitivos, solo en `#recepcion` (ver §4.4): jerarquía de títulos y subtítulos de grupo, labels 13px, inputs Inter 16px de 48px, placeholders de ejemplo, nota de campos obligatorios. | Hecha |
-| 7 (19/10/2026) | **Supabase + panel**: `supabase/schema.sql` (tablas `solicitudes`/`admins`, trigger, RLS), guía `supabase/INSTRUCCIONES.md`, `js/config.js`, envío real por REST con estados/honeypot, `admin.html` + `css/admin.css` + `js/admin.js` (login, stats, filtros, detalle, estados, notas, CSV), `robots.txt`, suites nuevas y `git init`. Ver §4.2 y §4.5. | Hecha (falta configuración del usuario) |
+| 7 (19/10/2026) | **Supabase + panel**: `supabase/schema.sql` (tablas `solicitudes`/`admins`, trigger, RLS), guía `supabase/INSTRUCCIONES.md`, `js/config.js`, envío real por REST con estados/honeypot, `admin.html` + `css/admin.css` + `js/admin.js` (login, stats, filtros, detalle, estados, notas, CSV), `robots.txt`, suites nuevas y `git init`. Ver §4.2 y §4.5. | Hecha y conectada (proyecto Supabase real el 19/10/2026) |
 
 ## 4. Recepción: diseño actual del flujo
 
@@ -178,6 +178,11 @@ Verificado: 4 suites en verde tras los cambios (62+11 jsdom, 64 visual,
   enlaces desde la página pública, y la autorización real es RLS: solo un
   usuario con fila en `admins` puede leer/actualizar. El frontend nunca usa
   `service_role`; la anon key es pública por diseño.
+- **Acceso**: sin botón visible; en `js/main.js` un atajo abre `admin.html`
+  cuando se mantiene **Ctrl** y se hacen **3 clics seguidos sobre el logo**
+  (se abre en otra pestaña y se cancela la navegación al ancla). Alternativas:
+  dirección directa en favoritos y "Agregar a la pantalla de inicio" en el
+  celular.
 - **Sin configurar**: si `js/config.js` está vacío, el login queda deshabilitado
   y se muestra un aviso con el enlace a `supabase/INSTRUCCIONES.md`.
 - **Móvil**: stats y tarjetas se reacomodan; el diálogo ocupa el ancho completo;

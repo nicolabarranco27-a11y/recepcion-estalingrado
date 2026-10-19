@@ -74,6 +74,32 @@ var ENVIO = (function () {
     });
   }
 
+  /* Acceso discreto al panel interno: mantener Ctrl (o Cmd) y hacer 3 clics
+     sobre el logo. No hay ningún enlace visible a propósito; en el celular se
+     entra por el acceso directo guardado en la pantalla de inicio. */
+  var logo = document.querySelector('.brand');
+  if (logo) {
+    var clicsLogo = 0;
+    var reinicioLogo = null;
+    logo.addEventListener('click', function (e) {
+      if (!e.ctrlKey && !e.metaKey) {
+        clicsLogo = 0;
+        return;
+      }
+      /* Evita que Ctrl+clic abra una pestaña con el ancla del logo. */
+      e.preventDefault();
+      clicsLogo += 1;
+      if (reinicioLogo) clearTimeout(reinicioLogo);
+      if (clicsLogo >= 3) {
+        clicsLogo = 0;
+        var panel = window.open('admin.html', '_blank');
+        if (!panel) window.location.href = 'admin.html';
+        return;
+      }
+      reinicioLogo = setTimeout(function () { clicsLogo = 0; }, 1500);
+    });
+  }
+
   /* Reveal on scroll */
   var revealEls = document.querySelectorAll('.reveal');
 

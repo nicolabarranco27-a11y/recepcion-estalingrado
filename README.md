@@ -138,9 +138,11 @@ Dirección directa (guardala en favoritos):
 
 <https://nicolabarranco27-a11y.github.io/recepcion-estalingrado/admin.html>
 
-No hay botón desde la página pública a propósito, para que un visitante no la
-encuentre. Para no escribirla cada vez:
+No hay botón visible desde la página pública a propósito, para que un visitante
+no la encuentre. Tres formas de entrar:
 
+- **Atajo secreto (escritorio):** mantener **Ctrl** y hacer **3 clics seguidos
+  sobre el logo** de la barra superior; el panel se abre en otra pestaña.
 - **Computadora:** abrir esa dirección y usar la estrella del navegador
   (Marcadores → "Panel Estalingrado").
 - **Celular:** menú del navegador → "Agregar a la pantalla de inicio" (queda

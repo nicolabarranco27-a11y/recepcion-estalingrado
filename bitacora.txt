@@ -239,9 +239,18 @@ Hecho:
   UID 5cc30f4b-cead-4901-8620-05f59a2aaf9c, correo nbmn38@gmail.com, insertado
   en public.admins. Probado de punta a punta: envío desde la página publicada,
   login en /admin.html y solicitud visible en la lista.
-- Documentado el acceso al panel (sin enlace público por diseño): sección nueva
-  "Cómo entrar al panel" en README con la dirección directa y el atajo de
-  favoritos / agregar a inicio.
+- Atajo secreto de acceso pedido por el usuario: mantener Ctrl y hacer 3 clics
+  sobre el logo (.brand) abre admin.html en otra pestaña; se cancela el ancla
+  y un clic normal sigue yendo a #inicio. Verificado en Chromium real contra el
+  servidor local (popup abre admin.html, sin errores de consola).
+- Las suites de etiqueta visual y de panel afirmaban el estado "sin configurar"
+  y ahora js/config.js tiene datos reales: se fuerza CONFIG_SUPABASE vacío con
+  addInitScript en esas comprobaciones. Batería completa en verde:
+  test-recepcion (62), test-tecnico (11), etapa4-visual (64), etapa4-extra (26),
+  test-supabase (48), test-admin (60).
+- Documentado el acceso al panel (sin enlace público por dirección): sección
+  nueva "Cómo entrar al panel" en README con la dirección directa, el atajo y
+  el acceso de favoritos / pantalla de inicio.
 
 Pendiente:
 - Apagar "Allow new users to sign up" en Authentication (recomendado).
