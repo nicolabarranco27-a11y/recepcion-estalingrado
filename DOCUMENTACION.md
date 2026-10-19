@@ -254,9 +254,9 @@ Pasos que debe hacer el usuario (resumidos; detalle en la guía):
 2. **Configurar Supabase**: crear el proyecto, completar `js/config.js`,
    ejecutar `supabase/schema.sql` y crear el admin (lo hace el usuario).
 3. Probar el envío y el panel contra el proyecto Supabase real.
-4. Subir el repositorio a GitHub: `git init` + commit local ya hechos; falta
-   elegir cuenta (`laboutiquecatydog` o `nicolabarranco27-a11y`) y crear el
-   remoto (no se pusheó todavía).
+4. Repositorio en GitHub: **subido** a
+   <https://github.com/nicolabarranco27-a11y/recepcion-estalingrado> (público,
+   rama `main`). GitHub Pages, dominio y correo siguen sin configurar.
 5. Verificar teléfono/correo oficiales cuando se publiquen (correo propuesto
    `estalingradocorp.servicios@gmail.com`, sin confirmar).
 6. No publicar ni configurar dominio (fuera de alcance hasta que se pida).

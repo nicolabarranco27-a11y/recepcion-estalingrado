@@ -190,15 +190,16 @@ Implementado:
 - README.md, DOCUMENTACION.md (§1, §2, §3, §4.2, §4.5, §5, §6, §7, §8) y esta
   bitácora actualizados. El plan viejo React/Node/Fastify/Prisma quedó
   descartado para esta etapa.
-- git init + primer commit local. NO se pusheó: hay dos cuentas de gh
-  (laboutiquecatydog activa y nicolabarranco27-a11y inactiva) y falta que el
-  usuario elija cuenta/nombre/visibilidad del repo. Tampoco se habilitó GitHub
-  Pages ni dominio.
+- git init + primer commit local. Repo subido con la cuenta elegida por el
+  usuario (nicolabarranco27-a11y), público y rama main:
+  https://github.com/nicolabarranco27-a11y/recepcion-estalingrado
+  GitHub Pages, dominio y correo siguen sin configurar.
 
 Pendiente del usuario:
 1. Crear el proyecto Supabase y pegar URL + anon key en js/config.js.
 2. Ejecutar supabase/schema.sql en el SQL Editor.
 3. Crear el usuario admin (Auto Confirm) e insertar su UUID en admins.
-4. Decir con qué cuenta de GitHub subir el repo.
+4. Decir con qué cuenta de GitHub subir el repo. (Hecho: nicolabarranco27-a11y,
+   repo público recepcion-estalingrado.)
 
 - FIN DE LA SESIÓN: se detiene y se espera la revisión del usuario.

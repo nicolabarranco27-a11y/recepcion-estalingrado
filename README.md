@@ -1,5 +1,7 @@
 # Recepción de clientes — Estalingrado Corp
 
+Repositorio: <https://github.com/nicolabarranco27-a11y/recepcion-estalingrado>
+
 Página independiente de recepción de clientes para dos servicios:
 
 1. Servicio técnico informático.
@@ -217,8 +219,9 @@ institucional.
       usuario admin e insertar su UUID en `admins`. Guía:
       `supabase/INSTRUCCIONES.md`.
 - [ ] Probar el envío y el panel contra el proyecto Supabase real.
-- [ ] Elegir cuenta de GitHub (`laboutiquecatydog` o `nicolabarranco27-a11y`)
-      y subir el repositorio (el remoto todavía no está configurado).
+- [x] Subir el repositorio a GitHub:
+      <https://github.com/nicolabarranco27-a11y/recepcion-estalingrado>
+      (público, rama `main`). GitHub Pages y dominio todavía sin configurar.
 - [ ] Revisión visual humana (checklist inferior) en escritorio y móvil.
 - [ ] Verificar teléfono/correo oficiales cuando estén publicados
       (correo propuesto: `estalingradocorp.servicios@gmail.com`, sin confirmar).
