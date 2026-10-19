@@ -193,7 +193,16 @@ Implementado:
 - git init + primer commit local. Repo subido con la cuenta elegida por el
   usuario (nicolabarranco27-a11y), público y rama main:
   https://github.com/nicolabarranco27-a11y/recepcion-estalingrado
-  GitHub Pages, dominio y correo siguen sin configurar.
+  GitHub Pages activado desde main:
+  https://nicolabarranco27-a11y.github.io/recepcion-estalingrado/
+  El primer deploy quedó en cola por el incidente de GitHub Actions/Pages del
+  19/10/2026 (githubstatus.com). Dominio y correo siguen sin configurar.
+- Corrección pedida por el usuario: el primer commit había quedado con el
+  autor global "EstalingradoCorp <laboutiquecatydog10@gmail.com>", de otra
+  cuenta/proyecto. No había colaboradores agregados. Se reescribió el autor y
+  el committer de ambos commits a nicolabarranco27-a11y y se actualizó el
+  remoto; contributors muestra solo esa cuenta. Git local del repo quedó con
+  identidad propia.
 
 Pendiente del usuario:
 1. Crear el proyecto Supabase y pegar URL + anon key en js/config.js.

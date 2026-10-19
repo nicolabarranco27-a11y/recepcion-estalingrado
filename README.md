@@ -221,7 +221,10 @@ institucional.
 - [ ] Probar el envío y el panel contra el proyecto Supabase real.
 - [x] Subir el repositorio a GitHub:
       <https://github.com/nicolabarranco27-a11y/recepcion-estalingrado>
-      (público, rama `main`). GitHub Pages y dominio todavía sin configurar.
+      (público, rama `main`). GitHub Pages **activado** desde `main`:
+      <https://nicolabarranco27-a11y.github.io/recepcion-estalingrado/>
+      (el primer deploy quedó en cola por un incidente de GitHub Actions/Pages
+      del 19/10/2026, ajeno al proyecto). Dominio propio todavía sin configurar.
 - [ ] Revisión visual humana (checklist inferior) en escritorio y móvil.
 - [ ] Verificar teléfono/correo oficiales cuando estén publicados
       (correo propuesto: `estalingradocorp.servicios@gmail.com`, sin confirmar).

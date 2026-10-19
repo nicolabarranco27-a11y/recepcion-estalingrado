@@ -256,7 +256,10 @@ Pasos que debe hacer el usuario (resumidos; detalle en la guía):
 3. Probar el envío y el panel contra el proyecto Supabase real.
 4. Repositorio en GitHub: **subido** a
    <https://github.com/nicolabarranco27-a11y/recepcion-estalingrado> (público,
-   rama `main`). GitHub Pages, dominio y correo siguen sin configurar.
+   rama `main`). GitHub Pages activado en
+   <https://nicolabarranco27-a11y.github.io/recepcion-estalingrado/>; el primer
+   deploy quedó en cola por el incidente de Actions/Pages del 19/10/2026.
+   Dominio y correo siguen sin configurar.
 5. Verificar teléfono/correo oficiales cuando se publiquen (correo propuesto
    `estalingradocorp.servicios@gmail.com`, sin confirmar).
 6. No publicar ni configurar dominio (fuera de alcance hasta que se pida).
