@@ -58,6 +58,7 @@ la Etapa 1). Este proyecto no modifica ni depende de sus archivos.
 | 5 (19/10/2026) | Fondo dinámico con red de orbes flotantes (canvas que imita la página institucional); **desduplicación** de la selección de servicio (se elimina el paso 1 del formulario: los radios, "Continuar" y su error; la selección vive solo en las tarjetas de `#servicios`); documentación completa (`DOCUMENTACION.md` + `bitacora.txt`). Corregido tras revisión del usuario: se quitó el aviso y la línea informativa agregados de más (la única función del formulario es despliegarse al tocar una tarjeta). | Hecha |
 | 6 (19/10/2026) | Tipografía y formulario más legibles e intuitivos, solo en `#recepcion` (ver §4.4): jerarquía de títulos y subtítulos de grupo, labels 13px, inputs Inter 16px de 48px, placeholders de ejemplo, nota de campos obligatorios. | Hecha |
 | 7 (19/10/2026) | **Supabase + panel**: `supabase/schema.sql` (tablas `solicitudes`/`admins`, trigger, RLS), guía `supabase/INSTRUCCIONES.md`, `js/config.js`, envío real por REST con estados/honeypot, `admin.html` + `css/admin.css` + `js/admin.js` (login, stats, filtros, detalle, estados, notas, CSV), `robots.txt`, suites nuevas y `git init`. Ver §4.2 y §4.5. | Hecha y conectada (proyecto Supabase real el 19/10/2026) |
+| 8 (19/10/2026) | **Accesos y botones**: hero con "Servicios informáticos y web" (ancla a `#servicios`) y "Conocer la empresa" (sitio institucional en otra pestaña); repaso visual de los botones del formulario y del panel (radio, alto táctil, contraste, foco y estado deshabilitado). Ver §4.7. | Hecha |
 
 ## 4. Recepción: diseño actual del flujo
 
@@ -219,6 +220,29 @@ Revisión completa pedida por el usuario tras conectar Supabase. Cambios:
   `anon key` es pública por diseño.
 - **Pendiente del usuario**: apagar "Allow new users to sign up", contraseña
   larga y única para el panel y verificación en dos pasos en GitHub/Supabase.
+
+### 4.7 Accesos y botones (19/10/2026)
+
+Cambios pedidos por el usuario:
+
+- **Hero**: el primer botón pasa a decir **"Servicios informáticos y web"** y
+  mantiene el ancla `#servicios` (lleva a las dos tarjetas que inician la
+  recepción). El segundo botón deja de duplicar el destino del formulario y
+  pasa a **"Conocer la empresa"**, enlace externo al sitio institucional
+  (`target="_blank"` + `rel="noopener noreferrer"`, ícono
+  `fa-arrow-up-right-from-square`).
+- **Botones del formulario y del panel**: `.btn` ahora tiene `border-radius`
+  10 px (8 px en `.btn--sm`), `min-height` 3.25 rem (2.75 rem en `.btn--sm`),
+  `justify-content: center`, `font-weight` 600 y transición con `box-shadow` y
+  `transform`. `.btn--outline` gana borde `#52525b`, fondo `rgba(255,255,255,.03)`
+  y hover azul con relleno; `.btn--solid` mantiene blanco sobre negro, con
+  sombra y leve elevación al pasar el mouse. El estado deshabilitado ya no usa
+  `opacity` (quedaba poco legible): usa gris `#3f3f46` con texto `#d4d4d8` en
+  sólidos y `#71717a` en contornos. En `.flow__actions` los botones tienen
+  `min-width: 11rem` y en móvil se estiran a lo ancho.
+- **Verificación** (`verificar-botones.js`): alturas de 52 px (44 px en los
+  chicos) y contrastes medidos de 15,78:1 (contorno) y 21:1 (sólidos); las 6
+  suites siguen en verde, sin desborde en 390/360 px.
 
 ## 5. Pruebas (07/10 → 19/10/2026)
 

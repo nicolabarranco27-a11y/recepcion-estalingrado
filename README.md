@@ -94,6 +94,21 @@ Flujo en `#recepcion` con tres pasos (stepper accesible):
 
 El formulario y el stepper permanecen ocultos hasta que se toca una tarjeta.
 
+## Accesos del inicio y botones (ajuste 19/10/2026)
+
+- El hero tiene dos botones. El primero, **"Servicios informáticos y web"**,
+  baja a `#servicios`, donde están las dos tarjetas con las que arranca la
+  recepción. El segundo, **"Conocer la empresa"**, abre el sitio institucional
+  (`https://estalingradocorp.github.io/EstalingradoCorp/`) en otra pestaña
+  (`target="_blank"` + `rel="noopener noreferrer"`). Antes ambos llevaban al
+  mismo lugar del formulario.
+- Los botones (`Editar datos`, `Enviar solicitud`, `Nueva solicitud`, y los del
+  panel) se repasaron para ganar presencia y contraste: alto mínimo de 52 px
+  (44 px en los chicos del panel), radio de 10 px (8 px en los chicos), texto en
+  blanco/zinc de alto contraste (≥ 15,8:1 sobre negro), hover con realce azul en
+  los de contorno y estado deshabilitado en gris legible (ya no se aclaran con
+  `opacity`).
+
 ## Envío con Supabase (Etapa 7)
 
 Cada solicitud se guarda en una tabla PostgreSQL de Supabase mediante su API
@@ -266,6 +281,9 @@ institucional.
       real desde el formulario con estados y honeypot, panel `admin.html`
       (login, lista, filtros, detalle, notas, CSV), `robots.txt` y suites
       nuevas en verde. `git init` + primer commit local.
+- [x] Etapa 8 (19/10/2026): accesos del inicio (botón a `#servicios` + enlace al
+      sitio institucional) y repaso de botones del formulario y del panel
+      (radio, alto táctil y contraste), documentado en `DOCUMENTACION.md` §4.7.
 - [x] **Configurar Supabase (19/10/2026):** proyecto `estalingrado-corp` (São
       Paulo) creado, URL + anon key en `js/config.js`, `supabase/schema.sql`
       ejecutado, usuario admin `nbmn38@gmail.com` (Auto Confirm) e insertado su

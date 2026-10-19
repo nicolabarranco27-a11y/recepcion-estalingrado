@@ -383,23 +383,32 @@ p { margin: 0; }
 .btn {
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: .75rem;
+  min-height: 3.25rem;
   padding: 1rem 2rem;
+  border: 1px solid transparent;
+  border-radius: 10px;
   font-size: .75rem;
-  font-weight: 500;
-  letter-spacing: .2em;
+  font-weight: 600;
+  letter-spacing: .18em;
+  line-height: 1.1;
+  text-align: center;
   text-transform: uppercase;
-  transition: border-color .3s ease, color .3s ease, background .3s ease;
+  transition: border-color .3s ease, color .3s ease, background .3s ease,
+    box-shadow .3s ease, transform .3s var(--ease);
 }
 
 .btn--outline {
-  border: 1px solid #3f3f46;
-  color: #d4d4d8;
+  border-color: #52525b;
+  background: rgba(255, 255, 255, .03);
+  color: #e4e4e7;
 }
 
 .btn--outline:hover {
-  border-color: rgba(59, 130, 246, .5);
-  color: var(--text-strong);
+  border-color: rgba(59, 130, 246, .65);
+  background: rgba(59, 130, 246, .12);
+  color: #fff;
 }
 
 .btn__arrow {
@@ -408,6 +417,9 @@ p { margin: 0; }
 }
 
 .btn:hover .btn__arrow { transform: translateX(4px); }
+
+/* El foco global redondea a 2px: los botones mantienen su radio. */
+.btn:focus-visible { border-radius: 10px; }
 
 /* ---------- Secciones ---------- */
 
@@ -609,18 +621,39 @@ p { margin: 0; }
 
 .btn--solid {
   background: var(--text-strong);
-  border: 1px solid var(--text-strong);
+  border-color: var(--text-strong);
   color: #000;
-  font-weight: 600;
+  font-weight: 700;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, .35);
 }
 
-.btn--solid:hover { background: #e4e4e7; border-color: #e4e4e7; }
+.btn--solid:hover {
+  background: #fff;
+  border-color: #fff;
+  color: #000;
+  transform: translateY(-1px);
+  box-shadow: 0 12px 26px rgba(0, 0, 0, .45);
+}
 
 .btn:disabled,
 .btn[aria-disabled="true"] {
-  opacity: .4;
   cursor: not-allowed;
   pointer-events: none;
+}
+
+.btn--solid:disabled,
+.btn--solid[aria-disabled="true"] {
+  background: #3f3f46;
+  border-color: #3f3f46;
+  color: #d4d4d8;
+  box-shadow: none;
+}
+
+.btn--outline:disabled,
+.btn--outline[aria-disabled="true"] {
+  border-color: #3f3f46;
+  background: transparent;
+  color: #71717a;
 }
 
 /* ---------- Recepción: stepper ---------- */
@@ -722,12 +755,14 @@ p { margin: 0; }
   display: flex;
   flex-wrap: wrap;
   justify-content: flex-end;
-  gap: 1rem;
+  gap: .875rem;
   margin-top: 2rem;
 }
 
+.flow__actions .btn { min-width: 11rem; }
+
 .flow .btn {
-  min-height: 3rem;
+  min-height: 3.25rem;
   font-size: .8125rem;
 }
 

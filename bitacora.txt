@@ -303,3 +303,38 @@ Pendiente del usuario:
   Supabase.
 
 - FIN DE LA SESIÓN: se detiene y se espera la revisión del usuario.
+
+============================================================
+SESIÓN 12 - 19/10/2026 - Accesos del inicio y repaso de botones
+============================================================
+Pedido del usuario (ajustes chicos):
+1. En el inicio hay dos botones; el primero debia decir "Servicios Informaticos
+   y web" y llevar a ambos servicios de la recepcion.
+2. El segundo ("Iniciar solicitud") estaba de mas porque llevaba al mismo lugar;
+   en su lugar debia llevar a la pagina de la empresa.
+3. Los botones del formulario (Editar datos / Enviar solicitud / Nueva
+   solicitud) y los equivalentes del panel debian verse bien, con buena
+   presencia y contraste.
+
+Hecho:
+- index.html (hero): el primer boton ahora dice "Servicios informaticos y web" y
+  mantiene href="#servicios". El segundo pasa a "Conocer la empresa", enlace
+  externo a https://estalingradocorp.github.io/EstalingradoCorp/ con
+  target="_blank" y rel="noopener noreferrer" e icono
+  fa-arrow-up-right-from-square. Las tarjetas de servicio conservan su
+  "Iniciar solicitud" (ahi si corresponde).
+- css/styles.css: .btn con radio 10px, min-height 3.25rem, justify-content
+  center, weight 600 y transicion con sombra/transform; .btn--outline con borde
+  #52525b, fondo sutil y hover azul; .btn--solid con sombra y leve elevacion;
+  estado deshabilitado explicito (gris #3f3f46 / texto #d4d4d8 en solidos y
+  #71717a en contornos) en lugar del opacity .4; .flow__actions con
+  min-width 11rem por boton.
+- css/admin.css: .btn--sm con min-height 2.75rem (44px tactiles), radio 8px,
+  padding y peso mayores.
+- Verificacion nueva verificar-botones.js (Chromium): alturas de 52px (44 en los
+  chicos) y contrastes 15,78:1 (contorno) y 21:1 (solidos). Las 6 suites siguen
+  en verde (276 aserciones) sin desborde en 390/360.
+- Documentacion: README (seccion "Accesos del inicio y botones", checklist con
+  Etapa 8), DOCUMENTACION (§3 fila 8 y §4.7) y esta bitacora.
+
+- FIN DE LA SESIÓN: se detiene y se espera la revisión del usuario.

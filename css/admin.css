@@ -309,9 +309,11 @@
 }
 
 .btn--sm {
-  min-height: auto;
-  padding: .625rem 1.125rem;
+  min-height: 2.75rem;
+  padding: .7rem 1.25rem;
+  border-radius: 8px;
   font-size: .6875rem;
+  font-weight: 600;
   letter-spacing: .12em;
 }
 
