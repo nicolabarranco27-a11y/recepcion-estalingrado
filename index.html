@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Estalingrado Corp — Recepción de clientes</title>
+<meta name="description" content="Recepción de clientes de Estalingrado Corp. Servicio técnico informático y creación y desarrollo de sitios web.">
+<meta name="author" content="Estalingrado Corp">
+<link rel="icon" type="image/jpeg" href="assets/favicon.jpg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400;500;600;700&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+<a class="skip-link" href="#contenido">Saltar al contenido</a>
+
+<!-- Fondo dinámico: red de orbes flotantes (canvas decorativo) -->
+<canvas id="fondo-particulas" aria-hidden="true"></canvas>
+
+<!-- NAVBAR -->
+<header class="navbar glass" id="navbar">
+  <div class="container navbar__inner">
+    <a href="#inicio" class="brand" aria-label="Estalingrado Corp — Inicio">
+      <span class="brand__avatar">
+        <img src="assets/logo.jpg" alt="" width="40" height="40">
+      </span>
+      <span class="brand__text">
+        <span class="brand__name">Estalingrado</span>
+        <span class="brand__suffix">Corp.</span>
+      </span>
+    </a>
+
+    <nav class="nav-links" aria-label="Navegación principal">
+      <a href="#inicio" class="nav-links__item">Inicio</a>
+      <a href="#servicios" class="nav-links__item">Servicios</a>
+      <a href="#recepcion" class="nav-links__item">Recepción</a>
+      <a href="#contacto" class="nav-links__item">Contacto</a>
+    </nav>
+
+    <button class="nav-toggle" id="nav-toggle" type="button" aria-expanded="false" aria-controls="mobile-menu" aria-label="Abrir menú">
+      <i class="fa-solid fa-bars" aria-hidden="true"></i>
+    </button>
+  </div>
+</header>
+
+<!-- MENÚ MÓVIL -->
+<div class="mobile-menu" id="mobile-menu" hidden>
+  <button class="mobile-menu__close" id="mobile-menu-close" type="button" aria-label="Cerrar menú">
+    <i class="fa-solid fa-xmark" aria-hidden="true"></i>
+  </button>
+  <nav class="mobile-menu__links" aria-label="Navegación móvil">
+    <a href="#inicio" class="mobile-menu__link">Inicio</a>
+    <a href="#servicios" class="mobile-menu__link">Servicios</a>
+    <a href="#recepcion" class="mobile-menu__link">Recepción</a>
+    <a href="#contacto" class="mobile-menu__link">Contacto</a>
+  </nav>
+</div>
+
+<main id="contenido">
+
+  <!-- HERO -->
+  <section class="hero bgh" id="inicio">
+    <div class="container">
+      <div class="hero__content">
+        <p class="pill reveal">
+          <span class="pill__dot" aria-hidden="true"></span>
+          <span>Recepción de clientes · en línea</span>
+        </p>
+
+        <h1 class="hero__title reveal">Servicio técnico y <span class="tg">sitios web</span>.</h1>
+
+        <p class="hero__lead reveal">
+          Estalingrado Corp recibe tus solicitudes. Elegí el servicio que necesitás
+          y comenzá tu atención con nuestro equipo.
+        </p>
+
+        <div class="hero__actions reveal">
+          <a href="#servicios" class="btn btn--outline">
+            Ver servicios
+            <i class="fa-solid fa-chevron-right btn__arrow" aria-hidden="true"></i>
+          </a>
+          <a href="#recepcion" class="btn btn--outline">
+            Iniciar solicitud
+            <i class="fa-solid fa-chevron-right btn__arrow" aria-hidden="true"></i>
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SERVICIOS -->
+  <section class="section section--grid" id="servicios" aria-labelledby="servicios-title">
+    <div class="container">
+      <div class="section__head reveal">
+        <p class="section__label"><span class="section__line" aria-hidden="true"></span>Recepción · Servicios</p>
+        <h2 class="section__title" id="servicios-title">¿Cómo podemos <span class="tg">ayudarte</span>?</h2>
+        <p class="section__desc">Dos servicios, una misma atención. Seleccioná el que corresponda a tu solicitud.</p>
+      </div>
+
+      <div class="cards">
+        <article class="card reveal" id="servicio-tecnico">
+          <div class="card__icon" aria-hidden="true">
+            <i class="fa-solid fa-screwdriver-wrench"></i>
+          </div>
+          <h3 class="card__title">Servicio técnico informático</h3>
+          <p class="card__text">
+            Diagnóstico, reparación y mantenimiento de equipos. Atención personalizada
+            para particulares y negocios.
+          </p>
+          <a href="#recepcion" class="card__link" data-servicio="tecnico">
+            Iniciar solicitud
+            <i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
+          </a>
+        </article>
+
+        <article class="card reveal" id="servicio-web">
+          <div class="card__icon" aria-hidden="true">
+            <i class="fa-solid fa-code"></i>
+          </div>
+          <h3 class="card__title">Creación de sitios web</h3>
+          <p class="card__text">
+            Diseño y desarrollo de sitios web a medida, con identidad propia,
+            velocidad y presencia profesional en internet.
+          </p>
+          <a href="#recepcion" class="card__link" data-servicio="web">
+            Iniciar solicitud
+            <i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
+          </a>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- RECEPCIÓN -->
+  <section class="section" id="recepcion" aria-labelledby="recepcion-title">
+    <div class="container container--narrow">
+      <div class="section__head reveal">
+        <p class="section__label"><span class="section__line" aria-hidden="true"></span>Recepción · Solicitud</p>
+        <h2 class="section__title" id="recepcion-title">Iniciá tu <span class="tg">solicitud</span></h2>
+        <p class="section__desc">Elegí el servicio, completá tus datos y revisá todo antes de dejarla lista para el envío.</p>
+      </div>
+
+      <ol class="stepper reveal" id="stepper" aria-label="Pasos de la solicitud" hidden>
+        <li class="stepper__item is-done" data-paso="1"><span class="stepper__num" aria-hidden="true">01</span> <span id="stepper-servicio">Servicio</span></li>
+        <li class="stepper__item" data-paso="2"><span class="stepper__num" aria-hidden="true">02</span> Datos</li>
+        <li class="stepper__item" data-paso="3"><span class="stepper__num" aria-hidden="true">03</span> Revisión</li>
+      </ol>
+
+      <form class="flow reveal" id="form-solicitud" novalidate hidden>
+
+        <!-- Paso 2: datos -->
+        <fieldset class="flow__paso" id="paso-datos" tabindex="-1" hidden>
+          <legend class="flow__titulo">Datos de la solicitud</legend>
+
+          <p class="flow__nota"><span class="field__req" aria-hidden="true">*</span> Los campos marcados con * son obligatorios.</p>
+
+          <!-- Trampa anti-bot: invisible para personas; si se completa, no se envía -->
+          <div class="hp" aria-hidden="true">
+            <label for="hp-empresa">No completar este campo</label>
+            <input type="text" id="hp-empresa" name="empresa" tabindex="-1" autocomplete="off">
+          </div>
+
+          <p class="flow__subtitulo">Tus datos</p>
+
+          <div class="field">
+            <label class="field__label" for="nombre"><span id="texto-label-nombre">Nombre del cliente</span> <span class="field__req" aria-hidden="true">*</span></label>
+            <input class="field__control" type="text" id="nombre" name="nombre" autocomplete="name" required aria-describedby="err-nombre" placeholder="Ej.: Ana Gómez">
+            <p class="field__error" id="err-nombre" hidden>Ingresá tu nombre.</p>
+          </div>
+
+          <div class="field">
+            <label class="field__label" for="medio-contacto">Medio de contacto <span class="field__req" aria-hidden="true">*</span></label>
+            <input class="field__control" type="text" id="medio-contacto" name="contacto" required aria-describedby="hint-contacto err-medio-contacto" placeholder="Ej.: ana@correo.com · 381 555 0101">
+            <p class="field__hint" id="hint-contacto">Indicá cómo podemos contactarte. No inventamos canales: los usás vos.</p>
+            <p class="field__error" id="err-medio-contacto" hidden>Ingresá un medio de contacto para poder responderte.</p>
+          </div>
+
+          <!-- Campos específicos: servicio técnico -->
+          <div class="field-group" id="campos-tecnico" hidden>
+            <p class="flow__subtitulo">Equipo y problema</p>
+            <div class="field">
+              <label class="field__label" for="tipo-problema">Tipo de problema <span class="field__req" aria-hidden="true">*</span></label>
+              <select class="field__control" id="tipo-problema" name="tipoProblema" required aria-describedby="err-tipo-problema">
+                <option value="">Seleccioná una opción</option>
+                <option value="Hardware (equipo, periféricos, componentes)">Hardware (equipo, periféricos, componentes)</option>
+                <option value="Sistema operativo o software">Sistema operativo o software</option>
+                <option value="Redes e internet">Redes e internet</option>
+                <option value="Seguridad (virus, datos, accesos)">Seguridad (virus, datos, accesos)</option>
+                <option value="Mantenimiento y limpieza">Mantenimiento y limpieza</option>
+                <option value="Otro">Otro</option>
+              </select>
+              <p class="field__error" id="err-tipo-problema" hidden>Seleccioná el tipo de problema.</p>
+            </div>
+
+            <div class="field">
+              <label class="field__label" for="dispositivo">Dispositivo o sistema operativo <span class="field__optional">(opcional)</span></label>
+              <input class="field__control" type="text" id="dispositivo" name="dispositivo" placeholder="Ej.: notebook con Windows 11">
+            </div>
+          </div>
+
+          <!-- Campos específicos: desarrollo web -->
+          <div class="field-group" id="campos-web" hidden>
+            <p class="flow__subtitulo">Tu sitio web</p>
+            <div class="field">
+              <label class="field__label" for="tipo-proyecto">Tipo de proyecto <span class="field__req" aria-hidden="true">*</span></label>
+              <select class="field__control" id="tipo-proyecto" name="tipoProyecto" required aria-describedby="err-tipo-proyecto">
+                <option value="">Seleccioná una opción</option>
+                <option value="Sitio nuevo desde cero">Sitio nuevo desde cero</option>
+                <option value="Rediseño o mejora de un sitio existente">Rediseño o mejora de un sitio existente</option>
+                <option value="Página o landing única">Página o landing única</option>
+                <option value="Otro">Otro</option>
+              </select>
+              <p class="field__error" id="err-tipo-proyecto" hidden>Seleccioná el tipo de proyecto.</p>
+            </div>
+
+            <div class="field">
+              <label class="field__label" for="sitio-actual">¿Ya tenés un sitio web? <span class="field__optional">(opcional)</span></label>
+              <select class="field__control" id="sitio-actual" name="sitioActual">
+                <option value="">Sin especificar</option>
+                <option value="Sí, ya tengo un sitio">Sí, ya tengo un sitio</option>
+                <option value="No, todavía no tengo">No, todavía no tengo</option>
+              </select>
+            </div>
+          </div>
+
+          <p class="flow__subtitulo flow__subtitulo--sep">Qué necesitás</p>
+
+          <div class="field">
+            <label class="field__label" for="descripcion"><span id="texto-label-descripcion">Descripción</span> <span class="field__req" aria-hidden="true">*</span></label>
+            <textarea class="field__control field__control--area" id="descripcion" name="descripcion" rows="5" required aria-describedby="err-descripcion" placeholder="Contanos qué necesitás con el mayor detalle posible."></textarea>
+            <p class="field__error" id="err-descripcion" hidden>Describí lo que necesitás.</p>
+          </div>
+
+          <div class="flow__actions">
+            <button type="submit" class="btn btn--solid" id="btn-revisar">Revisar solicitud <i class="fa-solid fa-arrow-right btn__arrow" aria-hidden="true"></i></button>
+          </div>
+
+          <p class="flow__privacidad">Tus datos se usan únicamente para responder tu solicitud. No se publican ni se comparten.</p>
+        </fieldset>
+
+        <!-- Paso 3: revisión -->
+        <div class="flow__paso" id="paso-resumen" tabindex="-1" hidden>
+          <h3 class="flow__titulo" id="resumen-titulo">Revisá tu solicitud</h3>
+
+          <dl class="resumen" id="resumen"></dl>
+
+          <div class="status status--warn" role="status" id="estado-envio">
+            <span class="status__icon" aria-hidden="true"><i class="fa-solid fa-triangle-exclamation" id="icono-estado"></i></span>
+            <div>
+              <p class="status__titulo" id="estado-titulo">Solicitud preparada · envío no habilitado todavía</p>
+              <p class="status__texto" id="estado-texto">Tus datos están listos y se conservan en pantalla. El canal oficial de recepción de Estalingrado Corp aún no está configurado, así que por ahora no podés enviarla. Podés volver a editar todo lo que quieras.</p>
+            </div>
+          </div>
+
+          <div class="flow__actions">
+            <button type="button" class="btn btn--outline" id="btn-editar">Editar datos</button>
+            <button type="button" class="btn btn--solid" id="btn-enviar" disabled aria-describedby="estado-envio">Enviar solicitud <i class="fa-solid fa-arrow-right btn__arrow" aria-hidden="true"></i></button>
+            <button type="button" class="btn btn--solid" id="btn-nueva" hidden>Nueva solicitud</button>
+          </div>
+        </div>
+
+      </form>
+    </div>
+  </section>
+
+  <!-- CONTACTO -->
+  <section class="section" id="contacto" aria-labelledby="contacto-title">
+    <div class="container container--narrow">
+      <div class="section__head reveal">
+        <p class="section__label"><span class="section__line" aria-hidden="true"></span>Contacto</p>
+        <h2 class="section__title" id="contacto-title">Canales <span class="tg">oficiales</span></h2>
+        <p class="section__desc">
+          Estalingrado Corp · Salta Capital, Argentina (zona sur).
+        </p>
+      </div>
+
+      <!-- TODO: teléfono y correo oficial cuando se verifiquen en el sitio institucional -->
+      <!-- El formulario de recepción vive en la sección #recepcion -->
+
+      <ul class="contact-list reveal">
+        <li class="contact-list__item">
+          <span class="contact-list__icon" aria-hidden="true"><i class="fa-brands fa-youtube"></i></span>
+          <div>
+            <p class="contact-list__label">YouTube</p>
+            <a class="contact-list__value" href="https://www.youtube.com/@Estalingradocorp" target="_blank" rel="noopener">@Estalingradocorp</a>
+          </div>
+        </li>
+        <li class="contact-list__item">
+          <span class="contact-list__icon" aria-hidden="true"><i class="fa-brands fa-facebook"></i></span>
+          <div>
+            <p class="contact-list__label">Facebook</p>
+            <a class="contact-list__value" href="https://web.facebook.com/estalingradocorp" target="_blank" rel="noopener">estalingradocorp</a>
+          </div>
+        </li>
+        <li class="contact-list__item">
+          <span class="contact-list__icon" aria-hidden="true"><i class="fa-brands fa-x-twitter"></i></span>
+          <div>
+            <p class="contact-list__label">X (Twitter)</p>
+            <a class="contact-list__value" href="https://x.com/estalingrado27" target="_blank" rel="noopener">@estalingrado27</a>
+          </div>
+        </li>
+        <li class="contact-list__item">
+          <span class="contact-list__icon" aria-hidden="true"><i class="fa-brands fa-telegram"></i></span>
+          <div>
+            <p class="contact-list__label">Telegram</p>
+            <a class="contact-list__value" href="https://t.me/estalingradocorp" target="_blank" rel="noopener">t.me/estalingradocorp</a>
+          </div>
+        </li>
+      </ul>
+    </div>
+  </section>
+
+</main>
+
+<!-- FOOTER -->
+<footer class="site-footer">
+  <div class="container">
+    <div class="glow-line" aria-hidden="true"></div>
+    <div class="site-footer__inner">
+      <p class="site-footer__copy">Estalingrado Corp. © <span id="year"></span></p>
+
+      <div class="site-footer__social">
+        <a href="https://www.youtube.com/@Estalingradocorp" target="_blank" rel="noopener" title="YouTube" aria-label="YouTube"><i class="fa-brands fa-youtube" aria-hidden="true"></i></a>
+        <a href="https://web.facebook.com/estalingradocorp" target="_blank" rel="noopener" title="Facebook" aria-label="Facebook"><i class="fa-brands fa-facebook" aria-hidden="true"></i></a>
+        <a href="https://x.com/estalingrado27" target="_blank" rel="noopener" title="X (Twitter)" aria-label="X (Twitter)"><i class="fa-brands fa-x-twitter" aria-hidden="true"></i></a>
+        <a href="https://t.me/estalingradocorp" target="_blank" rel="noopener" title="Telegram" aria-label="Telegram"><i class="fa-brands fa-telegram" aria-hidden="true"></i></a>
+      </div>
+
+      <p class="site-footer__status">
+        <span class="site-footer__status-dot" aria-hidden="true"></span>
+        SYS: ONLINE&nbsp;&nbsp;|&nbsp;&nbsp;SEC: CLR&nbsp;&nbsp;|&nbsp;&nbsp;REG: AR
+      </p>
+    </div>
+  </div>
+</footer>
+
+<script src="js/config.js"></script>
+<script src="js/main.js"></script>
+</body>
+</html>

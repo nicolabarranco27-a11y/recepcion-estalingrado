@@ -1,0 +1,204 @@
+# Bitácora de sesiones — Estalingrado Corp (recepción de clientes y sistema de gestión)
+# Formato: cronología breve de cada sesión de trabajo con el asistente.
+# Sesiones anteriores a hoy no tienen fecha exacta registrada; se ordenan por secuencia.
+
+============================================================
+SESIÓN 1 — Auditoría de la página institucional (Etapa 1)
+============================================================
+- Se auditió la página de referencia (estalingradocorp.github.io) en solo lectura.
+- Se extrajo la identidad verificada: fondo #000, azules #2563eb/#3b82f6/#60a5fa/#1d4ed8,
+  degradado .tg, Inter + JetBrains Mono, Font Awesome 6.5.1, navbar glass, tarjetas glass.
+- Se verificaron datos de contacto en empresa.html: Salta Capital (zona sur); redes
+  YouTube/Facebook/X/Telegram. Teléfono y correo NO publicados → no se inventaron.
+- Se dejó claro: no modificar el sitio institucional; crear proyecto aparte.
+
+============================================================
+SESIÓN 2 — Base del proyecto (Etapa 2)
+============================================================
+- Se creó la estructura: index.html, css/styles.css, js/main.js, assets/ (logo.jpg,
+  favicon.jpg descargados del sitio oficial), README.md.
+- Secciones: navbar con menú móvil accesible, hero con CTA, dos tarjetas de servicios
+  (#servicios), sección recepción preparada, contacto (con id duplicado resuelto:
+  input renombrado medio-contacto), footer con año dinámico.
+- Se replicaron los patrones institucionales (pill/badge, botones uppercase, encabezados
+  con línea azul, glow-line del footer) sin frameworks ni build.
+
+============================================================
+SESIÓN 3 — Flujo de recepción (Etapa 3)
+============================================================
+- Stepper accesible de 3 pasos: Servicio → Datos → Revisión.
+- Validación en cliente: aria-invalid, mensajes err-*, foco al primer campo inválido,
+  corrección en línea al escribir; campos del grupo inactivo deshabilitados.
+- Revisión armada solo con textContent (XSS: HTML del usuario siempre literal).
+- Envío deshabilitado a propósito: ENVIO = { tipo: null, destino: null } en js/main.js;
+  enviarSolicitud() retorna no-habilitado; botón Enviar siempre deshabilitado;
+  #estado-envio informa que nada se envió; nunca se borran datos ni se simula éxito.
+
+============================================================
+SESIÓN 4 — Bug + Auditoría en navegador real (Etapa 4 · 18/10/2026)
+============================================================
+- BUG encontrado y corregido: pulsar tarjeta de servicio en paso 2/3 dejaba el resumen
+  obsoleto (servicio anterior). Corrección: el handler de tarjetas vuelve al paso
+  correspondiente conservando datos.
+- Auditoría completa con Chromium/Playwright contra servidor local (puerto 8123):
+  1440/390/360 px, consola limpia, sin desborde horizontal, recorridos funcionales,
+  XSS, texto extenso, prefers-reduced-motion, menú móvil con Escape.
+- Suites jsdom (63 aserciones) y Playwright en verde. Limitación declarada: la
+  revisión estética fina requiere checklist humano (la asistente no ve imágenes).
+- README actualizado con estado, resultados y checklist manual.
+
+============================================================
+SESIÓN 5 — Sistema de gestión (solo especificación, NO aprobada aún)
+============================================================
+- Se definió en chat la especificación funcional completa (11 secciones): stack
+  React+TS panel / Node+TS+Fastify API / PostgreSQL+Prisma / Zod / /api/v1 /
+  sesiones con cookie; entidades clientes, equipos, servicios técnicos, proyectos web,
+  tickets, presupuestos, facturación y reportes; estados de 3-5 por entidad.
+- Plan de 8 etapas de implementación propuesto.
+- Auditoría de solo lectura: en la carpeta solo existe la recepción; sin Git, backend,
+  panel, Prisma ni .env. Conclusión: DETENTE — AUDITORÍA COMPLETADA. Sin implementar nada.
+- Acuerdo: primero aprobar la especificación, versionarla en el repo y hacer git init.
+
+============================================================
+SESIÓN 6 — 19/10/2026 — Rediseño visual + desduplicación + documentación
+============================================================
+- Pedido del usuario: (a) fondo con orbes azules/violetas en CSS puro (decisión propia:
+  CSS sobre canvas JS); (b) reorganizar la recepción eliminando la selección de servicio
+  duplicada, conservando el flujo de 3 pasos; (c) NO habilitar envío ni BD; (d) crear
+  documentación completa y esta bitácora; (e) verificar y detener al final.
+- index.html: capa .orbs con 5 orbes decorativos (aria-hidden, sin eventos); aviso inicial
+  #recepcion-aviso con enlace a #servicios; stepper y formulario ocultos hasta elegir;
+  ítem 01 "Servicio" se marca completado con el nombre elegido; línea informativa
+  #servicio-actual; eliminados del formulario: radios de servicio, btn-datos,
+  err-servicio, btn-volver-servicio y el botón "Atrás" redundante.
+- css/styles.css: estilos .orbs (fijos, blur 90px, keyframes orbe-drift 45-65 s),
+  .aviso y .flow__servicio; borrado el bloque muerto .service-option* (~80 líneas);
+  orbes estáticos con prefers-reduced-motion.
+- js/main.js: estado servicioActual; abrirFormulario() desde las tarjetas; irAPaso(2|3);
+  cambio de servicio en vivo (si se está en Revisión se vuelve a Datos); ENVIO intacto.
+- Pruebas reescritas para el nuevo flujo y en verde (19/10/2026):
+  jsdom 65/65 · Playwright visual 54/54 (1440/390/360) · Playwright extra 29/29.
+  Falso positivo corregido en la suite: el detector de desborde ahora ignora la capa
+  .orbs (salen del viewport a propósito y no generan scroll; scrollW === clientW).
+- DOCUMENTACION.md y bitacora.txt creados; README.md actualizado.
+- FIN DE LA SESIÓN: se detuvo a pedido y se espera la revisión visual humana
+  (checklist del README) antes de seguir.
+
+============================================================
+SESIÓN 7 — 19/10/2026 — Correcciones tras la revisión del usuario
+============================================================
+Feedback recibido (dos puntos):
+a) El fondo estaba mal: no había que pintar la página con orbes de color
+   difuminados, sino IMITAR el fondo dinámico de la página institucional
+   (sus partículas/orbes flotantes unidas por líneas).
+b) El formulario estaba roto: solo se pidió NO repetir las tarjetas dentro del
+   formulario (ya están a la vista en #servicios). El formulario se despliega
+   al tocar una tarjeta, según corresponda.
+
+Correcciones aplicadas:
+- Fondo: se borró la capa .orbs de blobs CSS y su CSS. Ahora hay un canvas
+  <canvas id="fondo-particulas"> fijo (z-index:-1, sin eventos, aria-hidden)
+  que replica el canvas #pc de la referencia: hasta 110 orbes de 0.9-3.5 px
+  con halo, velocidad ±0.15 px/cuadro, opacidad 0.15-0.6, líneas de unión a
+  <120 px con alpha 0.07·(1-d/120) y grosor 0.5 px, envoltura toroidal, resize.
+  Colores: azules #2563eb/#3b82f6 y un tercio de violeta #7c3aed.
+  prefers-reduced-motion: se dibuja una vez y no se anima. Sin dependencias.
+- Formulario: se eliminaron los elementos agregados de más en la sesión anterior
+  (el aviso #recepcion-aviso con su CSS y la línea #servicio-actual con su CSS).
+  Se restauró la descripción original de la sección. Queda exactamente lo
+  pedido: formulario sin el paso de selección duplicado, desplegándose en el
+  paso 2 al tocar una tarjeta de #servicios.
+- Suites actualizadas y en verde (19/10/2026): jsdom 62/62 (test-recepcion)
+  + 11/11 (test-tecnico); Playwright visual 64/64 (1440/390/360, con píxeles
+  del canvas verificados); Playwright extra 26/26 (incluye orbes estáticos
+  con movimiento reducido: dos capturas idénticas).
+- Se borró la suite obsoleta etapa4-repro.js (reproducía el bug viejo ya
+  corregido y cubierto); test-tecnico.js pasó de radios a tarjeta.
+- DOCUMENTACION.md y README.md actualizados con lo corregido.
+- FIN DE LA SESIÓN: se detiene y se espera la revisión del usuario.
+
+============================================================
+SESIÓN 8 — 19/10/2026 — Tipografía y formulario más legibles
+============================================================
+Pedido: "mejorar la tipografía y el formulario, tiene que ser legible fácilmente
+e intuitivo". Definido con el usuario antes de tocar nada: alcance SOLO la
+sección de recepción (identidad intacta) y mejora VISIBLE (no sutil).
+
+Aplicado:
+- Jerarquía dentro del formulario: título de paso 1.125rem -> 1.375rem y
+  subtítulos de grupo con regla fina (.flow__subtitulo): "Tus datos",
+  "Equipo y problema", "Tu sitio web", "Qué necesitás".
+- Labels de 11px a 13px semibold y más brillantes; inputs de mono 14px a
+  Inter 16px (mejor lectura y sin zoom automático en iOS) con alto mínimo 48px
+  y subrayado reforzado; placeholder legible y placeholders de ejemplo
+  (nombre y contacto).
+- Nota "Los campos marcados con * son obligatorios" arriba del formulario;
+  el placeholder del textarea pasa a ser un ejemplo concreto del servicio
+  elegido (cambia en aplicarServicio() junto a las etiquetas).
+- Hints a 13px, errores a 14px semibold, stepper a 12px con paso activo en
+  bold, resumen con valores a 16px, caja de estado a 15px, botones del flujo
+  de 48px con flecha de avance.
+- Todo acotado a #recepcion/.flow; el resto de la página sin cambios.
+- Suites en verde tras los cambios: jsdom 62/62 + 11/11; visual 64/64;
+  extra 26/26 (ninguna aserción dependía de los tamaños modificados).
+- DOCUMENTACION.md (§4.4 y Etapa 6) y README.md (checklist) actualizados.
+- FIN DE LA SESIÓN: se detiene y se espera la revisión visual del usuario.
+
+============================================================
+SESIÓN 9 — 19/10/2026 — Supabase + panel de solicitudes
+============================================================
+Pedido aprobado: conectar la recepción con Supabase y construir el panel admin
+dentro del mismo sitio, explicando paso a paso (el usuario recién aprende a
+programar), actualizar la documentación y subir el repo.
+
+Decisiones tomadas con el usuario:
+- Supabase: solo tiene cuenta, todavía NO creó el proyecto. La URL y la anon key
+  se pegan después en js/config.js.
+- Panel v1: solo solicitudes (sin clientes, facturación ni presupuestos).
+- El envío público se habilita ahora (queda activo al configurar Supabase).
+- Stack: vanilla sin build, igual que el resto de la página.
+- GitHub no hace falta para conectar Supabase; solo para publicar. El dominio
+  y el correo (propuesto estalingradocorp.servicios@gmail.com) quedan para más
+  adelante.
+
+Implementado:
+- supabase/schema.sql: tablas solicitudes y admins, índices, trigger
+  tocar_actualizado_en, RLS (público solo inserta con límites; admins leen y
+  actualizan), grants/revokes e instrucciones de alta del admin. Re-ejecutable.
+- supabase/INSTRUCCIONES.md: guía para principiantes (crear proyecto en São
+  Paulo, copiar URL/anon key, ejecutar SQL, crear usuario Auto Confirm, insertar
+  UUID en admins, probar con npx http-server, seguridad y troubleshooting).
+- js/config.js: window.CONFIG_SUPABASE con url/anonKey vacías (override-able
+  para pruebas).
+- index.html: carga config.js antes de main.js, honeypot #hp-empresa, nota de
+  privacidad, id="icono-estado" y botón #btn-nueva oculto.
+- css/styles.css: .status--ok/.status--error, .hp, .flow__privacidad.
+- js/main.js: ENVIO lee CONFIG_SUPABASE; POST REST con apikey/Authorization/
+  Prefer y timeout 20 s; estados enviando/éxito/error; éxito con "Nueva
+  solicitud" (reset al paso 2); error conserva datos y permite reintentar;
+  honeypot confirma sin enviar. Sin config, el botón sigue deshabilitado y
+  avisa (comportamiento anterior intacto).
+- admin.html + css/admin.css + js/admin.js: login por REST (sessionStorage,
+  refresh ante 401), stats por estado, lista (máx. 500, orden desc), búsqueda y
+  filtros, detalle en <dialog>, cambio de estado + notas con PATCH, CSV con BOM
+  y ";", render 100% textContent, noindex y robots.txt. Sin config, login
+  deshabilitado con aviso.
+- Pruebas nuevas fuera del proyecto: test-supabase.js (jsdom, 48/48) y
+  test-admin.js (Chromium con page.route, 60/60). Las 4 suites anteriores
+  siguen verdes (62+11, 64, 26). Las de Etapa 7 usan red simulada: falta probar
+  contra el Supabase real del usuario.
+- README.md, DOCUMENTACION.md (§1, §2, §3, §4.2, §4.5, §5, §6, §7, §8) y esta
+  bitácora actualizados. El plan viejo React/Node/Fastify/Prisma quedó
+  descartado para esta etapa.
+- git init + primer commit local. NO se pusheó: hay dos cuentas de gh
+  (laboutiquecatydog activa y nicolabarranco27-a11y inactiva) y falta que el
+  usuario elija cuenta/nombre/visibilidad del repo. Tampoco se habilitó GitHub
+  Pages ni dominio.
+
+Pendiente del usuario:
+1. Crear el proyecto Supabase y pegar URL + anon key en js/config.js.
+2. Ejecutar supabase/schema.sql en el SQL Editor.
+3. Crear el usuario admin (Auto Confirm) e insertar su UUID en admins.
+4. Decir con qué cuenta de GitHub subir el repo.
+
+- FIN DE LA SESIÓN: se detiene y se espera la revisión del usuario.

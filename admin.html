@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Panel · Estalingrado Corp</title>
+<meta name="robots" content="noindex, nofollow, noarchive">
+<meta name="description" content="Panel interno de Estalingrado Corp. Solo administradores.">
+<link rel="icon" type="image/jpeg" href="assets/favicon.jpg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400;500;600;700&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<link rel="stylesheet" href="css/styles.css">
+<link rel="stylesheet" href="css/admin.css">
+</head>
+<body class="admin">
+
+<a class="skip-link" href="#admin-contenido">Saltar al contenido</a>
+
+<header class="admin-head">
+  <div class="admin-head__inner">
+    <p class="admin-head__brand">Estalingrado <span class="tg">Corp</span> <span class="admin-head__tag">Panel</span></p>
+    <div class="admin-head__actions">
+      <span class="admin-head__user" id="admin-usuario" hidden></span>
+      <button type="button" class="btn btn--outline btn--sm" id="btn-salir" hidden>Salir</button>
+    </div>
+  </div>
+</header>
+
+<main id="admin-contenido" class="admin-main">
+
+  <!-- ===================== LOGIN ===================== -->
+  <section class="admin-login" id="vista-login" aria-labelledby="login-titulo">
+    <p class="admin-login__eyebrow">Acceso interno</p>
+    <h1 class="admin-login__titulo" id="login-titulo">Panel de solicitudes</h1>
+    <p class="admin-login__texto">Ingresá con el correo y la contraseña del usuario administrador creado en Supabase.</p>
+
+    <form id="form-login" novalidate>
+      <div class="field">
+        <label class="field__label" for="login-email">Correo electrónico</label>
+        <input class="field__control" type="email" id="login-email" autocomplete="username" required placeholder="admin@correo.com">
+      </div>
+      <div class="field">
+        <label class="field__label" for="login-password">Contraseña</label>
+        <input class="field__control" type="password" id="login-password" autocomplete="current-password" required placeholder="••••••••">
+      </div>
+      <p class="admin-error" id="login-error" role="alert" hidden></p>
+      <div class="flow__actions">
+        <button type="submit" class="btn btn--solid" id="btn-login">Ingresar <i class="fa-solid fa-arrow-right btn__arrow" aria-hidden="true"></i></button>
+      </div>
+    </form>
+
+    <p class="admin-login__nota" id="login-nota" hidden></p>
+    <p class="admin-login__volver"><a href="index.html">← Volver a la página</a></p>
+  </section>
+
+  <!-- ===================== PANEL ===================== -->
+  <section id="vista-panel" hidden aria-labelledby="panel-titulo">
+    <div class="admin-panel__head">
+      <div>
+        <h1 class="admin-panel__titulo" id="panel-titulo">Solicitudes recibidas</h1>
+        <p class="admin-panel__texto">Los pedidos que llegan desde la página. Los cambios de estado y las notas son internos.</p>
+      </div>
+    </div>
+
+    <div class="admin-stats" id="admin-stats" aria-label="Resumen por estado"></div>
+
+    <div class="admin-toolbar" role="search" aria-label="Filtros de solicitudes">
+      <label class="admin-toolbar__campo">
+        <span class="field__label">Buscar</span>
+        <input class="field__control" type="search" id="filtro-busqueda" placeholder="Nombre, contacto o descripción">
+      </label>
+      <label class="admin-toolbar__campo">
+        <span class="field__label">Estado</span>
+        <select class="field__control" id="filtro-estado">
+          <option value="">Todos</option>
+          <option value="nueva">Nueva</option>
+          <option value="en_revision">En revisión</option>
+          <option value="respondida">Respondida</option>
+          <option value="cerrada">Cerrada</option>
+        </select>
+      </label>
+      <label class="admin-toolbar__campo">
+        <span class="field__label">Servicio</span>
+        <select class="field__control" id="filtro-servicio">
+          <option value="">Todos</option>
+          <option value="tecnico">Servicio técnico</option>
+          <option value="web">Sitio web</option>
+        </select>
+      </label>
+      <div class="admin-toolbar__acciones">
+        <button type="button" class="btn btn--outline btn--sm" id="btn-recargar"><i class="fa-solid fa-rotate" aria-hidden="true"></i> Actualizar</button>
+        <button type="button" class="btn btn--outline btn--sm" id="btn-csv"><i class="fa-solid fa-file-csv" aria-hidden="true"></i> Exportar CSV</button>
+      </div>
+    </div>
+
+    <p class="admin-info" id="admin-info" role="status" aria-live="polite"></p>
+
+    <div class="admin-lista" id="lista-solicitudes"></div>
+    <p class="admin-vacio" id="admin-vacio" hidden>No hay solicitudes con esos filtros.</p>
+  </section>
+
+</main>
+
+<!-- ===================== DETALLE ===================== -->
+<dialog class="admin-dialog" id="dialog-solicitud" aria-labelledby="dialog-titulo">
+  <div class="admin-dialog__caja">
+    <header class="admin-dialog__head">
+      <h2 class="admin-dialog__titulo" id="dialog-titulo">Solicitud</h2>
+      <button type="button" class="admin-dialog__cerrar" id="btn-cerrar-dialog" aria-label="Cerrar"><i class="fa-solid fa-xmark" aria-hidden="true"></i></button>
+    </header>
+
+    <dl class="admin-detalle" id="detalle-datos"></dl>
+
+    <div class="field">
+      <label class="field__label" for="detalle-estado">Estado</label>
+      <select class="field__control" id="detalle-estado">
+        <option value="nueva">Nueva</option>
+        <option value="en_revision">En revisión</option>
+        <option value="respondida">Respondida</option>
+        <option value="cerrada">Cerrada</option>
+      </select>
+    </div>
+
+    <div class="field">
+      <label class="field__label" for="detalle-notas">Notas internas <span class="field__optional">(solo admins)</span></label>
+      <textarea class="field__control field__control--area" id="detalle-notas" rows="4" placeholder="Ej.: le respondí por correo el 19/10…"></textarea>
+    </div>
+
+    <p class="admin-error" id="detalle-error" role="alert" hidden></p>
+
+    <div class="flow__actions">
+      <button type="button" class="btn btn--outline" id="btn-cancelar-detalle">Cerrar</button>
+      <button type="button" class="btn btn--solid" id="btn-guardar">Guardar cambios</button>
+    </div>
+  </div>
+</dialog>
+
+<script src="js/config.js"></script>
+<script src="js/admin.js"></script>
+</body>
+</html>
