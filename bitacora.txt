@@ -259,3 +259,47 @@ Pendiente:
 - Dominio propio, correo oficial y revisión visual humana del checklist.
 
 - FIN DE LA SESIÓN: se detiene y se espera la revisión del usuario.
+
+============================================================
+SESIÓN 11 - 19/10/2026 - Endurecimiento de seguridad y acceso móvil
+============================================================
+Pedido del usuario: actualizar git y toda la documentación, explicar cómo entrar
+desde el celular y asegurar una buena ciberseguridad.
+
+Auditoría hecha:
+- Sin claves privadas en el repositorio: la unica clave es la anon (publica por
+  diseno); no hay service_role en ningun archivo.
+- Sin scripts, estilos ni manejadores inline en el HTML (permite una CSP
+  estricta sin unsafe-inline). Sin innerHTML/eval en el JS.
+- Revisados: RLS de Supabase, exportacion CSV, sesion del panel, robots/noindex.
+
+Cambios aplicados:
+- supabase/schema.sql: trigger anti-spam solicitudes_limitar +
+  limitar_solicitudes() (SECURITY DEFINER, search_path=public) que rechaza la
+  cuarta solicitud del mismo contacto en 10 minutos; indice
+  (contacto, creado_en desc); nota sobre apagar los registros y el Site URL.
+- js/main.js: al recibir el error DEMASIADAS_SOLICITUDES muestra "Esperá unos
+  minutos" (lee respuesta.text() con guarda para los fetch simulados) y
+  conserva los datos.
+- js/admin.js: celdaCsv() antepone apostrofo a las celdas que empiezan con
+  = + - @ (o tabulacion/retorno) para neutralizar la inyeccion de formulas en
+  Excel/Sheets.
+- index.html y admin.html: meta Content-Security-Policy (scripts propios,
+  estilos/fuentes solo de los CDN usados, conexiones a *.supabase.co,
+  object-src/frame-src none, base-uri/form-action self,
+  upgrade-insecure-requests) y meta referrer strict-origin-when-cross-origin.
+- Pruebas: test-supabase.js suma la seccion F (anti-spam) -> 53 aserciones.
+  verificar-csp.js nuevo: local y publicado con 0 cortes por CSP, 0 errores de
+  consola, fuentes, iconos y logo ok. Bateria completa en verde (62+11+64+26+53+60
+  = 276). GitHub Pages confirmado con Enforce HTTPS activo.
+- Documentacion: README (seccion Seguridad + pasos de acceso desde Android y
+  iPhone), DOCUMENTACION (§4.6 endurecimiento, §5 y §6/§7 actualizados) y esta
+  bitacora.
+
+Pendiente del usuario:
+- Re-ejecutar supabase/schema.sql en el SQL Editor para activar el anti-spam.
+- Apagar "Allow new users to sign up" y poner el Site URL publicado.
+- Contrasena larga y unica para el panel; verificacion en dos pasos en GitHub y
+  Supabase.
+
+- FIN DE LA SESIÓN: se detiene y se espera la revisión del usuario.

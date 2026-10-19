@@ -188,6 +188,38 @@ Verificado: 4 suites en verde tras los cambios (62+11 jsdom, 64 visual,
 - **Móvil**: stats y tarjetas se reacomodan; el diálogo ocupa el ancho completo;
   sin desborde horizontal a 360 px (verificado).
 
+### 4.6 Endurecimiento de seguridad (19/10/2026)
+
+Revisión completa pedida por el usuario tras conectar Supabase. Cambios:
+
+- **Anti-spam en la base**: trigger `solicitudes_limitar` /
+  `limitar_solicitudes()` (función `SECURITY DEFINER` con `search_path = public`
+  para contar filas sin que la RLS la frene) que rechaza la cuarta solicitud del
+  mismo `contacto` en 10 minutos con
+  `raise exception 'DEMASIADAS_SOLICITUDES…'`. Índice
+  `(contacto, creado_en desc)` para que el conteo sea barato.
+- **Mensaje claro en el frontend**: `enviarASupabase()` lee el cuerpo del error
+  (`respuesta.text()`, con guarda por si el `fetch` simulado no lo tiene) y, si
+  contiene `DEMASIADAS_SOLICITUDES`, muestra "Esperá unos minutos" en lugar del
+  error genérico; los datos siguen en pantalla.
+- **CSP en `index.html` y `admin.html`**:
+  `default-src 'self'; img-src 'self' data:; style-src 'self' <cdnjs> <fonts.googleapis>;
+  font-src <cdnjs> <fonts.gstatic>; script-src 'self'; connect-src 'self'
+  https://*.supabase.co; object-src 'none'; frame-src 'none'; base-uri 'self';
+  form-action 'self'; upgrade-insecure-requests`. No hay scripts, estilos ni
+  manejadores inline en el HTML, así que no hizo falta `unsafe-inline`. Se sumó
+  `meta referrer = strict-origin-when-cross-origin`.
+- **CSV**: `celdaCsv()` antepone un apóstrofo a las celdas que empiezan con
+  `= + - @` (o tabulación/retorno) para neutralizar la inyección de fórmulas en
+  Excel/Sheets.
+- **Verificación**: `verificar-csp.js` (Chromium) sobre local y sobre la página
+  publicada: 0 cortes por CSP, 0 errores de consola, íconos de Font Awesome y
+  logo cargados. `Enforce HTTPS` de GitHub Pages confirmado activo. Auditoría de
+  secretos: no hay `service_role` ni claves privadas en el repositorio; la
+  `anon key` es pública por diseño.
+- **Pendiente del usuario**: apagar "Allow new users to sign up", contraseña
+  larga y única para el panel y verificación en dos pasos en GitHub/Supabase.
+
 ## 5. Pruebas (07/10 → 19/10/2026)
 
 Las suites viven **fuera del proyecto** (carpeta temporal de trabajo), porque
@@ -199,11 +231,13 @@ el proyecto no usa Node/build. Son 6 suites (4 de recepción + 2 de Etapa 7):
 | `test-tecnico.js` | jsdom | Camino del servicio técnico: validación de `tipo-problema`, dispositivo opcional, resumen y edición. | 11/11 PASS |
 | `etapa4-visual.js` | Chromium real | 1440/390/360 px: sin desborde horizontal, consola limpia, recursos locales OK, orbes (canvas fijo sin eventos, ajustado al viewport y **con píxeles dibujados**), recorrido completo tarjeta→errores→revisión, caracteres especiales/emoji, XSS, editar conserva datos. | 64/64 PASS |
 | `etapa4-extra.js` | Chromium real | Anclas vs navbar, skip link, foco visible con teclado, Enter implícito, cambio de servicio en vivo sin resumen obsoleto, campos de grupo preservados, texto >2000 chars, labels/`aria-describedby`, stepper coherente, `prefers-reduced-motion` (orbes estáticos: dos capturas idénticas), solapamientos @360. | 26/26 PASS |
-| `test-supabase.js` | jsdom | `CONFIG_SUPABASE` simulado: botón habilitado, POST a `/rest/v1/solicitudes`, URL/headers/`Prefer`, payload snake_case por servicio, éxito + "Nueva solicitud", error de red con datos conservados y reintento, honeypot sin `fetch`. | 48/48 PASS |
+| `test-supabase.js` | jsdom | `CONFIG_SUPABASE` simulado: botón habilitado, POST a `/rest/v1/solicitudes`, URL/headers/`Prefer`, payload snake_case por servicio, éxito + "Nueva solicitud", error de red con datos conservados y reintento, honeypot sin `fetch`, y respuesta anti-spam (título y texto específicos). | 53/53 PASS |
 | `test-admin.js` | Chromium real | Panel con API simulada por `page.route` (incluye preflight CORS): login inválido/válido, sesión, stats, lista, XSS, filtros, detalle, PATCH 204, CSV (BOM/`;`), recarga con sesión, logout y móvil 360 sin desborde. | 60/60 PASS |
 
-Las suites de Etapa 7 usan `window.fetch` / `page.route` simulados, no un
-proyecto Supabase real: falta validar con el proyecto del usuario (pendiente).
+Las suites de Etapa 7 usan `window.fetch` / `page.route` simulados. Desde el
+19/10/2026 el proyecto real ya está conectado y probado a mano de punta a punta
+(envío público + login + fila visible); además se comprobó con la anon key que
+la lectura pública devuelve 0 filas y que las escrituras inválidas se rechazan.
 
 Verificado lo funcional y geométrico; **no** se pudo verificar automáticamente
 la estética subjetiva (la asistente no ve imágenes) → checklist manual en
@@ -223,7 +257,10 @@ y seguir con HTML/CSS/JS vanilla. Lo implementado es:
     `notas_internas`.
   - `public.admins`: `user_id uuid` → `auth.users` (PK), `email`, `creado_en`.
   - Trigger `tocar_actualizado_en` para mantener `actualizado_en`.
-  - Índices por fecha/estado y por servicio.
+  - Trigger `solicitudes_limitar` (anti-spam: 3 solicitudes por contacto cada
+    10 minutos) con función `SECURITY DEFINER`.
+  - Índices por fecha/estado, por servicio y por `(contacto, creado_en desc)`
+    para el conteo anti-spam.
 - **Seguridad (RLS)**:
   - El público (anon) solo puede **insertar** en `solicitudes`, con límites de
     longitud, `estado = 'nueva'` y `notas_internas` nulo.
@@ -241,33 +278,39 @@ y seguir con HTML/CSS/JS vanilla. Lo implementado es:
   notas internas, CSV). No incluye clientes, equipos, presupuestos, facturación
   ni envío de correos; quedan como futuras etapas si se piden.
 - **Límites conscientes**: la lista trae hasta 500 filas (sin paginación
-  todavía), no hay tiempo real ni notificaciones, y el envío depende de que el
-  usuario complete `js/config.js`. Nada de esto se probó contra un Supabase real.
+  todavía), no hay tiempo real ni notificaciones, y el envío depende de que
+  `js/config.js` esté completo. El conjunto está conectado y probado contra el
+  proyecto Supabase real del usuario el 19/10/2026 (envío, panel, RLS y
+  anti-spam).
 
-Pasos que debe hacer el usuario (resumidos; detalle en la guía):
+Pasos del usuario (resueltos el 19/10/2026; detalle en la guía):
 
 1. Crear el proyecto en Supabase y copiar **Project URL** + **anon key** en
-   `js/config.js`.
-2. Ejecutar `supabase/schema.sql` completo en el SQL Editor.
+   `js/config.js`. ✔
+2. Ejecutar `supabase/schema.sql` completo en el SQL Editor. ✔ (re-ejecutar tras
+   el endurecimiento del §4.6 para activar el anti-spam)
 3. Crear el usuario admin en Authentication (Auto Confirm) e insertar su UUID
-   en `public.admins`.
-4. Probar el envío en `index.html` y el login en `admin.html`.
+   en `public.admins`. ✔
+4. Probar el envío en `index.html` y el login en `admin.html`. ✔
+5. *(hacer)* Apagar "Allow new users to sign up" en Authentication.
 
 ## 7. Pendientes conocidos
 
 1. Revisión visual humana del rediseño y del panel (checklist del `README.md`).
-2. **Configurar Supabase**: crear el proyecto, completar `js/config.js`,
-   ejecutar `supabase/schema.sql` y crear el admin (lo hace el usuario).
-3. Probar el envío y el panel contra el proyecto Supabase real.
+2. **Supabase**: proyecto creado, `js/config.js` completo, `schema.sql` ejecutado
+   y admin habilitado. ✔ Falta *(hacer)* apagar "Allow new users to sign up" y
+   re-ejecutar `schema.sql` para activar el anti-spam del §4.6.
+3. Envío y panel probados contra el proyecto Supabase real. ✔
 4. Repositorio en GitHub: **subido** a
    <https://github.com/nicolabarranco27-a11y/recepcion-estalingrado> (público,
-   rama `main`). GitHub Pages activado en
-   <https://nicolabarranco27-a11y.github.io/recepcion-estalingrado/>; el primer
-   deploy quedó en cola por el incidente de Actions/Pages del 19/10/2026.
+   rama `main`). GitHub Pages activo con "Enforce HTTPS" en
+   <https://nicolabarranco27-a11y.github.io/recepcion-estalingrado/>.
    Dominio y correo siguen sin configurar.
 5. Verificar teléfono/correo oficiales cuando se publiquen (correo propuesto
    `estalingradocorp.servicios@gmail.com`, sin confirmar).
 6. No publicar ni configurar dominio (fuera de alcance hasta que se pida).
+7. *(hacer)* contraseña fuerte para el panel y verificación en dos pasos en
+   GitHub y Supabase.
 
 ## 8. Limitaciones conocidas
 
@@ -278,8 +321,9 @@ Pasos que debe hacer el usuario (resumidos; detalle en la guía):
 - Las pruebas automatizadas no están versionadas en el proyecto (viven en
   carpeta temporal); si se quiere continuidad conviene llevarlas a `tests/`
   en una futura etapa con Node.
-- Las pruebas de Supabase/panel usan respuestas simuladas: no cubren errores
-  propios del servicio real (proyecto pausado, límites de plan, CORS del
-  dominio final). Se validará al configurar el proyecto del usuario.
+- Las pruebas de Supabase/panel usan respuestas simuladas; no cubren todos los
+  errores propios del servicio real (proyecto pausado, límites de plan, CORS del
+  dominio final). El camino principal ya se validó contra el proyecto real
+  (19/10/2026) y el anti-spam se comprobó con escrituras inválidas rechazadas.
 - La lista del panel está topeada en 500 solicitudes y no tiene paginación ni
   actualización en tiempo real; si el volumen crece habrá que agregarlas.

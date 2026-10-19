@@ -432,7 +432,12 @@
   /* ---------- CSV ---------- */
 
   function celdaCsv(valor) {
-    return '"' + String(valor == null ? '' : valor).replace(/"/g, '""') + '"';
+    var texto = String(valor == null ? '' : valor);
+    /* Anti inyección de fórmulas: si empieza con = + - @ (o tabulación o
+       retorno), se antepone un apóstrofo para que Excel/Sheets lo trate como
+       texto y no ejecute nada. */
+    if (/^[=+\-@\t\r]/.test(texto)) texto = "'" + texto;
+    return '"' + texto.replace(/"/g, '""') + '"';
   }
 
   function exportarCsv() {

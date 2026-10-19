@@ -12,6 +12,8 @@
 --   · Los admins autenticados pueden leer y actualizar solicitudes.
 --   · Nadie puede borrar filas desde la web.
 --   · La tabla admins solo muestra a cada admin su propia fila.
+--   · Anti-spam: un mismo contacto no puede cargar más de 3 solicitudes
+--     cada 10 minutos (frena bots que rellenan el formulario).
 -- ============================================================
 
 create extension if not exists pgcrypto;
@@ -62,6 +64,42 @@ drop trigger if exists solicitudes_tocar_actualizado_en on public.solicitudes;
 create trigger solicitudes_tocar_actualizado_en
 before update on public.solicitudes
 for each row execute function public.tocar_actualizado_en();
+
+-- ---------- Anti-spam ----------
+-- Un mismo contacto no puede cargar más de 3 solicitudes cada 10 minutos.
+-- Es SECURITY DEFINER para poder contar filas sin quedar frenado por RLS, y
+-- fija el search_path (buena práctica de seguridad en Postgres).
+
+create index if not exists solicitudes_contacto_creado_idx
+  on public.solicitudes (contacto, creado_en desc);
+
+create or replace function public.limitar_solicitudes()
+returns trigger
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  recientes integer;
+begin
+  select count(*) into recientes
+  from public.solicitudes s
+  where s.contacto = new.contacto
+    and s.creado_en > now() - interval '10 minutes';
+
+  if recientes >= 3 then
+    raise exception 'DEMASIADAS_SOLICITUDES: este contacto ya envió solicitudes hace muy poco'
+      using errcode = 'P0001';
+  end if;
+
+  return new;
+end;
+$$;
+
+drop trigger if exists solicitudes_limitar on public.solicitudes;
+create trigger solicitudes_limitar
+before insert on public.solicitudes
+for each row execute function public.limitar_solicitudes();
 
 -- ---------- Seguridad a nivel de fila (RLS) ----------
 
@@ -124,4 +162,9 @@ revoke insert, update, delete on public.admins from anon, authenticated;
 --    on conflict (user_id) do nothing;
 --
 -- 3. Verificá: select * from public.admins;
+--
+-- RECOMENDADO (Authentication → Sign In / Up):
+--   · Apagar "Allow new users to sign up": ya no se crea nadie solo.
+--   · (Opcional) Authentication → URL Configuration → Site URL =
+--     https://nicolabarranco27-a11y.github.io/recepcion-estalingrado/
 -- ============================================================

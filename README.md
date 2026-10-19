@@ -145,11 +145,50 @@ no la encuentre. Tres formas de entrar:
   sobre el logo** de la barra superior; el panel se abre en otra pestaña.
 - **Computadora:** abrir esa dirección y usar la estrella del navegador
   (Marcadores → "Panel Estalingrado").
-- **Celular:** menú del navegador → "Agregar a la pantalla de inicio" (queda
-  como un ícono más, igual que una app).
+- **Celular (Android, Chrome):** abrir esa dirección → menú **⋮** (arriba a la
+  derecha) → **"Añadir a pantalla de inicio"** → confirmar. Queda un ícono con
+  el logo: al tocarlo se abre el panel directo (pide la contraseña la primera
+  vez).
+- **Celular (iPhone, Safari):** abrir esa dirección → botón **Compartir**
+  (cuadrado con la flecha hacia arriba) → deslizar y tocar **"Añadir a pantalla
+  de inicio"** → "Añadir". Mismo resultado: un ícono propio.
 
 Verificado con pruebas automatizadas jsdom y Chromium real (ver abajo y en
 `DOCUMENTACION.md`).
+
+## Seguridad
+
+Lo que protege al sitio y a los datos (lo marcado con *(hacer)* depende del
+usuario; el resto ya está en el código):
+
+- **La clave pública no da acceso a los datos.** `js/config.js` solo contiene la
+  `anon key`, pública por diseño. La autorización real está en las políticas RLS
+  de `supabase/schema.sql`: el público **solo inserta** una solicitud nueva, con
+  límites de longitud y sin poder tocar `estado` ni `notas_internas`; leer y
+  actualizar exige ser un admin autenticado. La clave `service_role` no aparece
+  en ninguna parte del repositorio.
+- **Sin registros abiertos.** *(hacer)* Authentication → Sign In / Up → apagar
+  **"Allow new users to sign up"**. Los administradores se crean a mano en el
+  dashboard y se habilitan con su UUID en la tabla `admins`.
+- **Anti-spam.** Un mismo contacto no puede cargar más de 3 solicitudes cada
+  10 minutos (trigger `limitar_solicitudes`); el formulario tiene honeypot y, si
+  se alcanza el límite, muestra un aviso claro en vez de un error genérico.
+- **Contra XSS.** Todo lo que escribe el usuario se pinta con `textContent` (el
+  HTML nunca se interpreta). Además `index.html` y `admin.html` declaran
+  `Content-Security-Policy` (solo scripts propios, estilos y fuentes de los CDN
+  usados y conexiones a `*.supabase.co`) y
+  `referrer: strict-origin-when-cross-origin`.
+- **CSV seguro.** La exportación neutraliza la inyección de fórmulas: las celdas
+  que empiezan con `=`, `+`, `-` o `@` salen como texto.
+- **Panel escondido.** `admin.html` no está enlazado, lleva `noindex` y
+  `robots.txt` lo bloquea. La sesión vive en `sessionStorage` (se borra al
+  cerrar la pestaña) y el token se refresca solo.
+- **HTTPS.** GitHub Pages sirve el sitio por HTTPS con "Enforce HTTPS" activado.
+- **Cuentas.** *(hacer)* contraseña larga y única para el panel (guarda en el
+  gestor de contraseñas), y verificación en dos pasos en GitHub y en Supabase.
+- **Copias y limpieza.** El CSV del panel es la copia de respaldo más simple.
+  Las filas de prueba se borran desde Table Editor (fila → Delete row); nadie
+  puede borrar desde la web.
 
 ## Fondo dinámico con orbes flotantes (Etapa 5)
 

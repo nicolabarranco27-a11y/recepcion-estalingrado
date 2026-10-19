@@ -525,19 +525,39 @@ var ENVIO = (function () {
 
     window.fetch(ENVIO.destino, opciones).then(function (respuesta) {
       window.clearTimeout(temporizador);
-      if (!respuesta.ok) throw new Error('HTTP ' + respuesta.status);
-      enviando = false;
-      marcarEnviada(datos);
-    }).catch(function () {
+      if (respuesta.ok) {
+        enviando = false;
+        marcarEnviada(datos);
+        return null;
+      }
+      var errorHttp = new Error('HTTP ' + respuesta.status);
+      if (respuesta && typeof respuesta.text === 'function') {
+        return respuesta.text().then(function (cuerpo) {
+          if (cuerpo && cuerpo.indexOf('DEMASIADAS_SOLICITUDES') !== -1) {
+            errorHttp.demasiadas = true;
+          }
+          throw errorHttp;
+        }, function () { throw errorHttp; });
+      }
+      throw errorHttp;
+    }).catch(function (error) {
       window.clearTimeout(temporizador);
       enviando = false;
       btnEnviar.setAttribute('aria-busy', 'false');
       btnEnviar.disabled = false;
-      mostrarEstado(
-        'error',
-        'No pudimos enviar la solicitud',
-        'Revisá tu conexión e intentá de nuevo. Tus datos siguen cargados en pantalla.'
-      );
+      if (error && error.demasiadas) {
+        mostrarEstado(
+          'error',
+          'Esperá unos minutos',
+          'Recibimos varias solicitudes desde el mismo contacto hace muy poco. Esperá unos minutos y volvé a intentar; tus datos siguen cargados en pantalla.'
+        );
+      } else {
+        mostrarEstado(
+          'error',
+          'No pudimos enviar la solicitud',
+          'Revisá tu conexión e intentá de nuevo. Tus datos siguen cargados en pantalla.'
+        );
+      }
       btnEnviar.focus();
     });
   }
