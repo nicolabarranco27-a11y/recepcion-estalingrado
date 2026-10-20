@@ -120,8 +120,9 @@ var ENVIO = (function () {
 
   /* ===================== Fondo dinámico: red de orbes flotantes =====================
      Imita el canvas de la página institucional (#pc): orbes que flotan lentamente y
-     se unen con líneas tenues cuando quedan a menos de 120 px. Decorativo: sin
-     eventos, fijo detrás del contenido y estático con movimiento reducido. */
+     se unen con líneas tenues cuando quedan a menos de 120 px. Minimalistas, sin
+     aura alrededor. Decorativo: sin eventos, fijo detrás del contenido y estático
+     con movimiento reducido. */
   (function () {
     var lienzo = document.getElementById('fondo-particulas');
     if (!lienzo || !lienzo.getContext) return;
@@ -163,10 +164,6 @@ var ENVIO = (function () {
     };
 
     Orbe.prototype.dibujar = function () {
-      ctx.beginPath();
-      ctx.arc(this.x, this.y, this.size * 2.6, 0, Math.PI * 2);
-      ctx.fillStyle = 'rgba(' + this.color + ',' + (this.opacidad * .2) + ')';
-      ctx.fill();
       ctx.beginPath();
       ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
       ctx.fillStyle = 'rgba(' + this.color + ',' + this.opacidad + ')';
@@ -232,6 +229,145 @@ var ENVIO = (function () {
     });
   })();
 
+  /* ===================== Escritura del hero (como la página institucional) =====================
+     La pill, el título y el párrafo del hero se escriben carácter por carácter al
+     cargar, con cursor que parpadea mientras escriben (igual que la página oficial
+     de la empresa). El texto vive en el HTML (SEO y accesibilidad) pero se vacía
+     síncronamente al ejecutar este archivo —antes del primer pintado— para que
+     nunca se vea el texto completo para después reescribirlo. El JS reconstruye
+     los nodos originales: el título conserva el span .tg del degradado y los
+     espacios del fuente se colapsan para no pausar la escritura.
+     Con movimiento reducido no se anima: se deja el texto tal cual está. */
+  (function () {
+    if (!window.matchMedia || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+    var VELOCIDAD = 30; // ms por carácter, el mismo ritmo de la página institucional
+
+    var pill = document.querySelector('#inicio .pill');
+    var pillTexto = pill ? pill.lastElementChild : null;
+    var titulo = document.querySelector('#inicio .hero__title');
+    var lead = document.querySelector('#inicio .hero__lead');
+    if (!titulo || !lead) return;
+
+    function segmentosDe(el) {
+      var segmentos = [];
+      for (var i = 0; i < el.childNodes.length; i++) {
+        var n = el.childNodes[i];
+        if (n.nodeType === 3) {
+          if (n.nodeValue) segmentos.push({ texto: n.nodeValue, clase: null });
+        } else if (n.nodeType === 1) {
+          segmentos.push({ texto: n.textContent, clase: n.className || null });
+        }
+      }
+      /* El HTML tiene saltos de línea e indentación dentro del texto: si no se
+         colapsan, se escribirían como "pausas" de caracteres en blanco. */
+      var limpio = segmentos
+        .map(function (s) { return { texto: s.texto.replace(/\s+/g, ' '), clase: s.clase }; })
+        .filter(function (s) { return s.texto.length > 0; });
+      if (limpio.length) {
+        limpio[0].texto = limpio[0].texto.replace(/^ +/, '');
+        limpio[limpio.length - 1].texto = limpio[limpio.length - 1].texto.replace(/ +$/, '');
+        limpio = limpio.filter(function (s) { return s.texto.length > 0; });
+      }
+      return limpio;
+    }
+
+    /* Reconstruye el texto completo en el elemento (para medir su alto) */
+    function montar(el, segmentos) {
+      el.textContent = '';
+      segmentos.forEach(function (s) {
+        if (s.clase) {
+          var span = document.createElement('span');
+          span.className = s.clase;
+          span.textContent = s.texto;
+          el.appendChild(span);
+          return;
+        }
+        el.appendChild(document.createTextNode(s.texto));
+      });
+    }
+
+    function escribir(el, segmentos, alTerminar) {
+      el.textContent = '';
+      var nodos = segmentos.map(function (s) {
+        if (s.clase) {
+          var span = document.createElement('span');
+          span.className = s.clase;
+          el.appendChild(span);
+          return span;
+        }
+        var nodoTexto = document.createTextNode('');
+        el.appendChild(nodoTexto);
+        return nodoTexto;
+      });
+      var cursor = document.createElement('span');
+      cursor.className = 'hero__cursor';
+      cursor.setAttribute('aria-hidden', 'true');
+      cursor.textContent = '▌';
+      el.appendChild(cursor);
+
+      var total = segmentos.reduce(function (n, s) { return n + s.texto.length; }, 0);
+      var i = 0;
+      var reloj = window.setInterval(function () {
+        if (i >= total) {
+          window.clearInterval(reloj);
+          cursor.parentNode.removeChild(cursor);
+          if (alTerminar) alTerminar();
+          return;
+        }
+        var resto = i;
+        for (var k = 0; k < segmentos.length; k++) {
+          if (resto < segmentos[k].texto.length) {
+            nodos[k].textContent += segmentos[k].texto.charAt(resto);
+            break;
+          }
+          resto -= segmentos[k].texto.length;
+        }
+        i++;
+      }, VELOCIDAD);
+    }
+
+    var segPill = pillTexto ? segmentosDe(pillTexto) : null;
+    var segTitulo = segmentosDe(titulo);
+    var segLead = segmentosDe(lead);
+
+    /* Vacía los textos YA, en este mismo tick de ejecución: como main.js corre
+       antes del primer pintado, el navegador nunca llega a mostrar el texto
+       completo. Reserva el alto con las fuentes de respaldo como aproximación
+       inicial (se re-mide exacto cuando cargan las fuentes reales). */
+    var altoTitulo = titulo.offsetHeight;
+    var altoLead = lead.offsetHeight;
+    if (segPill && segPill.length) pillTexto.textContent = '';
+    titulo.textContent = '';
+    lead.textContent = '';
+    titulo.style.minHeight = altoTitulo + 'px';
+    lead.style.minHeight = altoLead + 'px';
+
+    function arrancar() {
+      /* Re-mide con las fuentes cargadas: monta y vacía en el mismo tick,
+         sin pintado intermedio, para que el alto reservado sea exacto. */
+      montar(titulo, segTitulo);
+      titulo.style.minHeight = titulo.offsetHeight + 'px';
+      titulo.textContent = '';
+      montar(lead, segLead);
+      lead.style.minHeight = lead.offsetHeight + 'px';
+      lead.textContent = '';
+
+      function escribirTitulo() {
+        escribir(titulo, segTitulo, function () {
+          titulo.style.minHeight = '';
+          escribir(lead, segLead, function () { lead.style.minHeight = ''; });
+        });
+      }
+      /* Primero la pill "Recepción de clientes · en línea", como arriba de todo */
+      if (segPill && segPill.length) escribir(pillTexto, segPill, escribirTitulo);
+      else escribirTitulo();
+    }
+
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(arrancar);
+    else arrancar();
+  })();
+
   /* ===================== Flujo de recepción ===================== */
 
   var form = document.getElementById('form-solicitud');
@@ -258,8 +394,9 @@ var ENVIO = (function () {
   var btnNueva = document.getElementById('btn-nueva');
   var honeypot = document.getElementById('hp-empresa');
 
-  /* El servicio se elige únicamente con las tarjetas de la sección
-     #servicios (sin duplicar la selección dentro del formulario). */
+  /* El servicio se elige con las entradas [data-servicio]: las tarjetas de
+     #servicios (técnico y web) y el botón de la sección #soporte, sin
+     duplicar la selección dentro del formulario. */
   var servicioActual = null;
 
   var SERVICIOS = {
@@ -357,7 +494,8 @@ var ENVIO = (function () {
     stepperServicio.textContent = textoServicio(valor);
   }
 
-  /* El formulario se despliega al tocar una tarjeta de servicio (paso 2). */
+  /* El formulario se despliega al tocar una tarjeta de servicio o el botón
+     de soporte (paso 2). */
   function abrirFormulario(valor) {
     servicioActual = valor;
     aplicarServicio(valor);

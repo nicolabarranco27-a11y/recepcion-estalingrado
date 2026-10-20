@@ -451,4 +451,321 @@ Hecho:
 PENDIENTE (usuario): ejecutar supabase/migracion-soporte.sql (Etapa 9) y, si
 quiere, revisar el .xlsx que descarga el panel abriendo el Excel.
 
+SESIÓN 15 (20/10/2026) — ETAPA 11: PULIR LA REDUNDANCIA DEL SOPORTE
+-------------------------------------------------------------------
+
+Motivo (queja del usuario): el soporte aparecia dos veces (tarjeta en
+Servicios + seccion #soporte) y encima el CTA de #soporte mandaba a #servicios.
+
+Decisiones del usuario (respondidas por el):
+- Quitar la tarjeta #servicio-soporte de #servicios: quedan solo 2 tarjetas
+  (tecnico y web).
+- El CTA de #soporte es la entrada al formulario: href="#recepcion" con
+  data-servicio="soporte" (mecanismo [data-servicio] ya existente).
+- Estilo btn--solid (mas presencia visual que el enlace de tarjeta).
+- Nombre "Soporte al cliente" (paso de "Soporte técnico" por el choque con
+  "Servicio técnico informático").
+- Icono fa-headset, sin chevron.
+- RESTRICCION EXPLICITA: nada de git ni de publicar hasta que el usuario
+  revise los cambios.
+
+Cambios aplicados (sin commit):
+- index.html: desc de #servicios ajustada ("...si ya sos cliente, el soporte
+  esta mas abajo"); tarjeta #servicio-soporte eliminada; paso 01 de
+  .soporte-steps apunta al boton; CTA reemplazado por <a href="#recepcion"
+  class="btn btn--solid" data-servicio="soporte"> + fa-headset +
+  "Soporte al cliente".
+- js/main.js: solo 2 comentarios actualizados (~261, ~360); cero cambios de
+  logica (el handler [data-servicio] ya abria el formulario).
+- Pruebas: test-recepcion.js bloque 2b (2 tarjetas, sin #servicio-soporte,
+  CTA solido + icono) → 86 PASS; etapa4-extra.js bloque C2 con el mismo
+  ajuste (click explicito en el CTA) → 33 PASS; verificar-soporte.js
+  reescrito (14 aserciones contra servidor local).
+- Bateria completa en verde: recepcion 86 + tecnico 11 + visual 64 + extra
+  33 + supabase 66 + panel 80 = 340 PASS, 0 FAIL. verificar-soporte.js
+  TODO OK contra http://localhost:8123/.
+- Documentacion: README (seccion de soporte Etapas 9/11, verificacion, fila
+  Etapa 11, checklist 3/4), DOCUMENTACION (§3 fila 11, §4.1 entrada, §4.8
+  tarjeta→CTA, §5 conteos con 340 y filas de recepcion/extra) y esta
+  bitacora.
+
+PENDIENTE (usuario): revisar los cambios locales de la Etapa 11. Recien
+ahi: commit + push + Pages, y verificar en vivo. Sigue pendiente ademas
+ejecutar supabase/migracion-soporte.sql (Etapa 9).
+
+- FIN DE LA SESIÓN: se detiene y se espera la revisión del usuario.
+
+SESIÓN 16 (20/10/2026) — ETAPA 12: ESCRITURA DEL HERO + ETAPA 13: ORBES SIN AURA
+--------------------------------------------------------------------------------
+
+El usuario reviso la Etapa 11 ("perfecto") y pidio dos cosas nuevas:
+a) Animacion de escritura fluida en los textos principales al cargar, tal
+   como la tiene la pagina oficial de la empresa.
+b) Fondo dinamico correcto, pero sin el aura externa de los orbes
+   (aspecto mas minimalista).
+
+Referencia: la pagina oficial (estalingradocorp.github.io) escribe el h1
+(#hero-t1-txt) y el sub (#hero-sub-txt) con setInterval de 30 ms, cursor
+"▌" azul mono que parpadea (@keyframes cursorBlink) y se quita al terminar
+cada texto. Lo imitamos sin copiar sus textos (los nuestros son fijos,
+no hay variantes aleatorias).
+
+ETAPA 12 — escritura del hero:
+- js/main.js: IIFE "Escritura del hero" despues del canvas. Lee los
+  childNodes del h1 y del .lead, los recrea por segmentos (los textos ya
+  estan en el HTML: SEO y accesibilidad intactos) y los reescribe a
+  30 ms/char; el span .tg del degradado se conserva con su clase.
+- Cursor span.hero__cursor (aria-hidden, "▌") que se borra al terminar
+  cada texto; primero el titulo, despues el párrafo (como la oficial).
+- Sin salto de layout: se mide el alto final de cada texto (tras
+  document.fonts.ready) y se reserva en min-height hasta terminar.
+- Movimiento reducido: si prefers-reduced-motion, la funcion no arranca
+  (texto completo de entrada, sin cursor).
+- css/styles.css: .hero__cursor + @keyframes hero-parpadeo (step-end).
+
+ETAPA 13 — orbes sin aura:
+- Orbe.prototype.dibujar() ya no pinta el circulo exterior difuso
+  (size * 2.6 al 20% de opacidad): solo queda el circulo central de
+  color. La red de lineas entre orbes no cambia.
+
+Pruebas: etapa4-visual.js +4 (cursor visible al cargar con aria-hidden,
+escritura terminada sin cursor y con titulo/párrafo completos, span.tg
+conservado; solo en el viewport 1440 para no triplicar la espera);
+etapa4-extra.js +1 en el bloque reducedMotion (hero completo sin cursor
+ni escritura). Bateria completa: recepcion 86 + tecnico 11 + visual 68 +
+extra 34 + supabase 66 + panel 80 = 345 PASS, 0 FAIL.
+
+Documentacion: README (identidad sin aura, seccion Etapas 12/13, verificacion,
+fila Etapa 12/13, checklist item 2 y item 11), DOCUMENTACION (§3 filas 12-13,
+§4.10 nueva, §5 con 345) y esta bitacora.
+
+PENDIENTE (usuario): revisar todo lo local (Etapas 11, 12 y 13 juntas) y
+decidir si se publica de una. Sigue pendiente ejecutar
+supabase/migracion-soporte.sql (Etapa 9).
+
+- FIN DE LA SESIÓN: se detiene y se espera la revisión del usuario.
+
+SESIÓN 17 (20/10/2026) — CORRECCIÓN DE LA ESCRITURA + PILL ANIMADA
+------------------------------------------------------------------
+
+Feedback del usuario tras probar la Etapa 12:
+a) "La animación de escritura está bugueada debajo del título principal".
+b) "Recepción de clientes · en línea también debe tener animación".
+
+Diagnóstico de (a): el párrafo del hero está en index.html con saltos de
+línea e indentación dentro de un único nodo de texto; la animación escribía
+esos caracteres en blanco uno por uno (~11 ticks de 30 ms = 330 ms) después
+del salto de línea del fuente, o sea una pausa en seco en medio de la frase,
+justo debajo del título. Igual al inicio y al final del nodo.
+
+Solución (js/main.js, segmentosDe):
+- Colapso de espacios: cada segmento pasa por /\s+/g -> ' ', se filtran
+  vacíos y se recortan los espacios inicial/final. La frase final queda
+  exacta: "Estalingrado Corp recibe tus solicitudes. Elegí el servicio que
+  necesitás y comenzá tu atención con nuestro equipo."
+
+Solución de (b):
+- La pill "Recepción de clientes · en línea" ahora se escribe PRIMERO
+  (pill -> título -> párrafo), con el mismo mecánico de 30 ms/char.
+  El objetivo es el último hijo de .pill (el span de texto); el punto
+  pulsante (.pill__dot) no se toca.
+- css/styles.css: .pill .hero__cursor en blanco (--text-strong) porque
+  el texto de la pill ya es azul y el cursor azul no se distinguía.
+
+Pruebas: etapa4-visual.js +2 (pill escrita completa; párrafo final con
+texto exacto, sin espacios raros del fuente) y el bloque de movimiento
+reduced ahora también exige la pill completa. Bateria: recepcion 86 +
+tecnico 11 + visual 70 + extra 34 + supabase 66 + panel 80 = 347 PASS,
+0 FAIL.
+
+Documentacion: README (seccion Etapa 12 con pill y colapso, verificacion,
+fila Etapa 12, checklist item 11), DOCUMENTACION (§3 fila 12, §4.10 con el
+colapso y las pruebas, §5 con 347) y esta bitacora.
+
+PENDIENTE (usuario): revisar todo lo local (Etapas 11, 12 y 13) y decidir
+si se publica de una. Sigue pendiente ejecutar
+supabase/migracion-soporte.sql (Etapa 9).
+
+- FIN DE LA SESIÓN: se detiene y se espera la revisión del usuario.
+
+SESIÓN 18 (20/10/2026) — SIN FLASH: EL TEXTO NO APARECE ESCRITO PRIMERO
+-----------------------------------------------------------------------
+
+Feedback del usuario: "La animación está bugueada: tiene que aparecer al
+momento de cargar la página, no aparecer escrito y escribirse nuevamente."
+
+Diagnóstico: el texto completo vive en el HTML (por SEO/accesibilidad) y
+main.js lo borraba recién en document.fonts.ready. Entre el primer pintado y
+ese momento se veía el texto COMPLETO; después se vaciaba y volvía a
+escribirse entero — el "parpadeo" que reportó el usuario.
+
+Solución (js/main.js, IIFE "Escritura del hero"):
+- main.js corre síncrono al final del <body> (antes del primer pintado).
+  Ahora mismo al ejecutar el IIFE: se parsean los segmentos de pill, título y
+  párrafo, se mide el alto de título/párrafo (con fuentes de respaldo) y se
+  vacían los tres textos reservando min-height. El navegador nunca llega a
+  pintar el texto completo.
+- document.fonts.ready re-mide el alto exacto con las fuentes reales (monta
+  el texto completo y lo vacía en el mismo tick, sin pintado intermedio) y
+  recién ahí empieza la secuencia pill → título → párrafo.
+- escribir() ahora recibe los segmentos ya parseados (antes los re-leía del
+  DOM vacío); montar() reconstruye el texto completo para medir.
+- Con movimiento reducido se sale antes de cualquier limpieza: el texto
+  completo del HTML queda tal cual (nada cambia para esos usuarios).
+
+Pruebas: etapa4-visual.js +1 aserción anti-flash — en el evento load el
+título no debe estar completo ni con cursor de escritura (si main.js no
+limpiara antes de pintar, esto fallaría). Batería: recepcion 86 + tecnico 11
++ visual 71 + extra 34 + supabase 66 + panel 80 = 348 PASS, 0 FAIL.
+
+Documentacion: README (sección Etapa 12 con limpieza síncrona, verificación,
+checklist item 11), DOCUMENTACION (§3 fila 12, §4.10 con el anti-flash y las
+pruebas, §5 con 348) y esta bitacora.
+
+PENDIENTE (usuario): revisar todo lo local (Etapas 11, 12 y 13) y decidir
+si se publica de una. Sigue pendiente ejecutar
+supabase/migracion-soporte.sql (Etapa 9).
+
+- FIN DE LA SESIÓN: se detiene y se espera la revisión del usuario.
+
+SESIÓN 19 (20/10/2026) — ETAPA 14: IMÁGENES INSTITUCIONALES EN LA PÁGINA
+------------------------------------------------------------------------
+
+El usuario confirmó que la escritura del hero "quedó bien" y agregó la
+carpeta Imagenes/ con dos fotos nuevas:
+- Imagenes/imagen.jpg  (1640x924, apaisada): imagen con el logo de la empresa
+  al centro sobre contraste azul.
+- Imagenes/oficina.jpg (640x800, vertical): foto de la oficina.
+Petición: integrarlas "bien pensadas, en dos lugares" (no juntas), y además
+un título gigante "OFICINAS".
+
+Ubicación elegida (confirmada con el usuario: "Hero + recepción"):
+1) HERO — imagen.jpg como pieza visual a la derecha del título.
+   - index.html: figure.hero__visual con img.hero__img (alt descriptivo,
+     width/height reales para evitar CLS), como segunda columna del
+     .hero__container.
+   - css/styles.css: .hero .container pasa a grid 1.1fr/.9fr (centrado
+     vertical); la imagen lleva radio --radius-card, borde --card-border y
+     doble sombra (negra + resplandor azul). A <=900px se apila debajo del
+     texto con max-width 34rem.
+2) RECEPCIÓN — oficina.jpg + título gigante "OFICINAS".
+   - index.html: bloque .oficinas al FINAL de #recepcion (después del
+     form): cuando el form está oculto da cuerpo a la sección; cuando se
+     abre, queda debajo sin empujar los pasos.
+   - Título gigante como <p class="oficinas__titulo tg"> (no es un heading
+     de la sección: el h2 sigue siendo "Iniciá tu solicitud"): degradado
+     --gradient-tg de la marca, clamp(3rem, 8vw, 5.5rem), Inter 700
+     (máximo peso cargado de Google Fonts), mayúsculas, y pie mono
+     "Salta Capital, Argentina" (dato ya publicado en #contacto, no se
+     inventó nada).
+   - css: grilla 1.15fr/.85fr con la foto (radio + borde + sombra azul);
+     a <=768px pasa a una sola columna.
+- Sin JS nuevo, sin librerías; CSP img-src 'self' cubre ambas rutas
+  (verificar-csp.js: 0 cortes, TODO OK). Las rutas respetan la mayúscula
+  de la carpeta "Imagenes/" (importante para GitHub Pages en Linux).
+
+Pruebas: etapa4-visual.js +2 (las dos imágenes cargadas con
+complete+naturalWidth>0, y el bloque con título "OFICINAS", pie exacto y
+alt en ambas fotos). Batería: recepcion 86 + tecnico 11 + visual 73 +
+extra 34 + supabase 66 + panel 80 = 350 PASS, 0 FAIL. Los verificadores
+csp/soporte/botones también en verde contra local.
+
+Nota: verificar-csp.js informa "fuente Inter: false" en index — es
+pre-existente (el sitio publicado lo informa igual; ningún elemento usa
+peso 400 de Inter, así que document.fonts.check('16px Inter') queda false).
+No afecta el resultado: el verificador termina TODO OK.
+
+Documentacion: README (árbol con Imagenes/, sección "Imágenes
+institucionales (Etapa 14)", verificación 350, fila Etapa 14, checklist
+manual 12), DOCUMENTACION (§3 fila 14, §4.11 nueva, §5 con 73 y 350) y esta
+bitacora.
+
+PENDIENTE (usuario): revisar todo lo local (Etapas 11, 12, 13 y 14) y
+decidir si se publica de una. Sigue pendiente ejecutar
+supabase/migracion-soporte.sql (Etapa 9).
+
+- FIN DE LA SESIÓN: se detiene y se espera la revisión del usuario.
+
+SESIÓN 20 (20/10/2026) — AJUSTE DE LA ETAPA 14 TRAS REVISIÓN DEL USUARIO
+------------------------------------------------------------------------
+
+Feedback del usuario:
+a) El título "Oficinas" era gigante: tiene que ser minimalista, en blanco
+   y que no ocupe mucho espacio.
+b) La foto de la oficina quedaría mejor "por donde dice Soporte al cliente".
+c) La otra imagen (el cerebro, en el hero) se deja como está.
+
+Cambios:
+- index.html: se eliminó el bloque .oficinas de #recepcion y la foto pasó
+  al INTRO de #soporte, en la nueva grilla .soporte__intro (1.35fr / .65fr):
+  a la izquierda el section__head existente (margin-bottom anulado dentro
+  del intro), a la derecha figure.oficinas__figura con la foto y su
+  figcaption.oficinas__pie — "Oficinas" como <span> blanco (no heading: el
+  h2 de la sección sigue siendo "Soporte al cliente") + el pie mono
+  "Salta Capital, Argentina". En móvil se apila debajo del encabezado.
+- css/styles.css: .oficinas__titulo pasó de clamp(3rem, 8vw, 5.5rem) con
+  degradado .tg a color blanco puro (--text-strong), Inter 600,
+  clamp(1.375rem, 2.5vw, 1.75rem) = 22-28 px; foto con max-width 300px;
+  media <=768px: .soporte__intro a una columna.
+- index.html: alt de la imagen del hero mejorado con lo que describió el
+  usuario ("Cerebro con contraste azul y el logo de Estalingrado Corp al
+  centro"); la imagen no se movió.
+- etapa4-visual.js: las 2 aserciones de la Etapa 14 ahora exigen que la
+  foto esté DENTRO de #soporte (no en #recepcion), que el título sea
+  blanco exacto rgb(255,255,255), de hasta 32 px, con el pie y los alt.
+
+Revisión pedida por el usuario antes de dar por terminado el trabajo:
+- Batería completa: recepcion 86 + tecnico 11 + visual 73 + extra 34 +
+  supabase 66 + panel 80 = 350 PASS, 0 FAIL.
+- Verificadores contra local: verificar-csp (0 cortes, TODO OK),
+  verificar-soporte (TODO OK) y verificar-botones (TODO OK).
+- Probe de layout con Playwright en 1440/768/390/360: sin scroll
+  horizontal, foto sin solape con el encabezado, pasos del soporte por
+  debajo de la foto, título rgb(255,255,255) 28px (22px en móvil) peso
+  600, 0 errores de consola → REVISION LAYOUT: TODO OK.
+
+Documentacion: README (árbol, sección Etapa 14, fila del checklist y
+checklist manual 12 actualizados a #soporte + título blanco), DOCUMENTACION
+(§3 fila 14, §4.11 reescrita, §5) y esta bitacora.
+
+PENDIENTE (usuario): revisar todo lo local (Etapas 11, 12, 13 y 14) y
+decidir si se publica de una. Sigue pendiente ejecutar
+supabase/migracion-soporte.sql (Etapa 9).
+
+- FIN DE LA SESIÓN: se detiene y se espera la revisión del usuario.
+
+SESIÓN 21 (20/10/2026) — AJUSTE DE POSICIÓN Y TAMAÑO DE LA FOTO EN #SOPORTE
+---------------------------------------------------------------------------
+
+Feedback del usuario tras ver la Etapa 14: "me gusta; posicionar mejor la
+imagen un poco más arriba a la derecha según la coordenada que tiene, y que
+sea un poco más grande". Se refiere a Imagenes/oficina.jpg en #soporte (la
+imagen del cerebro en el hero se dejó como está).
+
+Cambios (solo css/styles.css):
+- .soporte__intro: columnas 1.35fr/.65fr → 1.15fr/.85fr (columna ancha para
+  la foto) y align-items: center → start (el encabezado arranca arriba).
+- .oficinas__figura: margin: -3rem 0 0 → la foto sube 48px por encima de la
+  primera línea del encabezado (queda a la derecha, con su borde derecho en
+  el borde del contenedor, que no se movió).
+- .oficinas__img: max-width 300px → 360px (más grande).
+- Media <=768px: se anula el margin-top negativo de la foto (en móvil la
+  foto va debajo del encabezado, sin pisarse).
+
+Medición antes/después (1440px, probe Playwright):
+- Antes: foto x=895 y=2318, 281x351 px; encabezado y=2434.
+- Después: foto x=809 y=2270, 360x450 px; encabezado y=2318.
+  → 48px más arriba, +79px de ancho, borde derecho igual (1169≈1176).
+
+Revisión: suite visual 73/73; batería completa 350 PASS, 0 FAIL; probe de
+layout en 1440/768/390/360: sin desborde, sin solapes, foto arriba del
+encabezado en desktop, pasos debajo, 0 errores de consola → TODO OK.
+
+Documentacion: DOCUMENTACION §4.11 actualizada (columnas, margin negativo,
+max-width 360) y esta bitacora.
+
+PENDIENTE (usuario): revisar todo lo local (Etapas 11, 12, 13 y 14) y
+decidir si se publica de una. Sigue pendiente ejecutar
+supabase/migracion-soporte.sql (Etapa 9).
+
 - FIN DE LA SESIÓN: se detiene y se espera la revisión del usuario.

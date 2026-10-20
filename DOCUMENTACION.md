@@ -62,15 +62,21 @@ la Etapa 1). Este proyecto no modifica ni depende de sus archivos.
 | 8 (19/10/2026) | **Accesos y botones**: hero con "Servicios informáticos y web" (ancla a `#servicios`) y "Conocer la empresa" (sitio institucional en otra pestaña); repaso visual de los botones del formulario y del panel (radio, alto táctil, contraste, foco y estado deshabilitado). Ver §4.7. | Hecha |
 | 9 (20/10/2026) | **Soporte al cliente como tercer servicio**: sección `#soporte` (pasos + correo + CTA), tarjeta `#servicio-soporte`, grupo `#campos-soporte` (motivo obligatorio + producto relacionado), refactor de `aplicarServicio` a 3 grupos, columnas nuevas en la base con `supabase/migracion-soporte.sql`, filtro y detalle en el panel, y suites ampliadas (322 aserciones). Ver §4.8. | Hecha (falta correr el SQL en Supabase) |
 | 10 (20/10/2026) | **Exportación a Excel `.xlsx` sin librerías**: nuevo `js/exportacion.js` (ZIP sin comprimir + CRC32 y XML de OOXML escritos a mano), botón "Exportar Excel" que reemplaza al CSV, hojas *Solicitudes* y *Resumen*, agrupamiento por servicio y exportación de lo filtrado. Ver §4.9. | Hecha |
+| 11 (20/10/2026) | **Soporte sin redundancia**: se quitó la tarjeta `#servicio-soporte` de `#servicios` (quedan dos: técnico y web) y el botón "Soporte al cliente" de la sección `#soporte` (`btn--solid`, `fa-headset`, `data-servicio="soporte"`) abre el formulario directo con los campos de soporte. Sin cambios de lógica en el JS; suites ajustadas (340 aserciones). Ver §4.8. | Hecha y publicada |
+| 12 (20/10/2026) | **Escritura del hero** como la página institucional: pill, título y párrafo se escriben carácter por carácter (30 ms/char) con cursor `▌` que parpadea; el JS **vacía los textos síncronamente antes del primer pintado** (nunca se ve el texto completo para reescribirlo), el span `.tg` se conserva, los espacios del fuente se colapsan (sin pausas raras), se reserva el alto final (sin salto de layout) y con movimiento reducido no se anima. Ver §4.10. | Hecha y publicada |
+| 13 (20/10/2026) | **Orbes minimalistas**: el canvas de fondo ya no dibuja el aura difusa alrededor de cada orbe; quedan círculos de color puro con la misma red de líneas. Ver §4.10. | Hecha y publicada |
+| 14 (20/10/2026) | **Imágenes institucionales**: fotos agregadas por la empresa en `Imagenes/`, integradas en dos lugares distintos — `imagen.jpg` (cerebro con contraste azul y logo) como pieza visual del hero y `oficina.jpg` en el intro de `#soporte`, junto al título "Soporte al cliente", con pie minimalista "Oficinas" en blanco. Ver §4.11. | Hecha y publicada |
 
 ## 4. Recepción: diseño actual del flujo
 
 ### 4.1 Interacción
 
-1. El usuario elige el servicio **solo** en las tarjetas `#servicios`
-   (atributo `data-servicio="tecnico|web|soporte"`). No existe una segunda selección
-   dentro del formulario (se eliminó la duplicación: radios, botón Continuar
-   y error de servicio del flujo viejo ya no están en el HTML ni en el JS).
+1. El usuario elige el servicio **solo** con las entradas `data-servicio`
+   (`tecnico|web|soporte`): las dos tarjetas de `#servicios` (técnico y web)
+   y, desde la Etapa 11, el botón "Soporte al cliente" de la sección `#soporte`.
+   No existe una segunda selección dentro del formulario (se eliminó la
+   duplicación: radios, botón Continuar y error de servicio del flujo viejo ya
+   no están en el HTML ni en el JS).
 2. Al tocar una tarjeta, **el formulario se despliega** directamente en el
    **paso 2 (Datos)**: el stepper de 3 ítems pasa a verse con el 01 completado
    (muestra el nombre del servicio elegido) y el 02 activo. Sin elementos
@@ -250,21 +256,29 @@ Cambios pedidos por el usuario:
   chicos) y contrastes medidos de 15,78:1 (contorno) y 21:1 (sólidos); las 6
   suites siguen en verde, sin desborde en 390/360 px.
 
-### 4.8 Soporte al cliente (Etapa 9, 20/10/2026)
+### 4.8 Soporte al cliente (Etapas 9 y 11, 20/10/2026)
 
 El soporte se implementó como **tercer servicio** del mismo flujo: misma
-recepción, misma tabla `solicitudes`, mismo panel y misma exportación.
+recepción, misma tabla `solicitudes`, mismo panel y misma exportación. En la
+Etapa 11 se quitó la entrada duplicada (la tercera tarjeta) para que cada
+servicio tenga una única puerta de entrada.
 
 **Página (`index.html`)**
 
 - Enlace "Soporte" en la navbar desktop y en el menú móvil (entre Recepción y
   Contacto, en el orden de la página).
-- **Tercera tarjeta** `#servicio-soporte` en `#servicios` (ícono `fa-headset`,
-  `data-servicio="soporte"`) con el mismo CTA "Iniciar solicitud" de las otras.
 - **Sección `#soporte`** (antes de `#contacto`): descripción, tres pasos en
   `.soporte-steps` (01 pedir · 02 contá qué pasa · 03 recibir respuesta por el
-  medio dejado), canal directo con `mailto:estalingradocorpsupport@protonmail.com`
-  (también agregado a la lista de `#contacto`) y CTA "Pedir soporte" a `#servicios`.
+  medio dejado) y canal directo con `mailto:estalingradocorpsupport@protonmail.com`
+  (también agregado a la lista de `#contacto`).
+- **Botón "Soporte al cliente"** (Etapa 11) en `.soporte-canales`: `btn--solid`
+  con ícono `fa-headset` y `href="#recepcion" data-servicio="soporte"` — el
+  mismo mecanismo de las tarjetas —, así despliega el formulario con los campos
+  de soporte ya activos.
+- La **tarjeta `#servicio-soporte`** de `#servicios` fue eliminada (Etapa 11):
+  hoy hay dos tarjetas (técnico y web) y la descripción de la sección indica
+  que el soporte está más abajo. El paso 01 de `.soporte-steps` apunta al
+  botón en lugar de a una tarjeta.
 - **Grupo `#campos-soporte`** en el formulario: select *Motivo* obligatorio
   (Consulta general · Ayuda para usar un servicio · Incidencia o falla · Reclamo ·
   Estado de una solicitud o servicio · Otro) e input opcional *Producto o
@@ -367,6 +381,98 @@ paquete, las dos hojas, cabeceras, fechas con `s="2"`, HTML escapado, ausencia
 de fórmulas, orden agrupado, exportación filtrada, nombre con filtros y el
 caso sin filas.
 
+### 4.10 Escritura del hero y orbes minimalistas (Etapas 12 y 13, 20/10/2026)
+
+Dos ajustes estéticos pedidos por el usuario para acercarse más a la página
+institucional: la animación de escritura del hero y orbes de fondo sin aura.
+
+**Escritura del hero (`js/main.js` + `css/styles.css`)**
+
+- IIFE propio, sin dependencias, al estilo ES5 del resto del proyecto. Al
+  cargar (y tras `document.fonts.ready`, para medir con las fuentes puestas),
+  se reescriben carácter por carácter con `setInterval` de 30 ms — el mismo
+  ritmo de la página institucional — la pill "Recepción de clientes · en
+  línea", después el título y por último el párrafo, cada uno con un cursor
+  `▌` (`span.hero__cursor`, `aria-hidden`, parpadeo con
+  `@keyframes hero-parpadeo`) que desaparece al terminar. En la pill el cursor
+  va en blanco (`.pill .hero__cursor`) porque el texto ya es azul.
+- El texto vive completo en el HTML (SEO y accesibilidad intactos) pero, apenas
+  corre `main.js` (síncrono al final del `<body>`, **antes del primer pintado**),
+  los tres textos se vacían y se reserva su alto: el navegador nunca muestra el
+  texto completo para después reescribirlo — se ve vacío y se escribe desde
+  cero (corregido tras revisión del usuario: antes el texto completo aparecía
+  un instante y luego "se re-escribía"). El JS lee los `childNodes` originales
+  y los recrea por segmentos, de modo que el `span.tg` del degradado se
+  conserva con su clase mientras se escribe.
+- **Colapso de espacios** (corregido tras revisión del usuario): el texto del
+  HTML tiene saltos de línea e indentación dentro de un mismo nodo; si no se
+  normalizan (`\s+` → un espacio, sin espacios al inicio/fin), la animación
+  los escribiría uno por uno y la frase se pausaba ~330 ms en seco debajo del
+  título.
+- Sin salto de layout: antes de borrar cada texto se reserva su alto final en
+  `min-height` (medido con las fuentes cargadas) y se libera al terminar.
+- **Movimiento reducido**: si `prefers-reduced-motion: reduce` está activo, la
+  función ni arranca (el texto ya está completo en el HTML y no hay cursor).
+
+**Orbes sin aura (`js/main.js`)**
+
+- `Orbe.prototype.dibujar()` dejó de pintar el círculo exterior difuso
+  (radio `size * 2.6`, alphas al 20 %): ahora dibuja solo el círculo central
+  de color. La red de líneas entre orbes cercanos no cambia.
+
+**Pruebas**: `etapa4-visual.js` (+7) verifica en Chromium que al evento load el
+título **no** está completo ni con cursor escriturero (anti-flash), que el
+cursor `▌` aparece al cargar (con `aria-hidden="true"`), que la escritura
+termina sin cursor y con la pill, el título y el párrafo completos, que el
+`span.tg` se conserva y que el párrafo final no conserva espacios raros del
+fuente (texto exacto). `etapa4-extra.js` (+1) verifica en el contexto
+`reducedMotion: 'reduce'` que el hero (pill, título y párrafo) está completo
+sin cursor ni escritura.
+
+### 4.11 Imágenes institucionales (Etapa 14, 20/10/2026)
+
+La empresa agregó la carpeta `Imagenes/` con dos fotos, integradas cada una
+en un lugar distinto y pensado (el usuario pidió no ponerlas juntas):
+
+- **`Imagenes/imagen.jpg` (1640×924, apaisada)** — imagen del cerebro con
+  contraste azul y el logo al centro. Vive en el hero: `figure.hero__visual`
+  como segunda columna de `.hero .container` (`grid` de `1.1fr / .9fr`,
+  centrado vertical), a la derecha del título. Estilo propio de la marca:
+  radio `--radius-card`, borde `--card-border` y doble sombra (negra +
+  resplandor azul). A ≤900 px la grilla pasa a una sola columna y la imagen
+  se apila debajo del texto con `max-width: 34rem`. El usuario la dejó
+  "como está": no se movió ni se retoquó en la revisión final.
+- **`Imagenes/oficina.jpg` (640×800, vertical)** — foto de la oficina, en el
+  **intro de la sección `#soporte`** (`.soporte__intro`, lugar elegido por
+  el usuario: "por donde dice Soporte al cliente"). El intro es una grilla
+  `1.15fr / .85fr` con `align-items: start`: a la izquierda el `section__head`
+  de la sección (con su `margin-bottom` anulado dentro del intro), a la
+  derecha la foto (`figure.oficinas__figura`) con `margin-top: -3rem`, que la
+  **sube 48 px por encima de la primera línea del encabezado** (ajuste
+  pedido: "un poco más arriba a la derecha"). La foto mide
+  **`max-width: 360px`** (antes 300, se agrandó a pedido: "un poco más
+  grande") y mantiene su borde derecho en el borde del contenedor. Va con su
+  `figcaption.oficinas__pie`: **"Oficinas" en blanco**
+  (`var(--text-strong)`, Inter 600, `clamp(1.375rem, 2.5vw, 1.75rem)` →
+  22–28 px, sin degradado, minimalista a pedido del usuario tras ver la
+  versión gigante) y debajo el pie mono `Salta Capital, Argentina` (dato ya
+  publicado en `#contacto`). A ≤768 px el intro pasa a una sola columna
+  (encabezado arriba, foto abajo) y se anula el `margin-top` negativo de la
+  foto. El bloque `.oficinas` original en `#recepcion` fue eliminado.
+- Ambas con `width`/`height` reales (sin saltos de layout), `alt`
+  descriptivo y servidas desde el propio origen (`img-src 'self'` de la CSP,
+  sin cortes). Sin librerías ni JS nuevo: solo HTML + CSS.
+
+**Pruebas**: `etapa4-visual.js` (+2) verifica en Chromium que las dos imágenes
+están cargadas (`complete` + `naturalWidth > 0`) y que la de la oficina vive
+dentro de `#soporte` (no quedó en `#recepcion`), y que el pie tiene el
+título "Oficinas" **blanco** (`rgb(255,255,255)`), **compacto** (≤32 px), el
+texto "Salta Capital, Argentina" y `alt` en ambas fotos. El chequeo de
+desborde a 1440/390/360 y una revisión manual de layout con Playwright
+(rectángulos en 1440/768/390/360) confirmaron que la foto no se solapa con
+el encabezado, que los pasos del soporte quedan debajo y que no hay scroll
+horizontal.
+
 ## 5. Pruebas (07/10 → 20/10/2026)
 
 Las suites viven **fuera del proyecto** (carpeta temporal de trabajo), porque
@@ -374,14 +480,19 @@ el proyecto no usa Node/build. Son 6 suites (4 de recepción + 2 de Etapa 7):
 
 | Suite | Motor | Alcance | Resultado (20/10/2026) |
 |---|---|---|---|
-| `test-recepcion.js` | jsdom | Estado inicial (formulario/stepper ocultos, sin duplicación, sin elementos agregados), estructura de soporte (3 tarjetas, nav con 5 enlaces, mailto), despliegue por tarjeta, grupos alternados (3 servicios), validación, foco, corrección en línea, revisión, XSS literal, cambio de servicio desde revisión, motivo de soporte obligatorio, envío deshabilitado, menú móvil, canvas de fondo. | 82/82 PASS |
+| `test-recepcion.js` | jsdom | Estado inicial (formulario/stepper ocultos, sin duplicación, sin elementos agregados), estructura del soporte (2 tarjetas, sin `#servicio-soporte`, CTA "Soporte al cliente" con `btn--solid`/`fa-headset`, nav con 5 enlaces, mailto), despliegue por tarjeta/CTA, grupos alternados (3 servicios), validación, foco, corrección en línea, revisión, XSS literal, cambio de servicio desde revisión, motivo de soporte obligatorio, envío deshabilitado, menú móvil, canvas de fondo. | 86/86 PASS |
 | `test-tecnico.js` | jsdom | Camino del servicio técnico: validación de `tipo-problema`, dispositivo opcional, resumen y edición. | 11/11 PASS |
-| `etapa4-visual.js` | Chromium real | 1440/390/360 px: sin desborde horizontal, consola limpia, recursos locales OK, orbes (canvas fijo sin eventos, ajustado al viewport y **con píxeles dibujados**), recorrido completo tarjeta→errores→revisión, caracteres especiales/emoji, XSS, editar conserva datos. | 64/64 PASS |
-| `etapa4-extra.js` | Chromium real | Anclas vs navbar (incluye `#soporte`), skip link, foco visible con teclado, Enter implícito, tarjeta de soporte, cambio de servicio en vivo sin resumen obsoleto, campos de grupo preservados, texto >2000 chars, labels/`aria-describedby`, stepper coherente, `prefers-reduced-motion` (orbes estáticos: dos capturas idénticas), solapamientos @360. | 33/33 PASS |
+| `etapa4-visual.js` | Chromium real | 1440/390/360 px: sin desborde horizontal, consola limpia, recursos locales OK, orbes (canvas fijo sin eventos, ajustado al viewport y **con píxeles dibujados**), **escritura del hero** (anti-flash: título no completo al load; cursor visible al cargar; pill/título/párrafo completos sin cursor; `span.tg` conservado y párrafo sin espacios raros), **imágenes institucionales** (hero y oficina en `#soporte` cargadas, título "Oficinas" blanco compacto y `alt` presentes), recorrido completo tarjeta→errores→revisión, caracteres especiales/emoji, XSS, editar conserva datos. | 73/73 PASS |
+| `etapa4-extra.js` | Chromium real | Anclas vs navbar (incluye `#soporte`), skip link, foco visible con teclado, Enter implícito, CTA de soporte (despliega el formulario con sus campos), cambio de servicio en vivo sin resumen obsoleto, campos de grupo preservados, texto >2000 chars, labels/`aria-describedby`, stepper coherente, `prefers-reduced-motion` (orbes estáticos: dos capturas idénticas, y hero completo sin escritura ni cursor), solapamientos @360. | 34/34 PASS |
 | `test-supabase.js` | jsdom | `CONFIG_SUPABASE` simulado: botón habilitado, POST a `/rest/v1/solicitudes`, URL/headers/`Prefer`, payload snake_case por servicio (técnico, web y **soporte**), motivo vacío sin POST, éxito + "Nueva solicitud", error de red con datos conservados y reintento, honeypot sin `fetch`, y respuesta anti-spam (título y texto específicos). | 66/66 PASS |
 | `test-admin.js` | Chromium real | Panel con API simulada por `page.route` (incluye preflight CORS): login inválido/válido, sesión, stats, lista (3 filas), XSS, filtros, filtro y detalle de **soporte** (motivo, producto, búsqueda), PATCH 204, **exportación a Excel** (firma ZIP, estructura del paquete, dos hojas, cabeceras, fechas, escapado, sin fórmulas, agrupado por servicio, exportación filtrada y nombre con filtros), recarga con sesión, logout y móvil 360 sin desborde. | 80/80 PASS |
 
-**Total: 336 aserciones en verde (0 fallos).**
+**Total: 350 aserciones en verde (0 fallos).**
+
+Además, verificadores puntuales de navegador real (fuera del conteo):
+`verificar-csp.js` (0 cortes de la política), `verificar-botones.js` (contraste
+y alto táctil) y `verificar-soporte.js` (flujo completo del soporte contra un
+servidor local, 14 aserciones, en verde el 20/10/2026).
 
 Las suites de Etapa 7 usan `window.fetch` / `page.route` simulados. Desde el
 19/10/2026 el proyecto real ya está conectado y probado a mano de punta a punta
@@ -447,7 +558,8 @@ Pasos del usuario (resueltos el 19/10/2026; detalle en la guía):
 
 ## 7. Pendientes conocidos
 
-1. Revisión visual humana del rediseño y del panel (checklist del `README.md`).
+1. ✔ Revisión visual humana: el usuario revisó el sitio en varias rondas el
+   20/10/2026 (checklist del `README.md`) y aprobó el resultado.
 2. **Supabase**: proyecto creado, `js/config.js` completo, `schema.sql` ejecutado
    y admin habilitado. ✔ Falta *(hacer)* apagar "Allow new users to sign up" y
    re-ejecutar `schema.sql` para activar el anti-spam del §4.6.
@@ -469,8 +581,9 @@ Pasos del usuario (resueltos el 19/10/2026; detalle en la guía):
 
 ## 8. Limitaciones conocidas
 
-- La revisión visual pixel a pixel requiere inspección humana (limitación de
-  la asistente, no del proyecto).
+- La revisión visual pixel a pixel no se automatiza (limitación de la
+  asistente, no del proyecto); el usuario la hizo en varias rondas el
+  20/10/2026 y aprobó el resultado.
 - Los enlaces del pie tienen objetivos táctiles de 17–26 px en móvil: se
   mantienen iguales al sitio institucional por identidad aprobada.
 - Las pruebas automatizadas no están versionadas en el proyecto (viven en

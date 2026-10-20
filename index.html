@@ -92,6 +92,12 @@
           </a>
         </div>
       </div>
+
+      <figure class="hero__visual reveal">
+        <img class="hero__img" src="Imagenes/imagen.jpg"
+             alt="Cerebro con contraste azul y el logo de Estalingrado Corp al centro"
+             width="1640" height="924">
+      </figure>
     </div>
   </section>
 
@@ -101,7 +107,7 @@
       <div class="section__head reveal">
         <p class="section__label"><span class="section__line" aria-hidden="true"></span>Recepción · Servicios</p>
         <h2 class="section__title" id="servicios-title">¿Cómo podemos <span class="tg">ayudarte</span>?</h2>
-        <p class="section__desc">Tres servicios, una misma recepción. Seleccioná el que corresponda a tu solicitud.</p>
+        <p class="section__desc">Servicio técnico y sitios web, una misma recepción. Seleccioná el que corresponda a tu solicitud; si ya sos cliente, el soporte está más abajo.</p>
       </div>
 
       <div class="cards">
@@ -130,21 +136,6 @@
             velocidad y presencia profesional en internet.
           </p>
           <a href="#recepcion" class="card__link" data-servicio="web">
-            Iniciar solicitud
-            <i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
-          </a>
-        </article>
-
-        <article class="card reveal" id="servicio-soporte">
-          <div class="card__icon" aria-hidden="true">
-            <i class="fa-solid fa-headset"></i>
-          </div>
-          <h3 class="card__title">Soporte al cliente</h3>
-          <p class="card__text">
-            Ayuda y acompañamiento para clientes: consultas, incidencias y reclamos
-            sobre los servicios que ya estás usando.
-          </p>
-          <a href="#recepcion" class="card__link" data-servicio="soporte">
             Iniciar solicitud
             <i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
           </a>
@@ -311,13 +302,25 @@
   <!-- SOPORTE -->
   <section class="section" id="soporte" aria-labelledby="soporte-title">
     <div class="container container--narrow">
-      <div class="section__head reveal">
-        <p class="section__label"><span class="section__line" aria-hidden="true"></span>Soporte · Al cliente</p>
-        <h2 class="section__title" id="soporte-title">Soporte al <span class="tg">cliente</span></h2>
-        <p class="section__desc">
-          Si ya sos cliente o estás usando alguno de nuestros servicios, acá pedís
-          ayuda: consultas, incidencias, reclamos y seguimiento de lo que tenés en curso.
-        </p>
+      <div class="soporte__intro">
+        <div class="section__head reveal">
+          <p class="section__label"><span class="section__line" aria-hidden="true"></span>Soporte · Al cliente</p>
+          <h2 class="section__title" id="soporte-title">Soporte al <span class="tg">cliente</span></h2>
+          <p class="section__desc">
+            Si ya sos cliente o estás usando alguno de nuestros servicios, acá pedís
+            ayuda: consultas, incidencias, reclamos y seguimiento de lo que tenés en curso.
+          </p>
+        </div>
+
+        <figure class="oficinas__figura reveal">
+          <img class="oficinas__img" src="Imagenes/oficina.jpg"
+               alt="Oficina de trabajo de Estalingrado Corp"
+               width="640" height="800">
+          <figcaption class="oficinas__pie">
+            <span class="oficinas__titulo">Oficinas</span>
+            <span class="oficinas__desc">Salta Capital, Argentina</span>
+          </figcaption>
+        </figure>
       </div>
 
       <ol class="soporte-steps reveal">
@@ -326,8 +329,8 @@
           <div>
             <p class="soporte-steps__titulo">Pedí el soporte</p>
             <p class="soporte-steps__texto">
-              En la sección de servicios, elegí la tarjeta "Soporte al cliente" y
-              se abre el mismo formulario de recepción.
+              Tocá el botón "Soporte al cliente" de esta sección y se abre el
+              formulario de recepción con el motivo listo para completar.
             </p>
           </div>
         </li>
@@ -363,9 +366,9 @@
             </div>
           </li>
         </ul>
-        <a href="#servicios" class="btn btn--outline">
-          Pedir soporte
-          <i class="fa-solid fa-chevron-right btn__arrow" aria-hidden="true"></i>
+        <a href="#recepcion" class="btn btn--solid" data-servicio="soporte">
+          <i class="fa-solid fa-headset" aria-hidden="true"></i>
+          Soporte al cliente
         </a>
       </div>
     </div>

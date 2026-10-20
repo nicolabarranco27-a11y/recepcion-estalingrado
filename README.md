@@ -33,6 +33,9 @@ Servicio tecnico y paginas web/
 ├── assets/
 │   ├── logo.jpg      # Logo oficial descargado de la página institucional
 │   └── favicon.jpg   # Favicon oficial (JPEG; la extensión original .pnj es de Tumblr)
+├── Imagenes/
+│   ├── imagen.jpg    # Cerebro con contraste azul + logo (hero, Etapa 14)
+│   └── oficina.jpg   # Foto de la oficina (intro de #soporte, Etapa 14)
 ├── robots.txt        # Bloquea /admin.html para buscadores
 ├── DOCUMENTACION.md  # Historial completo: etapas, diseño del flujo, pruebas, sistema de gestión
 ├── bitacora.txt      # Cronología de sesiones de trabajo
@@ -57,7 +60,9 @@ npx http-server . -p 8080
 - Acentos: azules `#2563eb`, `#3b82f6`, `#60a5fa`, `#1d4ed8`; degradado `.tg`
   `linear-gradient(135deg, #60a5fa, #2563eb, #1d4ed8)`.
 - Violets `#7c3aed`/`#6d28d9`/`#8b5cf6`: solo en un tercio de los orbes del
-  canvas de fondo (Etapas 5), sin afectar los componentes institucionales.
+  canvas de fondo (Etapas 5 y 13), sin afectar los componentes institucionales.
+  Los orbes son minimalistas: círculos de color puro **sin aura** alrededor
+  (Etapa 13), unidos por las mismas líneas tenues de siempre.
 - Textos: `#e5e7eb` / blanco; secundarios zinc `#a1a1aa`, `#71717a`, `#52525b`.
 - Tipografías: Inter (contenido), JetBrains Mono (etiquetas técnicas).
 - Componentes reutilizados del patrón institucional: navbar glass fija, pill/badge
@@ -98,7 +103,8 @@ Flujo en `#recepcion` con tres pasos (stepper accesible):
    el servicio desde Revisión, el flujo vuelve a Datos (el resumen dejó de
    corresponder).
 
-El formulario y el stepper permanecen ocultos hasta que se toca una tarjeta.
+El formulario y el stepper permanecen ocultos hasta que se toca una tarjeta
+de servicio o el botón "Soporte al cliente" de la sección `#soporte` (Etapa 11).
 
 ## Accesos del inicio y botones (ajuste 19/10/2026)
 
@@ -115,16 +121,57 @@ El formulario y el stepper permanecen ocultos hasta que se toca una tarjeta.
   los de contorno y estado deshabilitado en gris legible (ya no se aclaran con
   `opacity`).
 
-## Soporte al cliente (Etapa 9)
+## Escritura del hero y orbes minimalistas (Etapas 12 y 13)
+
+- **Escritura del hero (Etapa 12)**: al cargar la página, la pill "Recepción
+  de clientes · en línea", el título ("Servicio técnico y *sitios web*.") y el
+  párrafo principal se escriben carácter por carácter con el mismo ritmo de la
+  página institucional (30 ms por carácter) y un cursor `▌` que parpadea mientras
+  escriben (blanco en la pill, azul en los textos grandes). El texto vive
+  completo en el HTML (bueno para SEO y accesibilidad) pero el JS
+  (`js/main.js`) lo **vacía de forma síncrona antes del primer pintado**, así
+  que el texto nunca aparece escrito para después reescribirse: se ve vacío y
+  se escribe desde cero. Al reescribir respeta los nodos originales: el span
+  `.tg` del degradado se conserva, y los saltos de línea del fuente se colapsan
+  en un solo espacio para que la escritura no se pause en caracteres en blanco.
+  Se reserva el alto final de cada texto para que el hero no salte, y con
+  **movimiento reducido** del sistema no se anima: el texto aparece completo de
+  entrada, sin cursor.
+- **Orbes minimalistas (Etapa 13)**: el canvas de fondo conserva la red de
+  puntos y líneas, pero los orbes ya no tienen el halo difuso externo: son
+  círculos de color puro, más limpios y minimalistas, como pidió la empresa.
+
+## Imágenes institucionales (Etapa 14)
+
+Dos fotos agregadas por la empresa en `Imagenes/`, integradas cada una en un
+lugar pensado (nunca juntas):
+
+- **Hero** (`Imagenes/imagen.jpg`, 1640×924): imagen del cerebro con contraste
+  azul y el logo de la empresa al centro, como pieza visual a la derecha del
+  título (`figure.hero__visual` con borde redondeado y resplandor azul). En
+  móvil se apila debajo del texto, sin superponerse. Carga con
+  `width`/`height` fijados para evitar saltos de layout.
+- **Sección `#soporte`** (`Imagenes/oficina.jpg`, 640×800): foto vertical de
+  la oficina en el intro de la sección de soporte (`.soporte__intro`), a la
+  derecha del título "Soporte al cliente", que es donde la pidió el usuario.
+  Junto a la foto va su pie de figura minimalista: **"Oficinas" en blanco**
+  (Inter 600, 22–28 px, sin degradado) y el mono "Salta Capital, Argentina".
+  En móvil se apila debajo del encabezado.
+- Ambas con `alt` descriptivo, sin librerías, servidas desde el propio
+  dominio (compatible con la CSP `img-src 'self'`).
+
+## Soporte al cliente (Etapas 9 y 11)
 
 El soporte es un tercer servicio más, con la misma recepción, la misma base y
 el mismo panel:
 
 - **Sección `#soporte`** (entre Recepción y Contacto): qué es, los tres pasos
-  para pedirlo y el canal directo (`mailto:estalingradocorpsupport@protonmail.com`)
-  con CTA a `#servicios`.
-- **Tercera tarjeta** `#servicio-soporte` en `#servicios` (`data-servicio="soporte"`)
-  que despliega el formulario con su propio grupo `#campos-soporte`.
+  para pedirlo y el canal directo (`mailto:estalingradocorpsupport@protonmail.com`).
+- **Botón "Soporte al cliente"** en esa misma sección (`btn--solid`, ícono
+  `fa-headset`, `data-servicio="soporte"`): baja al formulario de recepción y
+  despliega el grupo `#campos-soporte`. En la Etapa 11 se quitó la tercera
+  tarjeta de `#servicios` (hoy quedan solo dos: técnico y web) para no duplicar
+  entradas; la descripción de `#servicios` indica que el soporte está más abajo.
 - **Campos de soporte**: *Motivo* (obligatorio: consulta, ayuda con un servicio,
   incidencia o falla, reclamo, estado de una solicitud u otro) y *Producto o
   servicio relacionado* (opcional). El grupo activo se muestra y los otros dos
@@ -285,14 +332,17 @@ anteriores siguen en verde. Las pruebas de red usan `fetch` y `page.route`
 simulados: todavía **no** se ejecutaron contra un proyecto Supabase real
 (eso requiere que el usuario cree el suyo y complete `js/config.js`).
 
-**Etapa 9 y 10 (20/10/2026):** las suites se ampliaron con el soporte al
-cliente y con la exportación a Excel y suman hoy **336 aserciones en verde**:
-jsdom 82 (recepción) + 11 (técnico) + 66 (Supabase); Chromium 64 (visual) +
-33 (extra) + 80 (panel).
+**Etapa 9 a 14 (20/10/2026):** las suites se ampliaron con el soporte al
+cliente, la exportación a Excel, el ajuste del soporte, la escritura del hero,
+los orbes minimalistas y las imágenes institucionales, y suman hoy **350
+aserciones en verde**: jsdom 86 (recepción) + 11 (técnico) + 66 (Supabase);
+Chromium 73 (visual) + 34 (extra) + 80 (panel).
 
-**Limitación honesta:** la revisión visual pixel a pixel (estética, espaciados,
-legibilidad subjetiva) no pudo evaluarse automáticamente en esta máquina.
-Queda pendiente de inspección humana con el checklist al final de este archivo.
+**Revisión humana (20/10/2026):** la estética pixel a pixel no se puede evaluar
+automáticamente en esta máquina; el usuario revisó el sitio en varias rondas
+(corrigió la escritura del hero, el título de oficinas y la ubicación de las
+fotos) y aprobó el resultado. El checklist detallado queda al final de este
+archivo.
 
 **Observación (no modificada por identidad aprobada):** los enlaces del pie
 tienen objetivos táctiles de 17–26 px en móvil; se mantienen iguales al sitio
@@ -327,6 +377,22 @@ institucional.
       mano; hojas "Solicitudes" y "Resumen", agrupado por servicio, exporta lo
       filtrado con los filtros en el nombre). Reemplaza al CSV y queda
       documentado en `DOCUMENTACION.md` §4.9.
+- [x] Etapa 11 (20/10/2026): el soporte
+      se desduplicó: se quitó la tarjeta `#servicio-soporte` de `#servicios`
+      (quedan dos tarjetas: técnico y web) y el botón **"Soporte al cliente"**
+      de la sección `#soporte` (`btn--solid`, `fa-headset`) abre el formulario
+      directo con `data-servicio="soporte"`. Sin cambios de lógica en el JS.
+- [x] Etapa 12 (20/10/2026): **escritura del hero** como la página institucional
+      (pill, título y párrafo carácter por carácter con cursor `▌`, span `.tg`
+      conservado, espacios del fuente colapsados para no pausar, sin salto de
+      layout, sin animación con movimiento reducido).
+- [x] Etapa 13 (20/10/2026): **orbes minimalistas**: se quitó el aura difusa de
+      los orbes del canvas de fondo; quedan círculos de color puro con la misma
+      red de líneas.
+- [x] Etapa 14 (20/10/2026): **imágenes institucionales**: `Imagenes/imagen.jpg`
+      (cerebro con contraste azul y logo) integrada como pieza visual del hero
+      y `Imagenes/oficina.jpg` en el intro de `#soporte` (junto al título
+      "Soporte al cliente") con pie minimalista "Oficinas" en blanco.
 - [x] **Configurar Supabase (19/10/2026):** proyecto `estalingrado-corp` (São
       Paulo) creado, URL + anon key en `js/config.js`, `supabase/schema.sql`
       ejecutado, usuario admin `nbmn38@gmail.com` (Auto Confirm) e insertado su
@@ -346,18 +412,20 @@ institucional.
       (correo propuesto: `estalingradocorp.servicios@gmail.com`, sin confirmar).
 - [ ] No configurar dominio ni publicar (fuera del alcance de esta etapa).
 
-## Checklist de revisión visual manual (pendiente)
+## Checklist de revisión visual manual (revisado y aprobado el 20/10/2026)
 
 Con el sitio servido localmente (`npx http-server . -p 8080`):
 
 1. 1440×900, 390×844 y 360×800: sin scroll horizontal, sin textos cortados.
-2. Fondo: se ven los orbes flotantes (puntos de luz azules/violetas unidos por
-   líneas tenues) moviéndose lentamente sobre el negro, sin cubrir el texto;
-   con movimiento reducido del sistema, quedan quietos.
-3. Recepción inicial: el formulario y el stepper NO aparecen hasta tocar una tarjeta.
+2. Fondo: se ven los orbes flotantes (puntos de luz azules/violetas **sin aura**,
+   unidos por líneas tenues) moviéndose lentamente sobre el negro, sin cubrir
+   el texto; con movimiento reducido del sistema, quedan quietos.
+3. Recepción inicial: el formulario y el stepper NO aparecen hasta tocar una
+   tarjeta o el botón "Soporte al cliente" de la sección `#soporte`.
 4. Al pulsar una tarjeta de servicio: se despliega el formulario en "Datos" y el
    stepper muestra 01 completado con el nombre del servicio. Pulsar la otra
-   tarjeta alterna los campos sin perder lo escrito.
+   tarjeta alterna los campos sin perder lo escrito. El botón "Soporte al
+   cliente" hace lo mismo y muestra los campos de soporte (Motivo + Producto).
 5. Paso Datos: encabezado grande, nota de campos obligatorios y subtítulos de
    grupo ("Tus datos" · "Equipo y problema"/"Tu sitio web" · "Qué necesitás")
    con regla fina; labels de 13px legibles, placeholders de ejemplo visibles,
@@ -376,6 +444,18 @@ Con el sitio servido localmente (`npx http-server . -p 8080`):
 10. Envío real (cuando Supabase esté configurado): confirmación verde con
     "Nueva solicitud", error rojo con datos conservados si se corta internet,
     y la fila visible en el panel y en el Table Editor de Supabase.
+11. Al cargar la página: el hero aparece **vacío** (nunca se ve el texto
+    completo primero) y la pill "Recepción de clientes · en línea" se escribe
+    carácter por carácter con un cursor que parpadea, después el título del
+    hero y por último el párrafo, sin pausas raras en medio de las frases; al
+    terminar no queda ningún cursor. Con movimiento reducido del sistema, el
+    texto aparece completo de entrada (sin escritura).
+12. Imágenes institucionales: en el hero, a la derecha del título, se ve la
+    imagen del cerebro con el logo azul (borde redondeado, sin cortarse ni
+    desbordar; en móvil queda debajo del texto). Al bajar a "Soporte al
+    cliente", el encabezado de la sección acompaña con la foto de la oficina
+    y su pie "Oficinas" en blanco y compacto, más "Salta Capital, Argentina";
+    sin cortes ni desbordes en ningún ancho.
 
 ## Accesibilidad
 
