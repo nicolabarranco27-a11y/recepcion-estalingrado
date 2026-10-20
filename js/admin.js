@@ -46,7 +46,7 @@
   var filtroEstadoEl = $('filtro-estado');
   var filtroServicioEl = $('filtro-servicio');
   var btnRecargar = $('btn-recargar');
-  var btnCsv = $('btn-csv');
+  var btnExcel = $('btn-xlsx');
 
   var dialogo = $('dialog-solicitud');
   var detalleDatos = $('detalle-datos');
@@ -433,53 +433,133 @@
     });
   }
 
-  /* ---------- CSV ---------- */
+  /* ---------- Exportación a Excel ---------- */
 
-  function celdaCsv(valor) {
-    var texto = String(valor == null ? '' : valor);
-    /* Anti inyección de fórmulas: si empieza con = + - @ (o tabulación o
-       retorno), se antepone un apóstrofo para que Excel/Sheets lo trate como
-       texto y no ejecute nada. */
-    if (/^[=+\-@\t\r]/.test(texto)) texto = "'" + texto;
-    return '"' + texto.replace(/"/g, '""') + '"';
+  var ORDEN_SERVICIOS = ['tecnico', 'web', 'soporte'];
+  var COLUMNAS_EXCEL = [
+    'Nº', 'Recibida', 'Actualizada', 'Estado', 'Servicio', 'Nombre', 'Contacto',
+    'Tipo de problema', 'Dispositivo', 'Tipo de proyecto', 'Sitio actual',
+    'Motivo', 'Producto relacionado', 'Descripción', 'Notas internas'
+  ];
+  var ANCHOS_EXCEL = [5, 17, 17, 15, 17, 24, 24, 32, 24, 28, 24, 24, 26, 46, 30];
+
+  function agruparPorServicio(filas) {
+    var grupos = [[], [], []];
+    var resto = [];
+    filas.forEach(function (s) {
+      var posicion = ORDEN_SERVICIOS.indexOf(s.servicio);
+      if (posicion === -1) resto.push(s);
+      else grupos[posicion].push(s);
+    });
+    return grupos[0].concat(grupos[1], grupos[2], resto);
   }
 
-  function exportarCsv() {
+  function celdaExcel(s, posicion) {
+    return [
+      posicion,
+      window.Exportacion.fecha(s.creado_en),
+      window.Exportacion.fecha(s.actualizado_en),
+      ESTADOS[s.estado] || s.estado || '',
+      SERVICIOS[s.servicio] || s.servicio || '',
+      s.nombre || '',
+      s.contacto || '',
+      s.tipo_problema || '',
+      s.dispositivo || '',
+      s.tipo_proyecto || '',
+      s.sitio_actual || '',
+      s.motivo_soporte || '',
+      s.producto_relacionado || '',
+      s.descripcion || '',
+      s.notas_internas || ''
+    ];
+  }
+
+  function descripcionFiltros() {
+    var partes = [];
+    if (filtroEstadoEl.value) partes.push(ESTADOS[filtroEstadoEl.value] || filtroEstadoEl.value);
+    if (filtroServicioEl.value) partes.push(SERVICIOS[filtroServicioEl.value] || filtroServicioEl.value);
+    var consulta = buscarEl.value.trim();
+    if (consulta) partes.push('búsqueda: ' + consulta);
+    return partes.length ? partes.join(' · ') : 'Ninguno (todas)';
+  }
+
+  function hojaResumen(visibles) {
+    var porEstado = { nueva: 0, en_revision: 0, respondida: 0, cerrada: 0 };
+    var porServicio = [0, 0, 0];
+    var otros = 0;
+    visibles.forEach(function (s) {
+      if (porEstado[s.estado] != null) porEstado[s.estado]++;
+      var posicion = ORDEN_SERVICIOS.indexOf(s.servicio);
+      if (posicion === -1) otros++;
+      else porServicio[posicion]++;
+    });
+
+    var filas = [
+      [window.Exportacion.titulo('Resumen de la exportación')],
+      ['Generado', window.Exportacion.fecha(new Date().toISOString())],
+      ['Solicitudes incluidas', visibles.length],
+      ['Filtros aplicados', descripcionFiltros()],
+      [],
+      [window.Exportacion.titulo('Por estado')],
+      [window.Exportacion.encabezado('Estado'), window.Exportacion.encabezado('Cantidad')],
+      ['Nueva', porEstado.nueva],
+      ['En revisión', porEstado.en_revision],
+      ['Respondida', porEstado.respondida],
+      ['Cerrada', porEstado.cerrada],
+      [],
+      [window.Exportacion.titulo('Por servicio')],
+      [window.Exportacion.encabezado('Servicio'), window.Exportacion.encabezado('Cantidad')],
+      [SERVICIOS.tecnico, porServicio[0]],
+      [SERVICIOS.web, porServicio[1]],
+      [SERVICIOS.soporte, porServicio[2]]
+    ];
+    if (otros) filas.push(['Otros', otros]);
+    return filas;
+  }
+
+  function nombreArchivoExcel() {
+    var partes = [];
+    if (filtroEstadoEl.value) partes.push(filtroEstadoEl.value);
+    if (filtroServicioEl.value) partes.push(filtroServicioEl.value);
+    var consulta = buscarEl.value.trim();
+    if (consulta) {
+      var limpia = consulta.toLowerCase();
+      if (limpia.normalize) limpia = limpia.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+      limpia = limpia.replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 24);
+      if (limpia) partes.push('q-' + limpia);
+    }
+    return 'solicitudes-' + new Date().toISOString().slice(0, 10) +
+      (partes.length ? '-' + partes.join('-') : '') + '.xlsx';
+  }
+
+  function exportarExcel() {
+    if (!window.Exportacion) {
+      infoEl.textContent = 'No pudimos generar el archivo Excel (falta js/exportacion.js).';
+      return;
+    }
     var visibles = filtradas();
     if (!visibles.length) {
       infoEl.textContent = 'No hay solicitudes para exportar con esos filtros.';
       return;
     }
 
-    var lineas = [[
-      'Fecha', 'Servicio', 'Estado', 'Nombre', 'Contacto',
-      'Tipo', 'Equipo o sitio', 'Descripción', 'Notas internas'
-    ].map(celdaCsv).join(';')];
-
-    visibles.forEach(function (s) {
-      lineas.push([
-        fechaLegible(s.creado_en),
-        SERVICIOS[s.servicio] || s.servicio,
-        ESTADOS[s.estado] || s.estado,
-        s.nombre,
-        s.contacto,
-        s.tipo_problema || s.tipo_proyecto || s.motivo_soporte || '',
-        s.dispositivo || s.sitio_actual || s.producto_relacionado || '',
-        s.descripcion,
-        s.notas_internas || ''
-      ].map(celdaCsv).join(';'));
+    var filas = [COLUMNAS_EXCEL.map(function (columna) {
+      return window.Exportacion.encabezado(columna);
+    })];
+    agruparPorServicio(visibles).forEach(function (s, i) {
+      filas.push(celdaExcel(s, i + 1));
     });
 
-    var blob = new Blob(['\uFEFF' + lineas.join('\r\n')], { type: 'text/csv;charset=utf-8;' });
-    var url = URL.createObjectURL(blob);
-    var enlace = document.createElement('a');
-    enlace.href = url;
-    enlace.download = 'solicitudes-' + new Date().toISOString().slice(0, 10) + '.csv';
-    document.body.appendChild(enlace);
-    enlace.click();
-    enlace.remove();
-    URL.revokeObjectURL(url);
-    infoEl.textContent = 'CSV exportado con ' + visibles.length + ' solicitud' + (visibles.length === 1 ? '' : 'es') + '.';
+    try {
+      var bytes = window.Exportacion.crear([
+        { nombre: 'Solicitudes', filas: filas, anchos: ANCHOS_EXCEL },
+        { nombre: 'Resumen', filas: hojaResumen(visibles), anchos: [34, 24], congelar: false, filtro: false }
+      ]);
+      window.Exportacion.descargar(nombreArchivoExcel(), bytes);
+      infoEl.textContent = 'Excel exportado con ' + visibles.length + ' solicitud' + (visibles.length === 1 ? '' : 'es') + '.';
+    } catch (e) {
+      infoEl.textContent = 'No pudimos generar el archivo Excel: ' + e.message;
+    }
   }
 
   /* ---------- Eventos ---------- */
@@ -499,7 +579,7 @@
 
   btnSalir.addEventListener('click', salir);
   btnRecargar.addEventListener('click', cargarSolicitudes);
-  btnCsv.addEventListener('click', exportarCsv);
+  btnExcel.addEventListener('click', exportarExcel);
 
   buscarEl.addEventListener('input', function () {
     window.clearTimeout(esperaBusqueda);

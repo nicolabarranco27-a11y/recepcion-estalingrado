@@ -24,7 +24,8 @@ Servicio tecnico y paginas web/
 ├── js/
 │   ├── config.js     # URL + anon key de Supabase (el usuario las pega al crear el proyecto)
 │   ├── main.js       # Menú móvil, reveal on scroll, año dinámico, flujo y envío
-│   └── admin.js      # Login, lista, filtros, detalle, notas, CSV (API REST de Supabase)
+│   ├── exportacion.js # Generador de archivos .xlsx (ZIP + XML a mano, sin librerías)
+│   └── admin.js      # Login, lista, filtros, detalle, notas, exportación a Excel
 ├── supabase/
 │   ├── schema.sql    # Tablas, RLS, trigger e instrucciones del admin (re-ejecutable)
 │   ├── migracion-soporte.sql  # Habilita el tercer servicio en una base ya existente
@@ -165,8 +166,8 @@ REST (sin librerías ni backend propio):
   primero), con búsqueda y filtros por estado/servicio;
 - abrir el detalle en un `<dialog>`, cambiar el estado (`nueva`, `en_revision`,
   `respondida`, `cerrada`) y guardar notas internas;
-- exportar a CSV (UTF-8 con BOM y separador `;`, listo para Excel) lo que esté
-  filtrado.
+- exportar a **Excel** (`.xlsx` real, generado en el navegador sin librerías)
+  lo que esté filtrado, agrupado por servicio y con una hoja de resumen.
 
 Todo el contenido se renderiza con `textContent` (a prueba de XSS). Si
 `js/config.js` está vacío, el login queda deshabilitado con un aviso. Los
@@ -219,15 +220,17 @@ usuario; el resto ya está en el código):
   `Content-Security-Policy` (solo scripts propios, estilos y fuentes de los CDN
   usados y conexiones a `*.supabase.co`) y
   `referrer: strict-origin-when-cross-origin`.
-- **CSV seguro.** La exportación neutraliza la inyección de fórmulas: las celdas
-  que empiezan con `=`, `+`, `-` o `@` salen como texto.
+- **Exportación segura.** El `.xlsx` se arma con celdas de texto (`inlineStr`);
+  el archivo no contiene nunca fórmulas (`<f>`), así que ninguna celda del
+  usuario puede ejecutarse al abrirlo. Las fechas viajan como fechas reales de
+  Excel, no como texto.
 - **Panel escondido.** `admin.html` no está enlazado, lleva `noindex` y
   `robots.txt` lo bloquea. La sesión vive en `sessionStorage` (se borra al
   cerrar la pestaña) y el token se refresca solo.
 - **HTTPS.** GitHub Pages sirve el sitio por HTTPS con "Enforce HTTPS" activado.
 - **Cuentas.** *(hacer)* contraseña larga y única para el panel (guarda en el
   gestor de contraseñas), y verificación en dos pasos en GitHub y en Supabase.
-- **Copias y limpieza.** El CSV del panel es la copia de respaldo más simple.
+- **Copias y limpieza.** El Excel del panel es la copia de respaldo más simple.
   Las filas de prueba se borran desde Table Editor (fila → Delete row); nadie
   puede borrar desde la web.
 
@@ -282,6 +285,11 @@ anteriores siguen en verde. Las pruebas de red usan `fetch` y `page.route`
 simulados: todavía **no** se ejecutaron contra un proyecto Supabase real
 (eso requiere que el usuario cree el suyo y complete `js/config.js`).
 
+**Etapa 9 y 10 (20/10/2026):** las suites se ampliaron con el soporte al
+cliente y con la exportación a Excel y suman hoy **336 aserciones en verde**:
+jsdom 82 (recepción) + 11 (técnico) + 66 (Supabase); Chromium 64 (visual) +
+33 (extra) + 80 (panel).
+
 **Limitación honesta:** la revisión visual pixel a pixel (estética, espaciados,
 legibilidad subjetiva) no pudo evaluarse automáticamente en esta máquina.
 Queda pendiente de inspección humana con el checklist al final de este archivo.
@@ -314,6 +322,11 @@ institucional.
       (sección `#soporte`, tarjeta, campos, SQL de migración, panel y pruebas),
       documentado en `DOCUMENTACION.md` §4.8. Requiere ejecutar
       `supabase/migracion-soporte.sql` en Supabase (SQL Editor → Run).
+- [x] Etapa 10 (20/10/2026): **exportación a Excel `.xlsx` sin librerías** (nuevo
+      `js/exportacion.js`: ZIP sin comprimir con CRC32 propio y XML escrito a
+      mano; hojas "Solicitudes" y "Resumen", agrupado por servicio, exporta lo
+      filtrado con los filtros en el nombre). Reemplaza al CSV y queda
+      documentado en `DOCUMENTACION.md` §4.9.
 - [x] **Configurar Supabase (19/10/2026):** proyecto `estalingrado-corp` (São
       Paulo) creado, URL + anon key en `js/config.js`, `supabase/schema.sql`
       ejecutado, usuario admin `nbmn38@gmail.com` (Auto Confirm) e insertado su

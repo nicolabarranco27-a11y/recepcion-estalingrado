@@ -392,3 +392,63 @@ PENDIENTE (usuario): ejecutar supabase/migracion-soporte.sql en Supabase
 se rechazan. Despues hay que probar una solicitud real desde la pagina.
 
 - FIN DE LA SESIÓN: se detiene y se espera la revisión del usuario.
+
+============================================================
+SESIÓN 14 - 20/10/2026 - Exportacion a Excel (.xlsx) sin librerias
+============================================================
+Segunda tarea acordada con el usuario despues del soporte: pasar del CSV a un
+Excel real. Decisiones ya cerradas: .xlsx de verdad, generado en el navegador
+sin librerias (prohibidas por el proyecto), dos hojas (Solicitudes + Resumen),
+columnas con los 3 servicios, agrupado por servicio (tecnico, web, soporte y
+desconocidos al final, mas reciente primero dentro de cada grupo), exportando
+lo filtrado en pantalla, y el CSV se reemplaza (no se quedan los dos).
+
+Hecho:
+- js/exportacion.js (nuevo, cargado antes de admin.js en admin.html):
+  - ZIP sin comprimir (STORE) escrito a mano con DataView: cabeceras locales,
+    directorio central y fin de archivo con sus firmas hex; CRC32 propio con
+    tabla de 256 y polinomio 0xEDB88320; marcas DOS de fecha/hora; flag UTF-8
+    0x0800. Sin CompressionStream ni zlib.
+  - UTF-8 propio (aUtf8) con pares sustitutos, sin depender de TextEncoder.
+  - Partes OOXML: [Content_Types].xml, _rels/.rels, xl/workbook.xml,
+    xl/_rels/workbook.xml.rels, xl/styles.xml (4 estilos: normal, titulo
+    negrita, fecha dd/mm/yyyy hh:mm, cabecera blanco sobre azul #1D4ED8) y una
+    hoja por pestaña.
+  - Celdas: texto como inlineStr (el archivo NO puede contener formulas, asi
+    que la inyeccion de formulas queda eliminada por diseno), numeros como <v>,
+    fechas como serial de Excel con formato de fecha; todo con limpiarXml()
+    (caracteres de control), escaparXml() y tope de 32767 caracteres.
+  - Hoja con dimension, panel congelado en la fila de cabecera, anchos de
+    columna y autoFilter.
+  - API: Exportacion.titulo/encabezado/fecha/texto, crear(hojas) -> Uint8Array
+    y descargar(nombre, bytes) via Blob + <a download>.
+- admin.html: boton #btn-xlsx "Exportar Excel" (fa-file-excel) reemplaza al
+  "Exportar CSV" (#btn-csv); se carga js/exportacion.js antes de js/admin.js.
+- js/admin.js: se elimino celdaCsv/exportarCsv; ahora exportarExcel() arma la
+  hoja Solicitudes con 15 columnas (Nº, Recibida, Actualizada, Estado, Servicio,
+  Nombre, Contacto, Tipo de problema, Dispositivo, Tipo de proyecto, Sitio
+  actual, Motivo, Producto relacionado, Descripcion, Notas internas) con fechas
+  reales de Excel; agruparPorServicio() reordena sin usar indices peligrosos;
+  hoja Resumen con generacion, cantidad, filtros aplicados y conteos por estado
+  y por servicio; el nombre de archivo agrega los filtros (solicitudes-fecha
+  [-estado][-servicio][-q-busqueda-saneada].xlsx); sin filas no descarga y lo
+  informa; si falta exportacion.js muestra un aviso.
+- Pruebas: test-admin.js reescrito en su bloque de exportacion (+14
+  aserciones): parser de ZIP propio en la suite (leerZip, STORE y DEFLATE),
+  firma PK, estructura del paquete, dos hojas, cabeceras completas, fechas con
+  s=2 y serial 46..., HTML del usuario escapado, ausencia de <f>, orden
+  agrupado (los datos de prueba se acomodaron para que el orden por fecha
+  difiera del agrupado y el test lo demuestre), exportacion filtrada,
+  nombre con la busqueda normalizada (-q-panaderia) y caso sin filas.
+- Suites en verde: recepcion 82 + tecnico 11 + visual 64 + extra 33 +
+  supabase 66 + panel 80 = 336 PASS, 0 FAIL.
+- Documentacion: README (estructura con exportacion.js, botones del panel,
+  seccion de seguridad sobre la exportacion, verificacion 20/10 y checklist
+  Etapa 10), DOCUMENTACION (§1, §3 fila 10, §4.5, §4.6, §4.8, §4.9 nueva, §5
+  con 336, §6 columnas de la tabla + alcance del panel y §7 item 8) y esta
+  bitacora.
+
+PENDIENTE (usuario): ejecutar supabase/migracion-soporte.sql (Etapa 9) y, si
+quiere, revisar el .xlsx que descarga el panel abriendo el Excel.
+
+- FIN DE LA SESIÓN: se detiene y se espera la revisión del usuario.

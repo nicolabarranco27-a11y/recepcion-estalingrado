@@ -21,7 +21,8 @@ Carpeta de trabajo de Estalingrado Corp que contiene dos frentes:
    interfaz lo informa (nunca simula un envío).
 2. **Panel de administración (IMPLEMENTADO)** — `admin.html` sin enlace
    público: login con usuario de Supabase, lista de solicitudes, filtros,
-   detalle, estados, notas internas y exportación CSV. No hay backend propio:
+   detalle, estados, notas internas y exportación a Excel (`.xlsx`). No hay
+   backend propio:
    habla con la API REST de Supabase; la seguridad está en RLS.
 
 El sitio institucional de referencia es
@@ -60,6 +61,7 @@ la Etapa 1). Este proyecto no modifica ni depende de sus archivos.
 | 7 (19/10/2026) | **Supabase + panel**: `supabase/schema.sql` (tablas `solicitudes`/`admins`, trigger, RLS), guía `supabase/INSTRUCCIONES.md`, `js/config.js`, envío real por REST con estados/honeypot, `admin.html` + `css/admin.css` + `js/admin.js` (login, stats, filtros, detalle, estados, notas, CSV), `robots.txt`, suites nuevas y `git init`. Ver §4.2 y §4.5. | Hecha y conectada (proyecto Supabase real el 19/10/2026) |
 | 8 (19/10/2026) | **Accesos y botones**: hero con "Servicios informáticos y web" (ancla a `#servicios`) y "Conocer la empresa" (sitio institucional en otra pestaña); repaso visual de los botones del formulario y del panel (radio, alto táctil, contraste, foco y estado deshabilitado). Ver §4.7. | Hecha |
 | 9 (20/10/2026) | **Soporte al cliente como tercer servicio**: sección `#soporte` (pasos + correo + CTA), tarjeta `#servicio-soporte`, grupo `#campos-soporte` (motivo obligatorio + producto relacionado), refactor de `aplicarServicio` a 3 grupos, columnas nuevas en la base con `supabase/migracion-soporte.sql`, filtro y detalle en el panel, y suites ampliadas (322 aserciones). Ver §4.8. | Hecha (falta correr el SQL en Supabase) |
+| 10 (20/10/2026) | **Exportación a Excel `.xlsx` sin librerías**: nuevo `js/exportacion.js` (ZIP sin comprimir + CRC32 y XML de OOXML escritos a mano), botón "Exportar Excel" que reemplaza al CSV, hojas *Solicitudes* y *Resumen*, agrupamiento por servicio y exportación de lo filtrado. Ver §4.9. | Hecha |
 
 ## 4. Recepción: diseño actual del flujo
 
@@ -174,9 +176,9 @@ Verificado: 4 suites en verde tras los cambios (62+11 jsdom, 64 visual,
   servicio; permite cambiar `estado` (`nueva`, `en_revision`, `respondida`,
   `cerrada`) y guardar `notas_internas` con
   `PATCH /rest/v1/solicitudes?id=eq.<uuid>` + `Prefer: return=minimal`.
-- **CSV**: exporta lo filtrado con BOM UTF-8 y separador `;` (Excel es-AR);
-  columnas Fecha, Servicio, Estado, Nombre, Contacto, Tipo, Equipo o sitio,
-  Descripción y Notas internas.
+- **Exportación a Excel (Etapa 10, ver §4.9)**: exporta lo filtrado a un
+  `.xlsx` real con hojas *Solicitudes* (15 columnas, agrupado por servicio) y
+  *Resumen* (conteos por estado y por servicio).
 - **Seguridad**: todo se pinta con `textContent` (XSS neutralizado), no hay
   enlaces desde la página pública, y la autorización real es RLS: solo un
   usuario con fila en `admins` puede leer/actualizar. El frontend nunca usa
@@ -212,9 +214,11 @@ Revisión completa pedida por el usuario tras conectar Supabase. Cambios:
   form-action 'self'; upgrade-insecure-requests`. No hay scripts, estilos ni
   manejadores inline en el HTML, así que no hizo falta `unsafe-inline`. Se sumó
   `meta referrer = strict-origin-when-cross-origin`.
-- **CSV**: `celdaCsv()` antepone un apóstrofo a las celdas que empiezan con
-  `= + - @` (o tabulación/retorno) para neutralizar la inyección de fórmulas en
-  Excel/Sheets.
+- **CSV (Etapa 7, reemplazado en la Etapa 10)**: `celdaCsv()` antepone un
+  apóstrofo a las celdas que empiezan con `= + - @` (o tabulación/retorno) para
+  neutralizar la inyección de fórmulas en Excel/Sheets. El CSV ya no existe: el
+  `.xlsx` de §4.9 escribe las celdas como `inlineStr`, de modo que el archivo no
+  puede contener fórmulas.
 - **Verificación**: `verificar-csp.js` (Chromium) sobre local y sobre la página
   publicada: 0 cortes por CSP, 0 errores de consola, íconos de Font Awesome y
   logo cargados. `Enforce HTTPS` de GitHub Pages confirmado activo. Auditoría de
@@ -294,7 +298,7 @@ recepción, misma tabla `solicitudes`, mismo panel y misma exportación.
 - `SERVICIOS.soporte = 'Soporte'`; meta de la lista con
   `tipo_problema || tipo_proyecto || motivo_soporte`.
 - Detalle con filas *Motivo* y *Producto relacionado*; el buscador incluye los
-  dos campos; el CSV actual incluye el motivo en la columna "Tipo".
+  dos campos; la exportación (§4.9) les dedica una columna a cada uno.
 
 **CSS (`css/styles.css`)**
 
@@ -303,6 +307,65 @@ recepción, misma tabla `solicitudes`, mismo panel y misma exportación.
 - `.contact-list__value` con `overflow-wrap: anywhere` (el correo largo del
   soporte provocaba desborde horizontal a 360 px; detectado por la suite y
   corregido).
+
+### 4.9 Exportación a Excel (Etapa 10, 20/10/2026)
+
+El CSV del panel se reemplazó por un archivo **`.xlsx` real**, generado en el
+navegador **sin ninguna librería** (prohibido por las restricciones del
+proyecto). Decidido con el usuario: formato `.xlsx`, exportar lo filtrado en
+pantalla, agrupar por servicio y reemplazar al CSV.
+
+**`js/exportacion.js` (módulo nuevo, cargado antes de `admin.js`)**
+
+- **ZIP sin comprimir (STORE)**: escribe a mano los tres bloques del formato
+  ZIP — cabeceras locales (`0x04034b50`), directorio central (`0x02014b50`) y
+  fin de archivo (`0x06054b50`) — con `DataView`, `crc32` propio (tabla de
+  256 posiciones, polinomio `0xEDB88320`), marcas DOS de fecha/hora y el flag
+  UTF-8 (`0x0800`). Sin `CompressionStream` ni `zlib`: nada de la plataforma
+  de compresión.
+- **Codificación UTF-8 propia**: `aUtf8()` convierte strings a bytes manejando
+  BMP y pares sustitutos (emoji incluidos), sin depender de `TextEncoder`.
+- **Partes OOXML mínimas y válidas**: `[Content_Types].xml`, `_rels/.rels`,
+  `xl/workbook.xml`, `xl/_rels/workbook.xml.rels`, `xl/styles.xml` (4 estilos:
+  normal, título en negrita, fecha `dd/mm/yyyy hh:mm` y cabecera con texto
+  blanco sobre azul `#1D4ED8`) y una hoja por pestaña.
+- **Celdas**: texto como `inlineStr` (el archivo **no puede** contener fórmulas,
+  así que la inyección de fórmulas queda eliminada por diseño), números como
+  `<v>` y fechas como número serial de Excel con formato de fecha. Todo el texto
+  pasa por `limpiarXml()` (saca caracteres de control) y `escaparXml()`
+  (`& < > " '`) y se recorta al límite de 32767 caracteres.
+- **Hoja**: dimensión, panel congelado en la fila de cabecera, anchos de columna
+  personalizados y `autoFilter` (el Excel queda listo para filtrar).
+- **API**: `Exportacion.titulo/encabezado/fecha/texto` para armar celdas y
+  `Exportacion.crear(hojas)` → `Uint8Array`; `descargar(nombre, bytes)` genera
+  el `Blob` (MIME `…spreadsheetml.sheet`) y dispara el `<a download>`.
+
+**Panel (`js/admin.js`)**
+
+- Botón **"Exportar Excel"** (`#btn-xlsx`, `fa-file-excel`) que reemplaza a
+  "Exportar CSV".
+- **Hoja "Solicitudes"**: `Nº · Recibida · Actualizada · Estado · Servicio ·
+  Nombre · Contacto · Tipo de problema · Dispositivo · Tipo de proyecto ·
+  Sitio actual · Motivo · Producto relacionado · Descripción · Notas internas`
+  (una columna por servicio, sin fusionar; fechas con formato real de Excel).
+- **Agrupado por servicio**: `agruparPorServicio()` ordena técnica → web →
+  soporte (y lo desconocido al final) respetando el orden descendente de
+  fecha que ya trae la lista.
+- **Hoja "Resumen"**: fecha de generación, cantidad de solicitudes, filtros
+  aplicados y conteos por estado y por servicio.
+- **Exporta `filtradas()`**: lo que está en pantalla es lo que sale del archivo.
+- **Nombre de archivo**: `solicitudes-AAAA-MM-DD.xlsx` con los filtros
+  agregados (`-nueva`, `-soporte`, `-q-panaderia`…): la búsqueda se pasa por
+  `NFD`, se le sacan las tildes y se limita a 24 caracteres.
+- Sin filas filtradas no descarga nada y lo informa; si `js/exportacion.js`
+  no cargara, muestra un aviso en vez de fallar en silencio.
+
+**Pruebas (`test-admin.js`, +14 aserciones)**: descarga interceptada con
+`page.waitForEvent('download')`, verificación de la firma `PK`, parser de ZIP
+incluido en la suite (`leerZip()`, acepta STORE y DEFLATE), estructura del
+paquete, las dos hojas, cabeceras, fechas con `s="2"`, HTML escapado, ausencia
+de fórmulas, orden agrupado, exportación filtrada, nombre con filtros y el
+caso sin filas.
 
 ## 5. Pruebas (07/10 → 20/10/2026)
 
@@ -316,9 +379,9 @@ el proyecto no usa Node/build. Son 6 suites (4 de recepción + 2 de Etapa 7):
 | `etapa4-visual.js` | Chromium real | 1440/390/360 px: sin desborde horizontal, consola limpia, recursos locales OK, orbes (canvas fijo sin eventos, ajustado al viewport y **con píxeles dibujados**), recorrido completo tarjeta→errores→revisión, caracteres especiales/emoji, XSS, editar conserva datos. | 64/64 PASS |
 | `etapa4-extra.js` | Chromium real | Anclas vs navbar (incluye `#soporte`), skip link, foco visible con teclado, Enter implícito, tarjeta de soporte, cambio de servicio en vivo sin resumen obsoleto, campos de grupo preservados, texto >2000 chars, labels/`aria-describedby`, stepper coherente, `prefers-reduced-motion` (orbes estáticos: dos capturas idénticas), solapamientos @360. | 33/33 PASS |
 | `test-supabase.js` | jsdom | `CONFIG_SUPABASE` simulado: botón habilitado, POST a `/rest/v1/solicitudes`, URL/headers/`Prefer`, payload snake_case por servicio (técnico, web y **soporte**), motivo vacío sin POST, éxito + "Nueva solicitud", error de red con datos conservados y reintento, honeypot sin `fetch`, y respuesta anti-spam (título y texto específicos). | 66/66 PASS |
-| `test-admin.js` | Chromium real | Panel con API simulada por `page.route` (incluye preflight CORS): login inválido/válido, sesión, stats, lista (3 filas), XSS, filtros, filtro y detalle de **soporte** (motivo, producto, búsqueda), PATCH 204, CSV (BOM/`;` + motivo), recarga con sesión, logout y móvil 360 sin desborde. | 66/66 PASS |
+| `test-admin.js` | Chromium real | Panel con API simulada por `page.route` (incluye preflight CORS): login inválido/válido, sesión, stats, lista (3 filas), XSS, filtros, filtro y detalle de **soporte** (motivo, producto, búsqueda), PATCH 204, **exportación a Excel** (firma ZIP, estructura del paquete, dos hojas, cabeceras, fechas, escapado, sin fórmulas, agrupado por servicio, exportación filtrada y nombre con filtros), recarga con sesión, logout y móvil 360 sin desborde. | 80/80 PASS |
 
-**Total: 322 aserciones en verde (0 fallos).**
+**Total: 336 aserciones en verde (0 fallos).**
 
 Las suites de Etapa 7 usan `window.fetch` / `page.route` simulados. Desde el
 19/10/2026 el proyecto real ya está conectado y probado a mano de punta a punta
@@ -337,8 +400,9 @@ y seguir con HTML/CSS/JS vanilla. Lo implementado es:
 
 - **Base de datos** (PostgreSQL en Supabase), creada por `supabase/schema.sql`:
   - `public.solicitudes`: `id uuid`, `creado_en`, `actualizado_en`, `servicio`
-    (`tecnico|web`), `nombre`, `contacto`, `tipo_problema`, `dispositivo`,
-    `tipo_proyecto`, `sitio_actual`, `descripcion`, `estado`
+    (`tecnico|web|soporte`), `nombre`, `contacto`, `tipo_problema`, `dispositivo`,
+    `tipo_proyecto`, `sitio_actual`, `motivo_soporte`, `producto_relacionado`,
+    `descripcion`, `estado`
     (`nueva|en_revision|respondida|cerrada`, default `nueva`) y
     `notas_internas`.
   - `public.admins`: `user_id uuid` → `auth.users` (PK), `email`, `creado_en`.
@@ -361,7 +425,8 @@ y seguir con HTML/CSS/JS vanilla. Lo implementado es:
   en `supabase/INSTRUCCIONES.md` (crear proyecto en São Paulo, ejecutar SQL,
   crear admin, probar con `npx http-server . -p 8080`, troubleshooting).
 - **Alcance del panel v1**: solo solicitudes (lista, filtros, detalle, estado,
-  notas internas, CSV). No incluye clientes, equipos, presupuestos, facturación
+  notas internas, exportación a Excel). No incluye clientes, equipos,
+  presupuestos, facturación
   ni envío de correos; quedan como futuras etapas si se piden.
 - **Límites conscientes**: la lista trae hasta 500 filas (sin paginación
   todavía), no hay tiempo real ni notificaciones, y el envío depende de que
@@ -397,6 +462,10 @@ Pasos del usuario (resueltos el 19/10/2026; detalle en la guía):
 6. No publicar ni configurar dominio (fuera de alcance hasta que se pida).
 7. *(hacer)* contraseña fuerte para el panel y verificación en dos pasos en
    GitHub y Supabase.
+8. *(hacer)* **ejecutar `supabase/migracion-soporte.sql`** en el SQL Editor de
+   Supabase (guía: §8 de `supabase/INSTRUCCIONES.md`). Hasta que corra esa
+   migración, las solicitudes del servicio "Soporte" se rechazan (el resto del
+   sitio funciona igual).
 
 ## 8. Limitaciones conocidas
 
