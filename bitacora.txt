@@ -769,3 +769,36 @@ decidir si se publica de una. Sigue pendiente ejecutar
 supabase/migracion-soporte.sql (Etapa 9).
 
 - FIN DE LA SESIÓN: se detiene y se espera la revisión del usuario.
+
+SESIÓN 22 (20/10/2026) — REVISIÓN APROBADA Y PUBLICACIÓN EN GITHUB PAGES
+------------------------------------------------------------------------
+
+Feedback del usuario: "me gusta. actualiza toda la documentación. actualiza
+el repo y pages". Se levanta la restricción de no publicar.
+
+Documentacion final antes del commit:
+- README: fila de la Etapa 11 sin "pendiente de revisión", checklist manual
+  marcado "revisado y aprobado el 20/10/2026" y la "limitación honesta" de
+  revisión humana reemplazada por el registro de las rondas de revisión.
+- DOCUMENTACION: filas 11, 12, 13 y 14 a "Hecha y publicada", §7.1 marcado
+  ✔ (revisión humana) y §8 limitación ajustada.
+
+Commit y publicación:
+- git add -A (6 archivos modificados + 2 imágenes nuevas) → commit
+  1de6c8a "Cerrar Etapas 11 a 14: soporte directo, escritura del hero,
+  orbes minimalistas e imagenes" → git push origin main
+  (1770a46 → 1de6c8a).
+- GitHub Pages desplegó en ~30 segundos; verificado en vivo:
+  https://nicolabarranco27-a11y.github.io/recepcion-estalingrado/
+  HTML con hero__img / soporte__intro / oficinas__figura, CSS con
+  soporte__intro + hero-parpadeo, e Imagenes/imagen.jpg (144.023 bytes) y
+  Imagenes/oficina.jpg (52.500 bytes) con HTTP 200 (mayúsculas exactas).
+- Sitio publicado ahora con las Etapas 11, 12, 13 y 14. Batería previa al
+  commit: 350 PASS, 0 FAIL.
+
+PENDIENTE (usuario): ejecutar supabase/migracion-soporte.sql en Supabase
+(SQL Editor → Run, guía §8 de supabase/INSTRUCCIONES.md); hasta entonces el
+servicio "Soporte" se rechaza en la BD. Siguen los pendientes conocidos de
+DOCUMENTACION §7 (teléfono, 2FA, dominio).
+
+- FIN DE LA SESIÓN: Etapas 11-14 publicadas y documentadas.
