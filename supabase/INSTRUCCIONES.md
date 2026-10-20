@@ -113,3 +113,20 @@ npx http-server . -p 8080
 | El panel dice "Email o contraseña incorrectos" | usuario no existe, contraseña mal o falta confirmar el correo |
 | El panel entra pero no muestra solicitudes | el UUID no está en la tabla `admins` |
 | `new row violates row-level security policy` | se ejecutó el SQL viejo o el formulario envía campos fuera de los límites |
+| No se puede enviar una solicitud de **soporte** | falta ejecutar `migracion-soporte.sql` (sección 8) |
+
+## 8. Soporte al cliente: actualizar una base existente
+
+Si ya creaste las tablas con el `schema.sql` **anterior** (sin soporte), ejecutá
+una sola actualización:
+
+1. En Supabase: **SQL Editor → New query**.
+2. Abrí `supabase/migracion-soporte.sql`, copiá **todo** y pegalo.
+3. Pulsá **Run**. Debería decir "Success".
+
+Esto agrega las columnas `motivo_soporte` y `producto_relacionado`, amplía la
+regla de servicios válidos a `('tecnico', 'web', 'soporte')` y actualiza la
+política de seguridad. Se puede ejecutar más de una vez sin romper nada.
+
+Si hiciste el proyecto **desde cero** con el `schema.sql` actual, no hace falta
+hacer nada: el soporte ya viene habilitado.

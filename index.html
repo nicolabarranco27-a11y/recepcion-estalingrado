@@ -39,6 +39,7 @@
       <a href="#inicio" class="nav-links__item">Inicio</a>
       <a href="#servicios" class="nav-links__item">Servicios</a>
       <a href="#recepcion" class="nav-links__item">Recepción</a>
+      <a href="#soporte" class="nav-links__item">Soporte</a>
       <a href="#contacto" class="nav-links__item">Contacto</a>
     </nav>
 
@@ -57,6 +58,7 @@
     <a href="#inicio" class="mobile-menu__link">Inicio</a>
     <a href="#servicios" class="mobile-menu__link">Servicios</a>
     <a href="#recepcion" class="mobile-menu__link">Recepción</a>
+    <a href="#soporte" class="mobile-menu__link">Soporte</a>
     <a href="#contacto" class="mobile-menu__link">Contacto</a>
   </nav>
 </div>
@@ -99,7 +101,7 @@
       <div class="section__head reveal">
         <p class="section__label"><span class="section__line" aria-hidden="true"></span>Recepción · Servicios</p>
         <h2 class="section__title" id="servicios-title">¿Cómo podemos <span class="tg">ayudarte</span>?</h2>
-        <p class="section__desc">Dos servicios, una misma atención. Seleccioná el que corresponda a tu solicitud.</p>
+        <p class="section__desc">Tres servicios, una misma recepción. Seleccioná el que corresponda a tu solicitud.</p>
       </div>
 
       <div class="cards">
@@ -128,6 +130,21 @@
             velocidad y presencia profesional en internet.
           </p>
           <a href="#recepcion" class="card__link" data-servicio="web">
+            Iniciar solicitud
+            <i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
+          </a>
+        </article>
+
+        <article class="card reveal" id="servicio-soporte">
+          <div class="card__icon" aria-hidden="true">
+            <i class="fa-solid fa-headset"></i>
+          </div>
+          <h3 class="card__title">Soporte al cliente</h3>
+          <p class="card__text">
+            Ayuda y acompañamiento para clientes: consultas, incidencias y reclamos
+            sobre los servicios que ya estás usando.
+          </p>
+          <a href="#recepcion" class="card__link" data-servicio="soporte">
             Iniciar solicitud
             <i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
           </a>
@@ -228,6 +245,29 @@
             </div>
           </div>
 
+          <!-- Campos específicos: soporte al cliente -->
+          <div class="field-group" id="campos-soporte" hidden>
+            <p class="flow__subtitulo">Motivo del contacto</p>
+            <div class="field">
+              <label class="field__label" for="motivo-soporte">Motivo <span class="field__req" aria-hidden="true">*</span></label>
+              <select class="field__control" id="motivo-soporte" name="motivoSoporte" required aria-describedby="err-motivo-soporte">
+                <option value="">Seleccioná una opción</option>
+                <option value="Consulta general">Consulta general</option>
+                <option value="Ayuda para usar un servicio">Ayuda para usar un servicio</option>
+                <option value="Incidencia o falla">Incidencia o falla</option>
+                <option value="Reclamo">Reclamo</option>
+                <option value="Estado de una solicitud o servicio">Estado de una solicitud o servicio</option>
+                <option value="Otro">Otro</option>
+              </select>
+              <p class="field__error" id="err-motivo-soporte" hidden>Seleccioná el motivo del contacto.</p>
+            </div>
+
+            <div class="field">
+              <label class="field__label" for="producto-relacionado">Producto o servicio relacionado <span class="field__optional">(opcional)</span></label>
+              <input class="field__control" type="text" id="producto-relacionado" name="productoRelacionado" placeholder="Ej.: la página de mi negocio, la notebook que entregué">
+            </div>
+          </div>
+
           <p class="flow__subtitulo flow__subtitulo--sep">Qué necesitás</p>
 
           <div class="field">
@@ -268,6 +308,69 @@
     </div>
   </section>
 
+  <!-- SOPORTE -->
+  <section class="section" id="soporte" aria-labelledby="soporte-title">
+    <div class="container container--narrow">
+      <div class="section__head reveal">
+        <p class="section__label"><span class="section__line" aria-hidden="true"></span>Soporte · Al cliente</p>
+        <h2 class="section__title" id="soporte-title">Soporte al <span class="tg">cliente</span></h2>
+        <p class="section__desc">
+          Si ya sos cliente o estás usando alguno de nuestros servicios, acá pedís
+          ayuda: consultas, incidencias, reclamos y seguimiento de lo que tenés en curso.
+        </p>
+      </div>
+
+      <ol class="soporte-steps reveal">
+        <li class="soporte-steps__item">
+          <span class="soporte-steps__num" aria-hidden="true">01</span>
+          <div>
+            <p class="soporte-steps__titulo">Pedí el soporte</p>
+            <p class="soporte-steps__texto">
+              En la sección de servicios, elegí la tarjeta "Soporte al cliente" y
+              se abre el mismo formulario de recepción.
+            </p>
+          </div>
+        </li>
+        <li class="soporte-steps__item">
+          <span class="soporte-steps__num" aria-hidden="true">02</span>
+          <div>
+            <p class="soporte-steps__titulo">Contanos qué pasa</p>
+            <p class="soporte-steps__texto">
+              Seleccioná el motivo, indicá el producto o servicio relacionado y
+              detallá la situación en la descripción.
+            </p>
+          </div>
+        </li>
+        <li class="soporte-steps__item">
+          <span class="soporte-steps__num" aria-hidden="true">03</span>
+          <div>
+            <p class="soporte-steps__titulo">Recibí la respuesta</p>
+            <p class="soporte-steps__texto">
+              Respondemos por el medio de contacto que dejaste en la solicitud,
+              con el detalle del caso en tu correo o mensajería.
+            </p>
+          </div>
+        </li>
+      </ol>
+
+      <div class="soporte-canales reveal">
+        <ul class="contact-list">
+          <li class="contact-list__item">
+            <span class="contact-list__icon" aria-hidden="true"><i class="fa-solid fa-envelope"></i></span>
+            <div>
+              <p class="contact-list__label">Correo de soporte</p>
+              <a class="contact-list__value" href="mailto:estalingradocorpsupport@protonmail.com">estalingradocorpsupport@protonmail.com</a>
+            </div>
+          </li>
+        </ul>
+        <a href="#servicios" class="btn btn--outline">
+          Pedir soporte
+          <i class="fa-solid fa-chevron-right btn__arrow" aria-hidden="true"></i>
+        </a>
+      </div>
+    </div>
+  </section>
+
   <!-- CONTACTO -->
   <section class="section" id="contacto" aria-labelledby="contacto-title">
     <div class="container container--narrow">
@@ -279,10 +382,18 @@
         </p>
       </div>
 
-      <!-- TODO: teléfono y correo oficial cuando se verifiquen en el sitio institucional -->
+      <!-- Teléfono oficial: pendiente de que nos lo pase la empresa.
+           El correo de soporte sí está verificado y publicado arriba. -->
       <!-- El formulario de recepción vive en la sección #recepcion -->
 
       <ul class="contact-list reveal">
+        <li class="contact-list__item">
+          <span class="contact-list__icon" aria-hidden="true"><i class="fa-solid fa-envelope"></i></span>
+          <div>
+            <p class="contact-list__label">Soporte al cliente</p>
+            <a class="contact-list__value" href="mailto:estalingradocorpsupport@protonmail.com">estalingradocorpsupport@protonmail.com</a>
+          </div>
+        </li>
         <li class="contact-list__item">
           <span class="contact-list__icon" aria-hidden="true"><i class="fa-brands fa-youtube"></i></span>
           <div>

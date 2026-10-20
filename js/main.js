@@ -246,6 +246,7 @@ var ENVIO = (function () {
   var btnEnviar = document.getElementById('btn-enviar');
   var grupoTecnico = document.getElementById('campos-tecnico');
   var grupoWeb = document.getElementById('campos-web');
+  var grupoSoporte = document.getElementById('campos-soporte');
   var textoNombre = document.getElementById('texto-label-nombre');
   var textoDescripcion = document.getElementById('texto-label-descripcion');
   var campoDescripcion = document.getElementById('descripcion');
@@ -263,7 +264,8 @@ var ENVIO = (function () {
 
   var SERVICIOS = {
     tecnico: 'Servicio técnico informático',
-    web: 'Creación y desarrollo de sitios web'
+    web: 'Creación y desarrollo de sitios web',
+    soporte: 'Soporte al cliente'
   };
 
   var ETIQUETAS = {
@@ -273,6 +275,8 @@ var ENVIO = (function () {
     dispositivo: 'Dispositivo o sistema operativo',
     tipoProyecto: 'Tipo de proyecto',
     sitioActual: 'Sitio web actual',
+    motivoSoporte: 'Motivo',
+    productoRelacionado: 'Producto o servicio relacionado',
     descripcion: 'Descripción'
   };
 
@@ -316,17 +320,40 @@ var ENVIO = (function () {
     });
   }
 
+  var GRUPOS_SERVICIO = [
+    { clave: 'tecnico', grupo: grupoTecnico },
+    { clave: 'web', grupo: grupoWeb },
+    { clave: 'soporte', grupo: grupoSoporte }
+  ];
+
+  var TEXTOS_SERVICIO = {
+    tecnico: {
+      nombre: 'Nombre del cliente',
+      descripcion: 'Descripción del inconveniente',
+      placeholder: 'Ej.: La notebook no enciende desde el lunes, ya probé con otro cargador…'
+    },
+    web: {
+      nombre: 'Nombre del cliente o negocio',
+      descripcion: 'Descripción de lo que necesitás',
+      placeholder: 'Ej.: Quiero una página para mi negocio, con catálogo y contacto…'
+    },
+    soporte: {
+      nombre: 'Nombre del cliente',
+      descripcion: 'Descripción de la situación',
+      placeholder: 'Ej.: Ya soy cliente de la página y necesito ayuda para cargar mis productos…'
+    }
+  };
+
   function aplicarServicio(valor) {
-    var esTecnico = valor === 'tecnico';
-    grupoTecnico.hidden = !esTecnico;
-    grupoWeb.hidden = esTecnico;
-    deshabilitarGrupo(grupoTecnico, !esTecnico);
-    deshabilitarGrupo(grupoWeb, esTecnico);
-    textoNombre.textContent = esTecnico ? 'Nombre del cliente' : 'Nombre del cliente o negocio';
-    textoDescripcion.textContent = esTecnico ? 'Descripción del inconveniente' : 'Descripción de lo que necesitás';
-    campoDescripcion.placeholder = esTecnico
-      ? 'Ej.: La notebook no enciende desde el lunes, ya probé con otro cargador…'
-      : 'Ej.: Quiero una página para mi negocio, con catálogo y contacto…';
+    GRUPOS_SERVICIO.forEach(function (entrada) {
+      var activo = entrada.clave === valor;
+      entrada.grupo.hidden = !activo;
+      deshabilitarGrupo(entrada.grupo, !activo);
+    });
+    var textos = TEXTOS_SERVICIO[valor] || TEXTOS_SERVICIO.tecnico;
+    textoNombre.textContent = textos.nombre;
+    textoDescripcion.textContent = textos.descripcion;
+    campoDescripcion.placeholder = textos.placeholder;
     stepperServicio.textContent = textoServicio(valor);
   }
 
@@ -455,9 +482,12 @@ var ENVIO = (function () {
     if (datos.servicio === 'tecnico') {
       fila.tipo_problema = datos.tipoProblema || null;
       fila.dispositivo = datos.dispositivo || null;
-    } else {
+    } else if (datos.servicio === 'web') {
       fila.tipo_proyecto = datos.tipoProyecto || null;
       fila.sitio_actual = datos.sitioActual || null;
+    } else if (datos.servicio === 'soporte') {
+      fila.motivo_soporte = datos.motivoSoporte || null;
+      fila.producto_relacionado = datos.productoRelacionado || null;
     }
     return fila;
   }
@@ -582,6 +612,8 @@ var ENVIO = (function () {
 
   btnEnviar.addEventListener('click', function () {
     if (enviada || enviando) return;
+    /* El botón vive en el paso 3 (Revisión): nunca envía desde otro paso. */
+    if (pasoResumen.hidden) return;
     var datos = recolectar();
 
     /* Si la trampa anti-bot está completa, simulamos la confirmación sin enviar. */

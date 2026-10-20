@@ -614,6 +614,7 @@ p { margin: 0; }
 .contact-list__value {
   color: var(--text);
   font-size: .875rem;
+  overflow-wrap: anywhere;
   transition: color .25s ease;
 }
 
@@ -655,6 +656,56 @@ p { margin: 0; }
   background: transparent;
   color: #71717a;
 }
+
+/* ---------- Soporte ---------- */
+
+.soporte-steps {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 1.5rem;
+  padding: 0;
+  margin: 0 0 3rem;
+  list-style: none;
+}
+
+.soporte-steps__item {
+  display: flex;
+  gap: .875rem;
+  padding-top: 1.25rem;
+  border-top: 1px solid rgba(59, 130, 246, .35);
+}
+
+.soporte-steps__num {
+  flex-shrink: 0;
+  font-family: var(--font-mono);
+  font-size: .75rem;
+  letter-spacing: .1em;
+  color: var(--blue-400);
+  line-height: 1.7;
+}
+
+.soporte-steps__titulo {
+  margin-bottom: .375rem;
+  font-size: .9375rem;
+  font-weight: 600;
+  color: var(--text-strong);
+}
+
+.soporte-steps__texto {
+  font-size: .875rem;
+  line-height: 1.7;
+  color: var(--text-muted);
+}
+
+.soporte-canales {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.5rem;
+}
+
+.soporte-canales .contact-list { flex: 1 1 22rem; }
 
 /* ---------- Recepción: stepper ---------- */
 

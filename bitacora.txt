@@ -338,3 +338,57 @@ Hecho:
   Etapa 8), DOCUMENTACION (§3 fila 8 y §4.7) y esta bitacora.
 
 - FIN DE LA SESIÓN: se detiene y se espera la revisión del usuario.
+
+============================================================
+SESIÓN 13 - 20/10/2026 - Soporte al cliente (tercer servicio)
+============================================================
+Pedido del usuario: la pagina no es solo servicios informaticos y webs, tambien
+es soporte al cliente; quiere una seccion para eso. Correo nuevo creado por la
+empresa: estalingradocorpsupport@protonmail.com (el usuario confirmo la
+ortografia con "support"). El telefono llega mas adelante (no se inventa).
+
+Decisiones tomadas con el usuario:
+- Soporte integrado al MISMO sistema: tercera tarjeta en Servicios que abre la
+  misma recepcion, misma tabla y mismo panel (no un canal aparte).
+- Seccion visible #soporte ademas de la tarjeta.
+- Campos: Motivo (select obligatorio) + Producto o servicio relacionado (opcional).
+- Orden de trabajo: primero soporte, despues la exportacion en Excel (que ya
+  saldra con las columnas de los 3 servicios).
+
+Hecho:
+- supabase/migracion-soporte.sql (nuevo): agrega las 2 columnas, amplia el
+  check de servicio a ('tecnico','web','soporte') y reescribe la politica RLS
+  validando los largos nuevos. Idempotente (se puede re-ejecutar).
+- supabase/schema.sql: mismos cambios aplicados al archivo fuente (el create
+  table if not exists NO modifica una tabla existente, por eso el bloque de
+  alter table queda igual dentro del archivo) + comentario del resumen.
+- index.html: enlace "Soporte" en navbar desktop y movil; tercera tarjeta
+  #servicio-soporte (fa-headset, data-servicio="soporte"); seccion #soporte con
+  3 pasos (.soporte-steps), correo con mailto y CTA a #servicios; grupo
+  #campos-soporte con select Motivo (obligatorio) e input Producto (opcional);
+  correo agregado tambien a la lista de #contacto; comentario del TODO de
+  telefono actualizado.
+- js/main.js: SERVICIOS.soporte, ETIQUETAS con motivoSoporte/productoRelacionado,
+  aplicarServicio refactorizada a GRUPOS_SERVICIO (3 grupos, muestra uno y
+  deshabilita los otros dos) con TEXTOS_SERVICIO (labels y placeholders),
+  datosParaSupabase con if/else if por servicio (antes else mandaba campos web),
+  y ENDURECIMIENTO: #btn-enviar solo envia si el paso 3 (Revision) esta visible.
+- admin.html: opcion "Soporte" en el filtro de servicio.
+- js/admin.js: SERVICIOS.soporte, buscador incluye motivo/producto, meta de la
+  lista con motivo, detalle con filas Motivo y Producto relacionado, y el CSV
+  actual ahora refleja esos dos campos.
+- css/styles.css: .soporte-steps (grid con linea azul y numeros en mono),
+  .soporte-canales (correo + CTA), y fix de overflow-wrap: anywhere en
+  .contact-list__value (el correo largo desbordaba a 360px; lo detecto la suite).
+- Pruebas ampliadas: test-recepcion 82, test-tecnico 11, etapa4-visual 64,
+  etapa4-extra 33, test-supabase 66, test-admin 66 -> TOTAL 322 PASS, 0 FAIL.
+- Documentacion: README (intro de 3 servicios, estructura, datos de contacto con
+  el correo verificado, seccion "Soporte al cliente", checklist Etapa 9),
+  DOCUMENTACION (§3 fila 9, §4.1, §4.2, §4.8 nueva y §5 con los conteos nuevos),
+  INSTRUCCIONES.md (sección 8 + fila de diagnostico).
+
+PENDIENTE (usuario): ejecutar supabase/migracion-soporte.sql en Supabase
+(SQL Editor -> New query -> pegar -> Run). Sin eso, las solicitudes de soporte
+se rechazan. Despues hay que probar una solicitud real desde la pagina.
+
+- FIN DE LA SESIÓN: se detiene y se espera la revisión del usuario.

@@ -14,6 +14,7 @@
 --   · La tabla admins solo muestra a cada admin su propia fila.
 --   · Anti-spam: un mismo contacto no puede cargar más de 3 solicitudes
 --     cada 10 minutos (frena bots que rellenan el formulario).
+--   · Servicios válidos: técnico, web y soporte al cliente.
 -- ============================================================
 
 create extension if not exists pgcrypto;
@@ -21,21 +22,35 @@ create extension if not exists pgcrypto;
 -- ---------- Tablas ----------
 
 create table if not exists public.solicitudes (
-  id              uuid primary key default gen_random_uuid(),
-  creado_en       timestamptz not null default now(),
-  actualizado_en  timestamptz not null default now(),
-  servicio        text not null check (servicio in ('tecnico', 'web')),
-  nombre          text not null,
-  contacto        text not null,
-  tipo_problema   text,
-  dispositivo     text,
-  tipo_proyecto   text,
-  sitio_actual    text,
-  descripcion     text not null,
-  estado          text not null default 'nueva'
-                  check (estado in ('nueva', 'en_revision', 'respondida', 'cerrada')),
-  notas_internas  text
+  id                   uuid primary key default gen_random_uuid(),
+  creado_en            timestamptz not null default now(),
+  actualizado_en       timestamptz not null default now(),
+  servicio             text not null check (servicio in ('tecnico', 'web', 'soporte')),
+  nombre               text not null,
+  contacto             text not null,
+  tipo_problema        text,
+  dispositivo          text,
+  tipo_proyecto        text,
+  sitio_actual         text,
+  motivo_soporte       text,
+  producto_relacionado text,
+  descripcion          text not null,
+  estado               text not null default 'nueva'
+                       check (estado in ('nueva', 'en_revision', 'respondida', 'cerrada')),
+  notas_internas       text
 );
+
+-- ---------- Soporte al cliente (aplica aunque la tabla ya existiera) ----------
+-- El "create table if not exists" de arriba NO modifica una tabla existente,
+-- así que estas líneas garantizan que el tercer servicio esté habilitado aunque
+-- el archivo se ejecute varias veces.
+
+alter table public.solicitudes add column if not exists motivo_soporte       text;
+alter table public.solicitudes add column if not exists producto_relacionado text;
+
+alter table public.solicitudes drop constraint if exists solicitudes_servicio_check;
+alter table public.solicitudes add constraint solicitudes_servicio_check
+  check (servicio in ('tecnico', 'web', 'soporte'));
 
 create table if not exists public.admins (
   user_id    uuid primary key references auth.users(id) on delete cascade,
@@ -111,16 +126,18 @@ drop policy if exists "publico crea solicitudes" on public.solicitudes;
 create policy "publico crea solicitudes"
 on public.solicitudes for insert to anon, authenticated
 with check (
-  servicio in ('tecnico', 'web')
+  servicio in ('tecnico', 'web', 'soporte')
   and estado = 'nueva'
   and notas_internas is null
   and char_length(nombre) between 1 and 120
   and char_length(contacto) between 3 and 200
   and char_length(descripcion) between 1 and 5000
-  and (tipo_problema  is null or char_length(tipo_problema)  <= 120)
-  and (dispositivo    is null or char_length(dispositivo)    <= 200)
-  and (tipo_proyecto  is null or char_length(tipo_proyecto)  <= 120)
-  and (sitio_actual   is null or char_length(sitio_actual)   <= 200)
+  and (tipo_problema        is null or char_length(tipo_problema)        <= 120)
+  and (dispositivo          is null or char_length(dispositivo)          <= 200)
+  and (tipo_proyecto        is null or char_length(tipo_proyecto)        <= 120)
+  and (sitio_actual         is null or char_length(sitio_actual)         <= 200)
+  and (motivo_soporte       is null or char_length(motivo_soporte)       <= 120)
+  and (producto_relacionado is null or char_length(producto_relacionado) <= 200)
 );
 
 -- Admins: leer y actualizar todas las solicitudes.

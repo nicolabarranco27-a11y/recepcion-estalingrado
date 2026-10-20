@@ -21,7 +21,8 @@
 
   var SERVICIOS = {
     tecnico: 'Servicio técnico',
-    web: 'Sitio web'
+    web: 'Sitio web',
+    soporte: 'Soporte'
   };
 
   function $(id) { return document.getElementById(id); }
@@ -304,6 +305,7 @@
       var texto = [
         s.nombre, s.contacto, s.descripcion,
         s.tipo_problema, s.tipo_proyecto, s.dispositivo, s.sitio_actual,
+        s.motivo_soporte, s.producto_relacionado,
         s.notas_internas
       ].join(' ').toLowerCase();
       return texto.indexOf(consulta) !== -1;
@@ -337,7 +339,7 @@
     arriba.appendChild(el('span', 'admin-item__fecha', fechaLegible(s.creado_en)));
     arriba.appendChild(el('span', 'admin-badge admin-badge--' + (ESTADOS[s.estado] ? s.estado : 'nueva'), ESTADOS[s.estado] || s.estado));
 
-    var detalle = s.tipo_problema || s.tipo_proyecto;
+    var detalle = s.tipo_problema || s.tipo_proyecto || s.motivo_soporte;
     var meta = (SERVICIOS[s.servicio] || s.servicio) + (detalle ? ' · ' + detalle : '');
 
     tarjeta.appendChild(arriba);
@@ -381,10 +383,12 @@
     filaDetalle('Servicio', SERVICIOS[s.servicio] || s.servicio);
     filaDetalle('Nombre', s.nombre);
     filaDetalle('Contacto', s.contacto);
-    if (s.tipo_problema) filaDetalle('Tipo de problema', s.tipo_problema);
-    if (s.dispositivo) filaDetalle('Dispositivo', s.dispositivo);
-    if (s.tipo_proyecto) filaDetalle('Tipo de proyecto', s.tipo_proyecto);
-    if (s.sitio_actual) filaDetalle('Sitio actual', s.sitio_actual);
+  if (s.tipo_problema) filaDetalle('Tipo de problema', s.tipo_problema);
+  if (s.dispositivo) filaDetalle('Dispositivo', s.dispositivo);
+  if (s.tipo_proyecto) filaDetalle('Tipo de proyecto', s.tipo_proyecto);
+  if (s.sitio_actual) filaDetalle('Sitio actual', s.sitio_actual);
+  if (s.motivo_soporte) filaDetalle('Motivo', s.motivo_soporte);
+  if (s.producto_relacionado) filaDetalle('Producto relacionado', s.producto_relacionado);
     filaDetalle('Descripción', s.descripcion);
 
     if (typeof dialogo.showModal === 'function') dialogo.showModal();
@@ -459,8 +463,8 @@
         ESTADOS[s.estado] || s.estado,
         s.nombre,
         s.contacto,
-        s.tipo_problema || s.tipo_proyecto || '',
-        s.dispositivo || s.sitio_actual || '',
+        s.tipo_problema || s.tipo_proyecto || s.motivo_soporte || '',
+        s.dispositivo || s.sitio_actual || s.producto_relacionado || '',
         s.descripcion,
         s.notas_internas || ''
       ].map(celdaCsv).join(';'));

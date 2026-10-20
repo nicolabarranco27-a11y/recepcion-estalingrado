@@ -2,10 +2,11 @@
 
 Repositorio: <https://github.com/nicolabarranco27-a11y/recepcion-estalingrado>
 
-Página independiente de recepción de clientes para dos servicios:
+Página independiente de recepción de clientes para tres servicios:
 
 1. Servicio técnico informático.
 2. Creación y desarrollo de sitios web.
+3. Soporte al cliente (consultas, incidencias y reclamos de clientes).
 
 Identidad visual replicada a partir de la auditoría de la página institucional
 (https://estalingradocorp.github.io/EstalingradoCorp/index.html). No modifica ni
@@ -15,7 +16,7 @@ depende de los archivos del sitio institucional.
 
 ```
 Servicio tecnico y paginas web/
-├── index.html        # Página única (navbar, hero, servicios, recepción, contacto, footer)
+├── index.html        # Página única (navbar, hero, servicios, recepción, soporte, contacto, footer)
 ├── admin.html        # Panel interno de solicitudes (sin enlace público, noindex)
 ├── css/
 │   ├── styles.css    # Tokens (variables) + fondo dinámico + componentes + campos del flujo
@@ -26,6 +27,7 @@ Servicio tecnico y paginas web/
 │   └── admin.js      # Login, lista, filtros, detalle, notas, CSV (API REST de Supabase)
 ├── supabase/
 │   ├── schema.sql    # Tablas, RLS, trigger e instrucciones del admin (re-ejecutable)
+│   ├── migracion-soporte.sql  # Habilita el tercer servicio en una base ya existente
 │   └── INSTRUCCIONES.md  # Guía paso a paso para configurar Supabase
 ├── assets/
 │   ├── logo.jpg      # Logo oficial descargado de la página institucional
@@ -72,8 +74,11 @@ npx http-server . -p 8080
 - Ubicación: Salta Capital, Argentina (zona sur).
 - Redes oficiales: YouTube, Facebook, X (Twitter), Telegram (enlaces del pie
   institucional).
-- **Teléfono y correo: no publicados en el sitio institucional.** No se inventaron;
-  quedan pendientes de verificación antes de mostrarlos.
+- **Correo de soporte (verificado, creado por la empresa):**
+  `estalingradocorpsupport@protonmail.com` — publicado en `#soporte` y
+  `#contacto` con `mailto:`.
+- **Teléfono: no publicado todavía.** No se inventa: queda pendiente de que la
+  empresa lo indique.
 
 ## Recepción de solicitudes (Etapas 3 y 5)
 
@@ -108,6 +113,27 @@ El formulario y el stepper permanecen ocultos hasta que se toca una tarjeta.
   blanco/zinc de alto contraste (≥ 15,8:1 sobre negro), hover con realce azul en
   los de contorno y estado deshabilitado en gris legible (ya no se aclaran con
   `opacity`).
+
+## Soporte al cliente (Etapa 9)
+
+El soporte es un tercer servicio más, con la misma recepción, la misma base y
+el mismo panel:
+
+- **Sección `#soporte`** (entre Recepción y Contacto): qué es, los tres pasos
+  para pedirlo y el canal directo (`mailto:estalingradocorpsupport@protonmail.com`)
+  con CTA a `#servicios`.
+- **Tercera tarjeta** `#servicio-soporte` en `#servicios` (`data-servicio="soporte"`)
+  que despliega el formulario con su propio grupo `#campos-soporte`.
+- **Campos de soporte**: *Motivo* (obligatorio: consulta, ayuda con un servicio,
+  incidencia o falla, reclamo, estado de una solicitud u otro) y *Producto o
+  servicio relacionado* (opcional). El grupo activo se muestra y los otros dos
+  quedan deshabilitados.
+- **Base de datos**: `servicio` acepta `'soporte'` y hay dos columnas nuevas
+  (`motivo_soporte`, `producto_relacionado`) con sus largos validados en la
+  política RLS. Ver `supabase/migracion-soporte.sql`.
+- **Panel**: filtro "Soporte", meta con motivo en la lista, filas *Motivo* y
+  *Producto relacionado* en el detalle, y esos campos incluidos en el buscador y
+  en la exportación.
 
 ## Envío con Supabase (Etapa 7)
 
@@ -284,6 +310,10 @@ institucional.
 - [x] Etapa 8 (19/10/2026): accesos del inicio (botón a `#servicios` + enlace al
       sitio institucional) y repaso de botones del formulario y del panel
       (radio, alto táctil y contraste), documentado en `DOCUMENTACION.md` §4.7.
+- [x] Etapa 9 (20/10/2026): **soporte al cliente** como tercer servicio
+      (sección `#soporte`, tarjeta, campos, SQL de migración, panel y pruebas),
+      documentado en `DOCUMENTACION.md` §4.8. Requiere ejecutar
+      `supabase/migracion-soporte.sql` en Supabase (SQL Editor → Run).
 - [x] **Configurar Supabase (19/10/2026):** proyecto `estalingrado-corp` (São
       Paulo) creado, URL + anon key en `js/config.js`, `supabase/schema.sql`
       ejecutado, usuario admin `nbmn38@gmail.com` (Auto Confirm) e insertado su

@@ -59,13 +59,14 @@ la Etapa 1). Este proyecto no modifica ni depende de sus archivos.
 | 6 (19/10/2026) | Tipografía y formulario más legibles e intuitivos, solo en `#recepcion` (ver §4.4): jerarquía de títulos y subtítulos de grupo, labels 13px, inputs Inter 16px de 48px, placeholders de ejemplo, nota de campos obligatorios. | Hecha |
 | 7 (19/10/2026) | **Supabase + panel**: `supabase/schema.sql` (tablas `solicitudes`/`admins`, trigger, RLS), guía `supabase/INSTRUCCIONES.md`, `js/config.js`, envío real por REST con estados/honeypot, `admin.html` + `css/admin.css` + `js/admin.js` (login, stats, filtros, detalle, estados, notas, CSV), `robots.txt`, suites nuevas y `git init`. Ver §4.2 y §4.5. | Hecha y conectada (proyecto Supabase real el 19/10/2026) |
 | 8 (19/10/2026) | **Accesos y botones**: hero con "Servicios informáticos y web" (ancla a `#servicios`) y "Conocer la empresa" (sitio institucional en otra pestaña); repaso visual de los botones del formulario y del panel (radio, alto táctil, contraste, foco y estado deshabilitado). Ver §4.7. | Hecha |
+| 9 (20/10/2026) | **Soporte al cliente como tercer servicio**: sección `#soporte` (pasos + correo + CTA), tarjeta `#servicio-soporte`, grupo `#campos-soporte` (motivo obligatorio + producto relacionado), refactor de `aplicarServicio` a 3 grupos, columnas nuevas en la base con `supabase/migracion-soporte.sql`, filtro y detalle en el panel, y suites ampliadas (322 aserciones). Ver §4.8. | Hecha (falta correr el SQL en Supabase) |
 
 ## 4. Recepción: diseño actual del flujo
 
 ### 4.1 Interacción
 
 1. El usuario elige el servicio **solo** en las tarjetas `#servicios`
-   (atributo `data-servicio="tecnico|web"`). No existe una segunda selección
+   (atributo `data-servicio="tecnico|web|soporte"`). No existe una segunda selección
    dentro del formulario (se eliminó la duplicación: radios, botón Continuar
    y error de servicio del flujo viejo ya no están en el HTML ni en el JS).
 2. Al tocar una tarjeta, **el formulario se despliega** directamente en el
@@ -97,8 +98,9 @@ la Etapa 1). Este proyecto no modifica ni depende de sus archivos.
   timeout de 20 s con `AbortController`.
 - `datosParaSupabase()` envía snake_case y solo los campos del servicio elegido:
   comunes (`servicio`, `nombre`, `contacto`, `descripcion`) + `tipo_problema` y
-  `dispositivo` (técnico) o `tipo_proyecto` y `sitio_actual` (web). No puede
-  fijar `estado` ni `notas_internas` (lo impide también RLS).
+  `dispositivo` (técnico), `tipo_proyecto` y `sitio_actual` (web), o
+  `motivo_soporte` y `producto_relacionado` (soporte). No puede fijar `estado`
+  ni `notas_internas` (lo impide también RLS).
 - Estados de interfaz: "Enviando…" (ámbar), éxito (verde, ícono check, se
   ocultan "Editar" y aparece "Nueva solicitud") o error (rojo, conserva los
   datos y habilita reintentar; si falla, el botón vuelve a estar activo).
@@ -244,19 +246,79 @@ Cambios pedidos por el usuario:
   chicos) y contrastes medidos de 15,78:1 (contorno) y 21:1 (sólidos); las 6
   suites siguen en verde, sin desborde en 390/360 px.
 
-## 5. Pruebas (07/10 → 19/10/2026)
+### 4.8 Soporte al cliente (Etapa 9, 20/10/2026)
+
+El soporte se implementó como **tercer servicio** del mismo flujo: misma
+recepción, misma tabla `solicitudes`, mismo panel y misma exportación.
+
+**Página (`index.html`)**
+
+- Enlace "Soporte" en la navbar desktop y en el menú móvil (entre Recepción y
+  Contacto, en el orden de la página).
+- **Tercera tarjeta** `#servicio-soporte` en `#servicios` (ícono `fa-headset`,
+  `data-servicio="soporte"`) con el mismo CTA "Iniciar solicitud" de las otras.
+- **Sección `#soporte`** (antes de `#contacto`): descripción, tres pasos en
+  `.soporte-steps` (01 pedir · 02 contá qué pasa · 03 recibir respuesta por el
+  medio dejado), canal directo con `mailto:estalingradocorpsupport@protonmail.com`
+  (también agregado a la lista de `#contacto`) y CTA "Pedir soporte" a `#servicios`.
+- **Grupo `#campos-soporte`** en el formulario: select *Motivo* obligatorio
+  (Consulta general · Ayuda para usar un servicio · Incidencia o falla · Reclamo ·
+  Estado de una solicitud o servicio · Otro) e input opcional *Producto o
+  servicio relacionado*, con mensaje de error `err-motivo-soporte`.
+
+**Javascript (`js/main.js`)**
+
+- `SERVICIOS.soporte = 'Soporte al cliente'`; `ETIQUETAS` con `motivoSoporte` y
+  `productoRelacionado` para el resumen.
+- `aplicarServicio()` dejó de ser binaria (`esTecnico`): ahora recorre
+  `GRUPOS_SERVICIO` (tecnico, web, soporte), muestra el grupo activo, deshabilita
+  los otros dos y toma los textos de `TEXTOS_SERVICIO` (label de nombre, label y
+  placeholder de descripción).
+- `datosParaSupabase()` pasó de `if técnico / else web` a `if/else if` por
+  servicio, evitando que un servicio desconocido mande campos ajenos.
+- **Endurecimiento**: el handler de `#btn-enviar` sale si `paso-resumen` está
+  oculto → el envío solo ocurre desde el paso 3, nunca desde el botón oculto.
+
+**Base de datos (`supabase/migracion-soporte.sql` + `schema.sql`)**
+
+- `add column if not exists motivo_soporte / producto_relacionado`.
+- El `check` de servicio pasa a `('tecnico','web','soporte')` (drop + add, porque
+  en PostgreSQL no se edita un check en el lugar).
+- La política RLS de insert se reescribe incluyendo `soporte` y validando
+  `<= 120` para `motivo_soporte` y `<= 200` para `producto_relacionado`.
+- Todo es idempotente: se puede re-ejecutar sin romper nada.
+
+**Panel (`admin.html` + `js/admin.js`)**
+
+- Opción "Soporte" en `#filtro-servicio`.
+- `SERVICIOS.soporte = 'Soporte'`; meta de la lista con
+  `tipo_problema || tipo_proyecto || motivo_soporte`.
+- Detalle con filas *Motivo* y *Producto relacionado*; el buscador incluye los
+  dos campos; el CSV actual incluye el motivo en la columna "Tipo".
+
+**CSS (`css/styles.css`)**
+
+- Nuevos `.soporte-steps` (grid auto-fit con línea azul superior y números en
+  mono) y `.soporte-canales` (fila con correo + CTA).
+- `.contact-list__value` con `overflow-wrap: anywhere` (el correo largo del
+  soporte provocaba desborde horizontal a 360 px; detectado por la suite y
+  corregido).
+
+## 5. Pruebas (07/10 → 20/10/2026)
 
 Las suites viven **fuera del proyecto** (carpeta temporal de trabajo), porque
 el proyecto no usa Node/build. Son 6 suites (4 de recepción + 2 de Etapa 7):
 
-| Suite | Motor | Alcance | Resultado (19/10/2026) |
+| Suite | Motor | Alcance | Resultado (20/10/2026) |
 |---|---|---|---|
-| `test-recepcion.js` | jsdom | Estado inicial (formulario/stepper ocultos, sin duplicación, sin elementos agregados), despliegue por tarjeta, grupos alternados, validación, foco, corrección en línea, revisión, XSS literal, cambio de servicio desde revisión, envío deshabilitado, menú móvil, canvas de fondo. | 62/62 PASS |
+| `test-recepcion.js` | jsdom | Estado inicial (formulario/stepper ocultos, sin duplicación, sin elementos agregados), estructura de soporte (3 tarjetas, nav con 5 enlaces, mailto), despliegue por tarjeta, grupos alternados (3 servicios), validación, foco, corrección en línea, revisión, XSS literal, cambio de servicio desde revisión, motivo de soporte obligatorio, envío deshabilitado, menú móvil, canvas de fondo. | 82/82 PASS |
 | `test-tecnico.js` | jsdom | Camino del servicio técnico: validación de `tipo-problema`, dispositivo opcional, resumen y edición. | 11/11 PASS |
 | `etapa4-visual.js` | Chromium real | 1440/390/360 px: sin desborde horizontal, consola limpia, recursos locales OK, orbes (canvas fijo sin eventos, ajustado al viewport y **con píxeles dibujados**), recorrido completo tarjeta→errores→revisión, caracteres especiales/emoji, XSS, editar conserva datos. | 64/64 PASS |
-| `etapa4-extra.js` | Chromium real | Anclas vs navbar, skip link, foco visible con teclado, Enter implícito, cambio de servicio en vivo sin resumen obsoleto, campos de grupo preservados, texto >2000 chars, labels/`aria-describedby`, stepper coherente, `prefers-reduced-motion` (orbes estáticos: dos capturas idénticas), solapamientos @360. | 26/26 PASS |
-| `test-supabase.js` | jsdom | `CONFIG_SUPABASE` simulado: botón habilitado, POST a `/rest/v1/solicitudes`, URL/headers/`Prefer`, payload snake_case por servicio, éxito + "Nueva solicitud", error de red con datos conservados y reintento, honeypot sin `fetch`, y respuesta anti-spam (título y texto específicos). | 53/53 PASS |
-| `test-admin.js` | Chromium real | Panel con API simulada por `page.route` (incluye preflight CORS): login inválido/válido, sesión, stats, lista, XSS, filtros, detalle, PATCH 204, CSV (BOM/`;`), recarga con sesión, logout y móvil 360 sin desborde. | 60/60 PASS |
+| `etapa4-extra.js` | Chromium real | Anclas vs navbar (incluye `#soporte`), skip link, foco visible con teclado, Enter implícito, tarjeta de soporte, cambio de servicio en vivo sin resumen obsoleto, campos de grupo preservados, texto >2000 chars, labels/`aria-describedby`, stepper coherente, `prefers-reduced-motion` (orbes estáticos: dos capturas idénticas), solapamientos @360. | 33/33 PASS |
+| `test-supabase.js` | jsdom | `CONFIG_SUPABASE` simulado: botón habilitado, POST a `/rest/v1/solicitudes`, URL/headers/`Prefer`, payload snake_case por servicio (técnico, web y **soporte**), motivo vacío sin POST, éxito + "Nueva solicitud", error de red con datos conservados y reintento, honeypot sin `fetch`, y respuesta anti-spam (título y texto específicos). | 66/66 PASS |
+| `test-admin.js` | Chromium real | Panel con API simulada por `page.route` (incluye preflight CORS): login inválido/válido, sesión, stats, lista (3 filas), XSS, filtros, filtro y detalle de **soporte** (motivo, producto, búsqueda), PATCH 204, CSV (BOM/`;` + motivo), recarga con sesión, logout y móvil 360 sin desborde. | 66/66 PASS |
+
+**Total: 322 aserciones en verde (0 fallos).**
 
 Las suites de Etapa 7 usan `window.fetch` / `page.route` simulados. Desde el
 19/10/2026 el proyecto real ya está conectado y probado a mano de punta a punta
