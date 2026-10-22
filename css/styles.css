@@ -102,6 +102,7 @@ p { margin: 0; }
   font-size: .75rem;
   text-transform: uppercase;
   letter-spacing: .15em;
+  transition: top .25s var(--ease);
 }
 
 .skip-link:focus { top: 1rem; }
@@ -167,6 +168,13 @@ p { margin: 0; }
   transform: translateY(0);
 }
 
+/* Entrada suave reutilizable: pasos del formulario, avisos, errores y el
+   bloque del formulario al cambiar de sección. Corta y discreta. */
+@keyframes fade-up {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
 /* ---------- Navbar ---------- */
 
 .navbar {
@@ -194,7 +202,10 @@ p { margin: 0; }
   display: block;
   width: 40px;
   height: 40px;
+  transition: transform .3s var(--ease);
 }
+
+.brand:hover .brand__avatar { transform: scale(1.06); }
 
 .brand__avatar img {
   width: 40px;
@@ -253,6 +264,23 @@ p { margin: 0; }
 .nav-links__item:hover,
 .nav-links__item[aria-current="true"] { color: var(--text-strong); }
 
+/* Subrayado que crece desde la izquierda al pasar el puntero */
+.nav-links__item::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -.4rem;
+  height: 1px;
+  background: var(--blue-500);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform .3s var(--ease);
+}
+
+.nav-links__item:hover::after,
+.nav-links__item[aria-current="true"]::after { transform: scaleX(1); }
+
 .nav-toggle {
   display: none;
   padding: .5rem;
@@ -280,6 +308,11 @@ p { margin: 0; }
   background: rgba(0, 0, 0, .95);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
+  animation: menu-in .3s var(--ease);
+}
+
+@keyframes menu-in {
+  from { opacity: 0; }
 }
 
 .mobile-menu[hidden] { display: none; }
@@ -304,6 +337,11 @@ p { margin: 0; }
   flex-direction: column;
   align-items: center;
   gap: 2rem;
+  animation: menu-links .35s var(--ease) .05s backwards;
+}
+
+@keyframes menu-links {
+  from { opacity: 0; transform: translateY(10px); }
 }
 
 .mobile-menu__link {
@@ -395,8 +433,10 @@ p { margin: 0; }
   gap: 1rem;
 }
 
-/* ---------- Hero: imagen institucional ---------- */
+/* ---------- Hero: composición limpia ---------- */
 
+/* Dos columnas: el texto ocupa la primera y la segunda queda reservada como
+   espacio negativo. Sin imágenes ni capas decorativas en el sector derecho. */
 .hero .container {
   display: grid;
   grid-template-columns: minmax(0, 1.1fr) minmax(0, .9fr);
@@ -404,20 +444,8 @@ p { margin: 0; }
   align-items: center;
 }
 
-.hero__visual { margin: 0; }
-
-.hero__img {
-  display: block;
-  width: 100%;
-  height: auto;
-  border-radius: var(--radius-card);
-  border: 1px solid var(--card-border);
-  box-shadow: 0 24px 60px rgba(0, 0, 0, .45), 0 0 44px rgba(37, 99, 235, .14);
-}
-
 @media (max-width: 900px) {
   .hero .container { grid-template-columns: 1fr; }
-  .hero__visual { max-width: 34rem; }
 }
 
 /* ---------- Botones ---------- */
@@ -459,6 +487,9 @@ p { margin: 0; }
 }
 
 .btn:hover .btn__arrow { transform: translateX(4px); }
+
+/* Respuesta táctil discreta al presionar */
+.btn:active { transform: translateY(0) scale(.98); }
 
 /* El foco global redondea a 2px: los botones mantienen su radio. */
 .btn:focus-visible { border-radius: 10px; }
@@ -624,12 +655,13 @@ p { margin: 0; }
   background: var(--card-bg);
   border: 1px solid var(--card-border);
   border-radius: 12px;
-  transition: border-color .4s ease, background .4s ease;
+  transition: border-color .4s ease, background .4s ease, transform .3s var(--ease);
 }
 
 .contact-list__item:hover {
   border-color: rgba(37, 99, 235, .25);
   background: rgba(37, 99, 235, .03);
+  transform: translateY(-2px);
 }
 
 .contact-list__icon {
@@ -749,6 +781,15 @@ p { margin: 0; }
 
 .soporte-canales .contact-list { flex: 1 1 22rem; }
 
+/* ---------- Formulario compartido por sección ---------- */
+
+/* #recepcion (técnico y web) y #soporte comparten el mismo formulario:
+   el JS mueve el bloque entre sus slots. Con contenido, el slot de soporte
+   separa el formulario de los pasos y canales de arriba. */
+.slot-form:not(:empty) { margin-top: clamp(2rem, 4vw, 3rem); }
+
+.bloque-formulario.entrando { animation: fade-up .45s var(--ease); }
+
 /* ---------- Recepción: stepper ---------- */
 
 #recepcion .section__desc { font-size: 1.0625rem; }
@@ -800,6 +841,9 @@ p { margin: 0; }
 }
 
 .flow__paso[hidden] { display: none; }
+
+/* Cada paso entra con un desplazamiento mínimo al pasar de uno a otro */
+.flow__paso:not([hidden]) { animation: fade-up .35s var(--ease); }
 
 .flow__paso:focus { outline: none; }
 
@@ -946,6 +990,8 @@ select.field__control option { background: var(--surface); color: var(--text); }
 
 .field__error[hidden] { display: none; }
 
+.field__error:not([hidden]) { animation: fade-up .25s ease; }
+
 /* Revisión de la solicitud */
 
 .resumen {
@@ -993,6 +1039,8 @@ select.field__control option { background: var(--surface); color: var(--text); }
 }
 
 .status[hidden] { display: none; }
+
+.status:not([hidden]) { animation: fade-up .3s ease; }
 
 .status__icon {
   color: #f59e0b;
@@ -1074,14 +1122,20 @@ select.field__control option { background: var(--surface); color: var(--text); }
 }
 
 .site-footer__social a {
+  display: inline-flex;
   color: var(--text-faint);
-  transition: color .25s ease;
+  transition: color .25s ease, transform .25s var(--ease);
 }
 
-.site-footer__social a:hover { color: var(--text-strong); }
-.site-footer__social a:nth-child(1):hover { color: #ef4444; }
-.site-footer__social a:nth-child(2):hover { color: #2563eb; }
-.site-footer__social a:nth-child(4):hover { color: var(--blue-400); }
+.site-footer__social a:hover {
+  color: var(--text-strong);
+  transform: translateY(-2px);
+}
+
+.site-footer__social .sf--yt:hover { color: #ef4444; }
+.site-footer__social .sf--ig:hover { color: #e1306c; }
+.site-footer__social .sf--fb:hover { color: #2563eb; }
+.site-footer__social .sf--tg:hover { color: var(--blue-400); }
 
 .site-footer__status {
   display: flex;

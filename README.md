@@ -34,7 +34,9 @@ Servicio tecnico y paginas web/
 │   ├── logo.jpg      # Logo oficial descargado de la página institucional
 │   └── favicon.jpg   # Favicon oficial (JPEG; la extensión original .pnj es de Tumblr)
 ├── Imagenes/
-│   ├── imagen.jpg    # Cerebro con contraste azul + logo (hero, Etapa 14)
+│   ├── cerebro-neuronal.png  # Cerebro recortado con alfa (sin uso en el hero desde la Etapa 18)
+│   ├── Cerebro neural de neón azul.png  # Ilustración original, intacta
+│   ├── imagen.jpg    # Cerebro anterior con logo (se conserva, ya no se usa)
 │   └── oficina.jpg   # Foto de la oficina (intro de #soporte, Etapa 14)
 ├── robots.txt        # Bloquea /admin.html para buscadores
 ├── DOCUMENTACION.md  # Historial completo: etapas, diseño del flujo, pruebas, sistema de gestión
@@ -78,8 +80,10 @@ npx http-server . -p 8080
 ## Datos de contacto (verificados en empresa.html)
 
 - Ubicación: Salta Capital, Argentina (zona sur).
-- Redes oficiales: YouTube, Facebook, X (Twitter), Telegram (enlaces del pie
-  institucional).
+- Redes oficiales: YouTube, Facebook, X (Twitter) y Telegram (enlaces del pie
+  institucional), más **Instagram `@nicotips27`**
+  (<https://www.instagram.com/nicotips27/>), sumado en la Etapa 15 a los
+  canales de `#contacto` y al pie.
 - **Correo de soporte (verificado, creado por la empresa):**
   `estalingradocorpsupport@protonmail.com` — publicado en `#soporte` y
   `#contacto` con `mailto:`.
@@ -146,19 +150,67 @@ de servicio o el botón "Soporte al cliente" de la sección `#soporte` (Etapa 11
 Dos fotos agregadas por la empresa en `Imagenes/`, integradas cada una en un
 lugar pensado (nunca juntas):
 
-- **Hero** (`Imagenes/imagen.jpg`, 1640×924): imagen del cerebro con contraste
-  azul y el logo de la empresa al centro, como pieza visual a la derecha del
-  título (`figure.hero__visual` con borde redondeado y resplandor azul). En
-  móvil se apila debajo del texto, sin superponerse. Carga con
-  `width`/`height` fijados para evitar saltos de layout.
+- **Hero**: desde la **Etapa 18** el hero **no usa ninguna imagen decorativa**
+  (se retiró la ilustración del cerebro). Queda un diseño limpio: el texto a la
+  izquierda y la columna derecha reservada como espacio negativo.
+  `Imagenes/imagen.jpg` y `Imagenes/cerebro-neuronal.png` se conservan en el
+  repo, sin uso.
 - **Sección `#soporte`** (`Imagenes/oficina.jpg`, 640×800): foto vertical de
   la oficina en el intro de la sección de soporte (`.soporte__intro`), a la
   derecha del título "Soporte al cliente", que es donde la pidió el usuario.
   Junto a la foto va su pie de figura minimalista: **"Oficinas" en blanco**
   (Inter 600, 22–28 px, sin degradado) y el mono "Salta Capital, Argentina".
   En móvil se apila debajo del encabezado.
-- Ambas con `alt` descriptivo, sin librerías, servidas desde el propio
+- Con `alt` descriptivo, sin librerías, servidas desde el propio
   dominio (compatible con la CSP `img-src 'self'`).
+
+### Hero limpio (Etapa 18)
+
+A pedido del usuario se quitaron del hero la imagen del cerebro y su capa de
+sinapsis, porque la integración visual no quedó como se esperaba. El hero
+queda minimalista: sin imágenes ni canvas decorativos en el sector derecho, con
+espacio negativo reservado y el fondo negro y la estética tecnológica intactos.
+
+- **Se conservaron**: el fondo de partículas general (`#fondo-particulas`, red
+  de orbes con líneas, fijo detrás del contenido), el fondo negro, la escritura
+  del hero (pill, título y párrafo con cursor), el título, el párrafo, los dos
+  botones, el encabezado, la navegación y todas las demás secciones.
+- **Se eliminaron**: `figure.hero__visual`, `img.hero__img` y
+  `canvas.hero__neural` del HTML; las reglas `.hero__visual`, `.hero__img`,
+  `.hero__neural` y el `transform: none` del reveal en el CSS; y la IIFE
+  "Sinapsis del hero" de `js/main.js` (365 líneas, exclusiva del cerebro: la
+  capa de orbes y la de escritura no se tocaron).
+- **No se borró ningún archivo de imagen**: `cerebro-neuronal.png`,
+  `Cerebro neural de neón azul.png` e `imagen.jpg` siguen en el repo, por si
+  se quiere retomar la integración más adelante.
+- La grilla del hero mantiene dos columnas: el texto ocupa la primera y la
+  segunda queda reservada como espacio negativo (a 1440 px el título ocupa el
+  53 % del contenedor).
+
+### Cerebro neuronal y sinapsis (Etapas 16 y 17, en pausa)
+
+Trabajo **desactivado del hero** en la Etapa 18, pero conservado: si se quiere
+retomarlo, el asset y la implementación están en el repo.
+
+`Imagenes/cerebro-neuronal.png` (1299×853, recorte con alfa del original
+"Cerebro neural de neón azul", que queda intacto en
+`Imagenes/Cerebro neural de neón azul.png`) había reemplazado en el hero a
+`Imagenes/imagen.jpg`. Se integraba sin marco visible: el negro de fondo de la
+ilustración es **transparente** (alfa real), así que no queda ningún rectángulo;
+encima el `mix-blend-mode: screen` funde la luz con el fondo del hero y una
+máscara radial suave remata los extremos. Encima iba
+`canvas.hero__neural`, decorativo (`aria-hidden`) y con `pointer-events: none`,
+que dibujaba pulsos de luz: **solo avanzan por los píxeles luminosos reales** de la
+ilustración (la imagen se muestreaba una vez y no se unían puntos por cercanía),
+el chip central recibía un brillo tenue sin deformarse y el hover subía la
+actividad con vuelta suave. Usaba `requestAnimationFrame`, no creaba nodos por
+cuadro, pausaba con la pestaña oculta y con `prefers-reduced-motion` quedaba
+solo la imagen estática. Detalle técnico en `DOCUMENTACION.md` §4.13 y §4.14.
+
+La Etapa 17 había corregido además la composición (recorte del asset, alfa
+real, desvanecido de bordes y encuadre ~45 % mayor). Al retirar la imagen del
+hero, esa corrección queda sin efecto visible, pero el asset ya recortado y con
+alfa sigue guardado para una futura reincorporación.
 
 ## Soporte al cliente (Etapas 9 y 11)
 
@@ -332,17 +384,21 @@ anteriores siguen en verde. Las pruebas de red usan `fetch` y `page.route`
 simulados: todavía **no** se ejecutaron contra un proyecto Supabase real
 (eso requiere que el usuario cree el suyo y complete `js/config.js`).
 
-**Etapa 9 a 14 (20/10/2026):** las suites se ampliaron con el soporte al
+**Etapa 9 a 18 (21-22/10/2026):** las suites se ampliaron con el soporte al
 cliente, la exportación a Excel, el ajuste del soporte, la escritura del hero,
-los orbes minimalistas y las imágenes institucionales, y suman hoy **350
-aserciones en verde**: jsdom 86 (recepción) + 11 (técnico) + 66 (Supabase);
-Chromium 73 (visual) + 34 (extra) + 80 (panel).
+los orbes minimalistas, las imágenes institucionales, el formulario por sección,
+el cerebro neuronal con sinapsis, la corrección de su composición y la
+simplificación del hero, y suman hoy
+**368 aserciones en verde**: jsdom 91 (recepción) + 11 (técnico) + 66
+(Supabase); Chromium 84 (visual) + 36 (extra) + 80 (panel). Se suman fuera del
+conteo `probe-soporte.js` y `probe-hero.js` (ahora sonda del hero limpio).
 
 **Revisión humana (20/10/2026):** la estética pixel a pixel no se puede evaluar
 automáticamente en esta máquina; el usuario revisó el sitio en varias rondas
-(corrigió la escritura del hero, el título de oficinas y la ubicación de las
-fotos) y aprobó el resultado. El checklist detallado queda al final de este
-archivo.
+(corregió la escritura del hero, el título de oficinas y la ubicación de las
+fotos) y aprobó el resultado. Las Etapas 15, 16 y 17 quedan pendientes de su
+revisión local. El checklist detallado queda al final de este archivo.
+
 
 **Observación (no modificada por identidad aprobada):** los enlaces del pie
 tienen objetivos táctiles de 17–26 px en móvil; se mantienen iguales al sitio
@@ -393,6 +449,36 @@ institucional.
       (cerebro con contraste azul y logo) integrada como pieza visual del hero
       y `Imagenes/oficina.jpg` en el intro de `#soporte` (junto al título
       "Soporte al cliente") con pie minimalista "Oficinas" en blanco.
+- [x] Etapa 15 (21/10/2026): **formulario por sección**: el mismo formulario se
+      despliega en `#recepcion` para técnico y web (igual que antes) y al final
+      de `#soporte`, debajo de pasos y canales, al tocar "Soporte al cliente";
+      **Instagram** `@nicotips27` sumado a los canales y al pie; **pulido de
+      transiciones** discretas (pasos, avisos, menú móvil, nav y botones) con
+      movimiento reducido respetado.
+- [x] Etapa 16 (21/10/2026): **cerebro neuronal y sinapsis**: el hero usa
+      `Imagenes/cerebro-neuronal.png` integrada sin marco (máscara + `screen`)
+      con una capa Canvas superpuesta de pulsos que recorren solo las líneas
+      luminosas reales de la ilustración, brillo tenue del chip, hover con
+      vuelta suave, pausa con pestaña oculta y estático con movimiento
+      reducido. **Revocado en el hero por la Etapa 18** (el código y el asset
+      quedan en el repo).
+- [x] Etapa 17 (21/10/2026): **composición del cerebro**: el asset se recortó
+      (banda negra izquierda eliminada) y pasó a **alfa real** con bordes
+      desvanecidos, así que desaparece el rectángulo oscuro y el dibujo se
+      funde con el fondo; la figura **crece ~45 %** en escritorio por layout
+      (sin `transform: scale`, para no romper el mapeo del canvas) sin invadir
+      el título ni generar scroll horizontal. La capa de sinapsis se conserva.
+      **Sin efecto visible desde la Etapa 18**; el asset recortado queda
+      guardado para una futura reincorporación.
+- [x] Etapa 18 (22/10/2026): **hero limpio**: a pedido del usuario se quitaron del
+      hero la imagen del cerebro y la capa de sinapsis (HTML, CSS y la IIFE
+      "Sinapsis del hero" de `js/main.js`). El hero queda minimalista: texto a
+      la izquierda, columna derecha reservada como espacio negativo, fondo negro
+      y estética tecnológica intactos. **Se conservan** el fondo de partículas
+      general (`#fondo-particulas`), la escritura del hero, el título, el
+      párrafo, los botones, el encabezado, la navegación y el resto de las
+      secciones, y **no se borró ningún archivo de imagen**. Local, pendiente de
+      revisión del usuario.
 - [x] **Configurar Supabase (19/10/2026):** proyecto `estalingrado-corp` (São
       Paulo) creado, URL + anon key en `js/config.js`, `supabase/schema.sql`
       ejecutado, usuario admin `nbmn38@gmail.com` (Auto Confirm) e insertado su
@@ -412,7 +498,10 @@ institucional.
       (correo propuesto: `estalingradocorp.servicios@gmail.com`, sin confirmar).
 - [ ] No configurar dominio ni publicar (fuera del alcance de esta etapa).
 
-## Checklist de revisión visual manual (revisado y aprobado el 20/10/2026)
+## Checklist de revisión visual manual
+
+Ítems 1 a 12 aprobados el 20/10/2026; 4, 13 y 14 ampliados en las Etapas 15 y
+16, pendientes de revisión.
 
 Con el sitio servido localmente (`npx http-server . -p 8080`):
 
@@ -425,7 +514,9 @@ Con el sitio servido localmente (`npx http-server . -p 8080`):
 4. Al pulsar una tarjeta de servicio: se despliega el formulario en "Datos" y el
    stepper muestra 01 completado con el nombre del servicio. Pulsar la otra
    tarjeta alterna los campos sin perder lo escrito. El botón "Soporte al
-   cliente" hace lo mismo y muestra los campos de soporte (Motivo + Producto).
+   cliente" **baja hasta el final de la sección Soporte** y despliega ahí el
+   formulario (debajo de pasos y canales), con los campos de soporte (Motivo +
+   Producto); las tarjetas de técnico/web lo devuelven a "Recepción".
 5. Paso Datos: encabezado grande, nota de campos obligatorios y subtítulos de
    grupo ("Tus datos" · "Equipo y problema"/"Tu sitio web" · "Qué necesitás")
    con regla fina; labels de 13px legibles, placeholders de ejemplo visibles,
@@ -450,12 +541,28 @@ Con el sitio servido localmente (`npx http-server . -p 8080`):
     hero y por último el párrafo, sin pausas raras en medio de las frases; al
     terminar no queda ningún cursor. Con movimiento reducido del sistema, el
     texto aparece completo de entrada (sin escritura).
-12. Imágenes institucionales: en el hero, a la derecha del título, se ve la
-    imagen del cerebro con el logo azul (borde redondeado, sin cortarse ni
-    desbordar; en móvil queda debajo del texto). Al bajar a "Soporte al
-    cliente", el encabezado de la sección acompaña con la foto de la oficina
-    y su pie "Oficinas" en blanco y compacto, más "Salta Capital, Argentina";
-    sin cortes ni desbordes en ningún ancho.
+12. Hero (Etapa 18): a la derecha del título **no hay ninguna imagen ni capa
+    animada**: el sector derecho queda como **espacio negativo** sobre el fondo
+    negro, el texto se mantiene legible y centrado verticalmente, y el fondo de
+    partículas general sigue animándose detrás. Al bajar a "Soporte al cliente",
+    el encabezado acompaña con la foto de la oficina, su pie "Oficinas" en
+    blanco y "Salta Capital, Argentina"; sin cortes ni desbordes en ningún ancho.
+13. Canales: se ve **Instagram `@nicotips27`** en `#contacto` (ícono + enlace
+    a <https://www.instagram.com/nicotips27/>, abre en otra pestaña) y también
+    en los íconos del pie. Formulario de soporte: al tocar "Soporte al cliente"
+    el formulario aparece al final de la sección (no salta arriba a
+    "Recepción"), la página baja sola hasta él y, si después se toca una
+    tarjeta de técnico/web, vuelve a `#recepcion` conservando lo escrito.
+14. Fondo del hero (Etapa 18): la red de orbes del fondo general sigue
+    dibujándose detrás del contenido (círculos de color puro y líneas de
+    conexión), los enlaces siguen funcionando con normalidad y la consola queda
+    sin errores. Con movimiento reducido del sistema el fondo queda estático y el
+    hero completo, sin escritura.
+15. Espacio negativo (Etapa 18): en escritorio el título ocupa solo la mitad
+    izquierda del contenedor (a 1440 px, el 53 %), la columna derecha queda
+    libre de imágenes y el hero no se ve "vacío" ni descentrado; en móvil
+    (390 y 360 px) el texto ocupa todo el ancho y **debajo** quedan los botones,
+    sin taparlos. Al mover la ventana no aparece scroll horizontal.
 
 ## Accesibilidad
 

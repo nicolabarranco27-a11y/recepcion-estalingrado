@@ -802,3 +802,317 @@ servicio "Soporte" se rechaza en la BD. Siguen los pendientes conocidos de
 DOCUMENTACION §7 (teléfono, 2FA, dominio).
 
 - FIN DE LA SESIÓN: Etapas 11-14 publicadas y documentadas.
+
+SESIÓN 23 (21/10/2026) — ETAPA 15: FORMULARIO POR SECCIÓN, INSTAGRAM Y TRANSICIONES
+----------------------------------------------------------------------------------
+
+El usuario pidió, para trabajar en local (sin publicar todavía):
+1. Separar el formulario por sección: al pedir soporte, el formulario se
+   despliega debajo de la sección #soporte y no salta arriba al formulario
+   conjunto; técnico y web quedan como están.
+2. Mejorar todas las transiciones y animaciones, sin exagerar.
+3. Incorporar el Instagram de la empresa (https://www.instagram.com/nicotips27/
+   en los canales.
+
+Implementación (un solo formulario, movido por JS):
+- index.html: el stepper + form existentes se envolvieron en
+  #bloque-formulario dentro de #slot-recepcion; se agregó #slot-soporte al
+  final del container de #soporte (después de pasos y canales). El CTA
+  "Soporte al cliente" pasó de href="#recepcion" a href="#slot-soporte".
+  Texto del paso 01 de la sección actualizado ("se despliega acá abajo").
+- js/main.js: nueva función ubicarFormulario(valor) que mueve el mismo nodo
+  al slot del servicio (soporte -> #slot-soporte; técnico/web ->
+  #slot-recepcion) antes de desplegarlo. Se conservan los datos escritos y no
+  se duplican ids. Clase .entrando con fade-up para la entrada al cambiar de
+  sección.
+- css/styles.css:
+  - .slot-form:not(:empty) con margen superior; .bloque-formulario.entrando
+    con fade-up .45s.
+  - Keyframe reutilizable fade-up (pasos .35s, avisos .3s, errores .25s).
+  - Menú móvil: fade de entrada + enlaces con desplazamiento leve.
+  - Nav: subrayado que crece desde la izquierda.
+  - Botones: respuesta al presionar (scale .98).
+  - Tarjetas de canales: elevación de 2px; avatar del logo scale 1.06;
+    íconos del pie: elevación y colores de marca.
+  - Skip link con deslizamiento.
+  - Colores hover del pie pasan de :nth-child() a clases sf--yt/sf--ig/sf--fb/
+    sf--x/sf--tg (Instagram usa #e1306c).
+  - Todo cubierto por la regla global de prefers-reduced-motion.
+- Instagram: item en #contacto (fa-instagram, @nicotips27, target _blank +
+  rel noopener) y en el pie. Sin datos inventados: la cuenta la pasó el
+  usuario.
+
+Pruebas (adaptadas al nuevo comportamiento, no se relajaron):
+- test-recepcion.js 86 -> 91 (Instagram en canales y pie; formulario arranca
+  en #slot-recepcion; soporte lo despliega en #soporte; web lo devuelve).
+- etapa4-extra.js 34 -> 36 (ubicación real en Chromium al pedir soporte y al
+  volver con la tarjeta técnica). Se corrigió el test de foco con Tab: ahora
+  corta en cuanto encuentra :focus-visible visible en vez de contar 25 tabs
+  fijos (el enlace nuevo de Instagram corría el foco al chrome del navegador).
+- etapa4-visual.js 73 -> 76 (a 1440: formulario dentro de su sección, debajo
+  de pasos y canales, y slot liberado al volver).
+- verificar-soporte.js 14 -> 16 (Instagram y ubicación).
+- Batería completa: 360 PASS, 0 FAIL (91 + 11 + 76 + 36 + 66 + 80).
+- probe-soporte.js (nuevo, fuera del conteo): 1440/768/390/360 sin scroll
+  horizontal, formulario debajo de canales y bajo la navbar al anclar, clase
+  .entrando activa, consola limpia, y vuelta correcta a #recepcion.
+- verificar-csp.js TODO OK (0 cortes); verificar-botones.js sin fallas.
+
+Documentacion actualizada: README (redes con Instagram, resumen de suites
+360, etapa 15, checklist 4 y 13) y DOCUMENTACION (fila 15, §4.1, nueva §4.12,
+§5 con 360).
+
+PENDIENTE (usuario): revisar en local; no se hizo commit ni push. Sigue
+pendiente ejecutar supabase/migracion-soporte.sql (Etapa 9).
+
+- FIN DE LA SESIÓN: se detiene y se espera la revisión del usuario.
+
+SESIÓN 24 (21/10/2026) — Cerebro neuronal en el hero y capa de sinapsis
+(Local, sin commit ni push, como pidió el usuario.)
+
+Pedido: integrar la imagen "Cerebro neural de neón azul" (cerebro-neuronal.png)
+como base visual del hero, integrada al fondo oscuro, sin bordes visibles, y
+animar las conexiones con pulsos que viajen por las lineas reales (tipo C),
+con brillo del chip, hover discreto, pausa con pestana oculta, respeto por
+prefers-reduced-motion, responsive y sin tocar otras secciones.
+
+Inspeccion previa (antes de editar):
+- El hero es figure.hero__visual > img.hero__img con Imagenes/imagen.jpg, en
+  la 2a columna de la grilla .hero .container (1.1fr/.9fr), con estilo de
+  tarjeta (borde + radio + sombras): era la imagen decorativa a sustituir.
+- La imagen nueva estaba en Imagenes/Cerebro neural de neon azul.png: 1672x940,
+  PNG de 24 bpp (sin alfa), fondo casi negro (esquinas R0 G0-1 B2-4, brillo
+  medio 7.8/255). Con ese fondo, mix-blend-mode: screen la funde con el
+  hero sin rectangulo visible.
+- Convencion de animacion ya existente en el repo: canvas de orbes con
+  requestAnimationFrame, debounce de 150 ms al redimensionar y
+  prefers-reduced-motion. La CSP (script-src 'self') permite canvas local.
+- Se decide renombrar el archivo a cerebro-neuronal.png (URL limpia, sin
+  espacios ni acentos). imagen.jpg NO se borra: queda en el repositorio.
+
+Cambios:
+- Imagenes/Cerebro neural de neon azul.png -> Imagenes/cerebro-neuronal.png
+  (renombrado; 1.46 MB, 1672x940).
+- index.html: figure.hero__visual con data-sinapsis="cargando"; img.hero__img
+  apunta a cerebro-neuronal.png (width 1672, height 940, alt "Cerebro
+  neuronal azul con microchip central y conexiones luminosas"); se agrega
+  canvas.hero__neural (aria-hidden) dentro de la figura.
+- css/styles.css: .hero__visual con position: relative; .hero__img sin marco
+  (se quitan border, radius y box-shadow) y con mix-blend-mode: screen,
+  filter saturate(1.05) brightness(1.03) y mask-image radial (ellipse 80% 80%,
+  difuminado hacia los bordes); .hero__neural absoluto (inset 0), 100% x 100%,
+  pointer-events: none y mix-blend-mode: screen.
+- js/main.js: nueva IIFE "Sinapsis del hero" (ES5, sin librerias):
+  - Muestreo unico de la imagen a 480 px de ancho: mascara binaria de los
+    pixeles mas luminosos con umbral adaptativo sobre el maximo (se corrige
+    si la cobertura queda vacia o llena).
+  - Los pulsos avanzan SOLO a pixeles encendidos vecinos (prefiriendo
+    mantener la direccion, con saltos de hasta 3 px por el antialiasing).
+    No se unen puntos por cercania: si no hay linea encendida, la senal se
+    reinicia en otro punto de la red.
+  - El chip se detecta por centroide de lo mas brillante en la zona central:
+    los pulsos no nacen ni entran en un radio del 10 % del ancho y solo recibe
+    un resplandor radial tenue (alfa ~0.16, oscilacion suave), sin deformarlo.
+  - Estela de 11 posiciones con sprites pre-renderizados (azul y cian),
+    composicion screen; 11 pulsos base (7 en pantallas chicas) + 6 extra que
+    solo aparecen con el hover.
+  - Hover (solo con hover:hover): la actividad sube a 1.55 con interpolacion
+    (~0.045 por cuadro) y vuelve sola a 1 al salir.
+  - Rendimiento: requestAnimationFrame, sin nodos DOM ni gradientes por
+    cuadro, DPR max 2, pausa con visibilitychange, re-medicion con debounce
+    de 150 ms.
+  - prefers-reduced-motion: no se dibuja nada (data-sinapsis="estatica"); si
+    el canvas no esta o la imagen no se puede muestrear, queda solo la imagen
+    (data-sinapsis="sin-datos").
+  - Marcadores: data-sinapsis (cargando/activa/estatica/sin-datos) y
+    data-intensidad (1.00 en reposo).
+
+Pruebas (adaptadas, no relajadas):
+- etapa4-visual.js 76 -> 85: +4 a 1440 px (capa alineada y sin eventos;
+  imagen con mascara y screen; pulsos dibujados; el hover sube la actividad y
+  al salir vuelve sola), +1 por viewport (alineacion de la capa) y +2 en un
+  contexto reducedMotion:"reduce" (capa estatica sin pixeles; hero completo
+  sin escritura ni errores de JS).
+- probe-sinapsis.js (nuevo, fuera del conteo): 1440/768/390/360 con la capa
+  alineada y activa; los pulsos caen sobre zonas 4-5x mas luminosas que el
+  promedio de la imagen; 65-76 % de lo dibujado esta junto a lineas reales
+  frente a 12-13 % de puntos al azar (radio de 3 px en el mapa de 480 px);
+  ciclo de hover (1.00 -> 1.46 -> 1.02) y movimiento reducido (capa vacia).
+  - Ademas midio la union imagen-fondo: banda de 200x80 px sobre el borde
+    superior de la imagen, diferencia de luminancia 0.1 entre adentro y
+    afuera, sin costura ni rectangulo visible.
+- Bateria completa: 369 PASS, 0 FAIL (91 + 11 + 85 + 36 + 66 + 80).
+- Verificadores: verificar-csp TODO OK (0 cortes), verificar-botones sin
+  fallas, verificar-soporte 16/16, probe-soporte TODO OK.
+
+Documentacion actualizada: README (arbol con la nueva imagen, seccion "Cerebro
+neuronal y sinapsis", resumen de suites 369, etapa 16 del checklist, items 12
+y 14 de la revision visual) y DOCUMENTACION (fila 16, nota en 4.11, nueva
+4.13, 5 con 369 y el detalle de la suite visual).
+
+PENDIENTE: revision visual humana del resultado estetico (la imagen no se
+puede ver desde aqui; se verifico de forma automatica la alineacion, la
+integracion, el color de los pulsos y su reparto sobre las lineas reales).
+Sin commit ni push. Sigue pendiente ejecutar supabase/migracion-soporte.sql
+(Etapa 9).
+
+- FIN DE LA SESIÓN: se detiene y se espera la revisión del usuario.
+
+SESIÓN 25 (21/10/2026) — Corrección de la composición del cerebro en el hero
+(Local, sin commit ni push, como pidió el usuario.)
+
+Pedido: agrandar el cerebro del hero (más o menos un 40-60 %), quitar la zona
+rectangular oscura, hacer que los extremos se desvanezcan progresivamente hasta
+el negro (sin cortes ni rectas), conservar el detalle de las conexiones y que
+algunas lineas se continuen hacia el fondo, que el chip siga siendo pequeño y
+minimalista pero reconocible, y que se vea como parte del fondo tecnologico y
+no como una tarjeta. Sin tocar titulo, tipografia, colores, botones, encabezado,
+fondo general ni otras secciones; sin borrar imagen.jpg ni otros recursos; sin
+publicar.
+
+Diagnostico (medido con Chromium, no a ojo: el modelo no puede ver imagenes):
+- El archivo original (1672x940) no estaba centrado: la banda negra izquierda
+  ocupaba el 25 % del ancho y el motivo llegaba al borde derecho del archivo.
+  Los bordes eran negro puro (brillo medio 0.5/255).
+- El rectángulo oscuro no venía de la imagen sino del navegador: .reveal deja
+  transform: translateY(0), y un transform crea contexto de apilamiento, asi
+  que el mix-blend-mode: screen de la imagen se mezclaba solo contra un fondo
+  transparente y el negro del PNG se pintaba sobre el degradado azul del hero.
+- El nucleo brillante del motivo (brillo >= 45/255) ocupaba el 63 % del ancho
+  del archivo: con la caja anterior (582 px) se veian 365 px de cerebro.
+
+Cambios:
+- Imagenes/Cerebro neural de neon azul.png vuelve a su nombre original y queda
+  INTACTA; Imagenes/cerebro-neuronal.png pasa a ser el asset de trabajo:
+  recortado (se elimina la banda negra izquierda, con 6 px de margen) y con
+  ALFA REAL (el negro de fondo pasa a transparente con alfa segun luminancia y
+  los bordes se desvanecen con una rampa suave). 1299x853, 149 KB (antes
+  1,46 MB). El chip, las lineas y los colores no se retocan.
+- index.html: width/height de la imagen actualizados a 1299x853.
+- css/styles.css: filtro saturate(1.08) brightness(1.12); mascara mas suave
+  (ellipse 84% 86%); .hero__visual.visible con transform: none para que el
+  screen alcance el fondo real del hero; a >=901 px la caja se ensancha
+  clamp(2rem, 5vw, 5rem) y se corre clamp(1rem, 2.5vw, 2.5rem) a la izquierda
+  (dentro del hueco de la grilla). Sin transform: scale, para no romper el
+  mapeo del canvas.
+- js/main.js: SIN CAMBIOS (la capa de sinapsis se conserva tal cual).
+
+Resultado medido (1440/768/390/360):
+- Caja de la imagen a 1440: 582x327 -> 654x430 px; nucleo brillante del cerebro
+  365 -> ~528 px (+45 %).
+- Sin rectángulo: la franja interna de la caja y el fondo del hero difieren
+  0,0-0,2 de luminancia (antes el negro tapaba).
+- Canvas alineado a la imagen en los cuatro anchos; sin invasion del titulo;
+  sin scroll horizontal; consola limpia; sinapsis activa.
+- En movil (390 y 360 px) el cerebro queda debajo del texto y de los botones.
+
+Pruebas:
+- etapa4-visual.js 85 -> 86: +1 (composicion del hero: fondo transparente en
+  las esquinas, caja >= 640 px a 1440, natural 1299x853 y sin invasion del
+  titulo).
+- probe-hero.js (nuevo, fuera del conteo): 1440/768/390/360 con caja, rectangulo
+  medido (diferencia 0,0-0,2), invasion y scroll horizontal; deja capturas en
+  pruebas/shots/hero-*.png para revision visual humana.
+- probe-sinapsis.js TODO OK. Se corrigio el criterio del sonda para usar el
+  mismo umbral de "pixel encendido" que el renderizador (umbral 35 con la
+  correccion por cobertura): 70-72 % junto a lineas reales contra 15-18 % al
+  azar. Con el umbral viejo la medicion daba 49 % y habria parecido un fallo
+  que en realidad era una diferencia de criterio.
+- Bateria completa: 370 PASS, 0 FAIL (91 + 11 + 86 + 36 + 66 + 80).
+- Verificadores: verificar-csp TODO OK (0 cortes), verificar-botones sin
+  fallas, probe-soporte TODO OK. verificar-soporte tiene 3 fallos (boton
+  solido de soporte, Instagram y despliegue del formulario) que se verificaron
+  como PREEVISTENTES: se repitieron con los cambios guardados en git stash y
+  fallan igual, asi que no tienen que ver con el hero.
+
+Documentacion actualizada: README (arbol con el archivo original, seccion
+"Cerebro neuronal y sinapsis (Etapas 16 y 17)" mas "Composicion del cerebro
+en el hero (Etapa 17)", resumen de suites 370, etapa 17 del checklist y item
+15 de la revision visual) y DOCUMENTACION (fila 17, nota en 4.13, nueva 4.14
+con el diagnostico y las medidas, 5 con 370 y el detalle de la suite visual).
+
+PENDIENTE: revision visual humana del resultado estetico (la imagen no se
+puede ver desde aqui; se midio todo por pixeles y quedan capturas en
+pruebas/shots/hero-*.png). Sin commit ni push. Sigue pendiente ejecutar
+supabase/migracion-soporte.sql (Etapa 9).
+
+- FIN DE LA SESIÓN: se detiene y se espera la revisión del usuario.
+
+
+SESIÓN 26 (22/10/2026) — Hero limpio: se retira la imagen del cerebro y la
+capa de sinapsis del hero
+---------------------------------------------------------------------------
+
+Pedido: simplificar el hero porque la integracion del cerebro no quedo como
+se esperaba. Requisitos: quitar la imagen y el canvas de sinapsis, sacar el
+CSS que ya no se usa, conservar el fondo negro y la estetica tecnologica, NO
+tocar el titulo, el texto, los botones, el encabezado, la navegacion ni el
+resto de las secciones, conservar el fondo de particulas si es independiente,
+no borrar archivos de imagen, no tocar funcionalidades ajenas, todo local y
+sin commit ni push. Antes de editar habia que identificar que partes de la
+implementacion de sinapsis eran exclusivas del cerebro y cuales del fondo
+general.
+
+1) Diagnostico previo (sin tocar archivos):
+- js/main.js tenia dos IIFE de canvas:
+  * "Fondo dinamico: red de orbes flotantes" (canvas #fondo-particulas, fixed,
+    aria-hidden, pointer-events none): NO depende del hero ni de la imagen ->
+    es el fondo general -> SE CONSERVA.
+  * "Sinapsis del hero" (canvas.hero__neural, lineas 232-596): depende de
+    figure.hero__visual, img.hero__img, data-intensidad y data-sinapsis ->
+    es EXCLUSIVA del cerebro -> SE ELIMINA.
+- Tambien se conservaron la IIFE "Escritura del hero" (pill, titulo y parrafo
+  con cursor) y el reveal del resto de las secciones.
+
+2) Cambios:
+- index.html: se elimino <figure class="hero__visual reveal"
+  data-sinapsis="cargando"> con <img class="hero__img"
+  src="Imagenes/cerebro-neuronal.png"> y <canvas class="hero__neural">. El
+  resto del hero quedo intacto (pill, titulo con span.tg, parrafo, botones).
+- css/styles.css: bloque del hero reemplazado por "composicion limpia"; se
+  retiraron .hero__visual, .hero__img, .hero__visual.visible, el @media
+  (min-width: 901px) que ampliaba la figura, .hero__neural y el max-width
+  34rem de la figura en el breakpoint de 900 px.
+- js/main.js: se elimino la IIFE "Sinapsis del hero" (365 lineas). El archivo
+  paso de 1185 a 820 lineas. El resto del JS no se toco.
+- Composicion resultante: .hero .container mantiene la grilla de dos columnas
+  (minmax(0,1.1fr) minmax(0,.9fr)); el texto ocupa la primera y la segunda
+  queda RESERVADA como espacio negativo sobre el fondo negro, con los orbes
+  del fondo general detras. A <=900 px la grilla pasa a una sola columna. A
+  1440 px el titulo ocupa el 53 % del contenedor (la mitad izquierda). No se
+  toco la tipografia ni el espaciado del texto.
+- Imagenes: NO se borro ninguna. cerebro-neuronal.png (recortado con alfa),
+  "Cerebro neural de neon azul.png" (original intacto) e imagen.jpg siguen en
+  el repo, sin uso en el hero.
+
+3) Pruebas (fuera del proyecto, carpeta temporal):
+- etapa4-visual.js: se retiraron las aserciones del cerebro y se agregaron 7
+  del hero limpio (3 a 1440: sin img/canvas/.hero__visual en #inicio, botones y
+  fondo general conservados, espacio negativo con el titulo en menos del 60 %;
+  1 por viewport 1440/390/360: sin decorativos y con #fondo-particulas; 1 con
+  reducedMotion: hero sin decoracion, con fondo general y texto completo sin
+  escritura). Queda en 84/84 PASS.
+- probe-hero.js: se reescribio como sonda del hero limpio (1440/768/390/360):
+  sin decorativos, titulo y botones intactos, fondo de particulas dibujando
+  (>100 px con alfa), navegacion conservada, sin desborde horizontal, consola
+  limpia y capturas en pruebas/shots/hero-limpio-*.png. TODO OK.
+- probe-sinapsis.js: se elimino por obsoleto.
+- Bateria completa: 368 PASS, 0 FAIL (91 + 11 + 84 + 36 + 66 + 80).
+- Verificadores: verificar-csp TODO OK (0 cortes), probe-soporte TODO OK.
+  verificar-soporte sigue con los mismos 3 fallos PREEVISTENTES (boton solido
+  de soporte, Instagram y despliegue del formulario), atadas al formulario de
+  soporte y no al hero.
+
+Documentacion actualizada: README (arbol con las imagenes como "sin uso",
+seccion nueva "Hero limpio (Etapa 18)", seccion "Cerebro neuronal y sinapsis
+(Etapas 16 y 17, en pausa)", resumen de suites 368, etapa 18 del checklist e
+items 12, 14 y 15 de la revision visual) y DOCUMENTACION (fila 18, notas en
+4.13 y 4.14, nueva 4.15 con el diagnostico previo y los cambios, 5 con 368 y el
+detalle de la suite visual).
+
+PENDIENTE: revision visual humana del hero limpio (desde aqui no se pueden ver
+las capturas; quedaron en pruebas/shots/hero-limpio-*.png). Sin commit ni push.
+Sigue pendiente ejecutar supabase/migracion-soporte.sql (Etapa 9).
+
+- FIN DE LA SESIÓN: se detiene y se espera la revisión del usuario.
+

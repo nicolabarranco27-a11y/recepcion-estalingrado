@@ -373,6 +373,25 @@ var ENVIO = (function () {
   var form = document.getElementById('form-solicitud');
   if (!form) return;
 
+  /* El formulario es uno solo: se mueve al slot de la sección que lo pide.
+     Técnico y web lo usan en #recepcion; soporte lo usa al final de #soporte,
+     debajo de sus pasos y canales. Se mueve el mismo nodo para conservar los
+     datos cargados y no duplicar ids. */
+  var bloque = document.getElementById('bloque-formulario');
+  var slotRecepcion = document.getElementById('slot-recepcion');
+  var slotSoporte = document.getElementById('slot-soporte');
+
+  function ubicarFormulario(valor) {
+    if (!bloque) return;
+    var slot = valor === 'soporte' ? slotSoporte : slotRecepcion;
+    if (!slot || bloque.parentNode === slot) return;
+    slot.appendChild(bloque);
+    /* Entrada suave cada vez que el formulario cambia de sección. */
+    bloque.classList.remove('entrando');
+    void bloque.offsetWidth;
+    bloque.classList.add('entrando');
+  }
+
   var stepper = document.getElementById('stepper');
   var stepperServicio = document.getElementById('stepper-servicio');
   var stepperItems = document.querySelectorAll('.stepper__item');
@@ -495,9 +514,10 @@ var ENVIO = (function () {
   }
 
   /* El formulario se despliega al tocar una tarjeta de servicio o el botón
-     de soporte (paso 2). */
+     de soporte (paso 2). El de soporte se ubica dentro de #soporte. */
   function abrirFormulario(valor) {
     servicioActual = valor;
+    ubicarFormulario(valor);
     aplicarServicio(valor);
     stepper.hidden = false;
     form.hidden = false;

@@ -92,12 +92,6 @@
           </a>
         </div>
       </div>
-
-      <figure class="hero__visual reveal">
-        <img class="hero__img" src="Imagenes/imagen.jpg"
-             alt="Cerebro con contraste azul y el logo de Estalingrado Corp al centro"
-             width="1640" height="924">
-      </figure>
     </div>
   </section>
 
@@ -153,6 +147,11 @@
         <p class="section__desc">Elegí el servicio, completá tus datos y revisá todo antes de dejarla lista para el envío.</p>
       </div>
 
+      <!-- El formulario es uno solo y se comparte: las tarjetas de técnico/web
+           lo ubican en #slot-recepcion; el botón de soporte lo mueve a
+           #slot-soporte, al final de la sección Soporte. -->
+      <div class="slot-form" id="slot-recepcion">
+      <div class="bloque-formulario" id="bloque-formulario">
       <ol class="stepper reveal" id="stepper" aria-label="Pasos de la solicitud" hidden>
         <li class="stepper__item is-done" data-paso="1"><span class="stepper__num" aria-hidden="true">01</span> <span id="stepper-servicio">Servicio</span></li>
         <li class="stepper__item" data-paso="2"><span class="stepper__num" aria-hidden="true">02</span> Datos</li>
@@ -296,6 +295,8 @@
         </div>
 
       </form>
+      </div>
+      </div>
     </div>
   </section>
 
@@ -329,8 +330,8 @@
           <div>
             <p class="soporte-steps__titulo">Pedí el soporte</p>
             <p class="soporte-steps__texto">
-              Tocá el botón "Soporte al cliente" de esta sección y se abre el
-              formulario de recepción con el motivo listo para completar.
+              Tocá el botón "Soporte al cliente" de esta sección: el formulario
+              de soporte se despliega acá abajo, con el motivo listo para completar.
             </p>
           </div>
         </li>
@@ -366,11 +367,15 @@
             </div>
           </li>
         </ul>
-        <a href="#recepcion" class="btn btn--solid" data-servicio="soporte">
+        <a href="#slot-soporte" class="btn btn--solid" data-servicio="soporte">
           <i class="fa-solid fa-headset" aria-hidden="true"></i>
           Soporte al cliente
         </a>
       </div>
+
+      <!-- Acá se despliega el formulario de soporte (el JS lo trae desde
+           #recepcion al elegir "Soporte al cliente"). -->
+      <div class="slot-form" id="slot-soporte"></div>
     </div>
   </section>
 
@@ -387,7 +392,8 @@
 
       <!-- Teléfono oficial: pendiente de que nos lo pase la empresa.
            El correo de soporte sí está verificado y publicado arriba. -->
-      <!-- El formulario de recepción vive en la sección #recepcion -->
+      <!-- El formulario compartido vive en #recepcion; al pedir soporte se
+           despliega al final de la sección #soporte (ver js/main.js). -->
 
       <ul class="contact-list reveal">
         <li class="contact-list__item">
@@ -402,6 +408,13 @@
           <div>
             <p class="contact-list__label">YouTube</p>
             <a class="contact-list__value" href="https://www.youtube.com/@Estalingradocorp" target="_blank" rel="noopener">@Estalingradocorp</a>
+          </div>
+        </li>
+        <li class="contact-list__item">
+          <span class="contact-list__icon" aria-hidden="true"><i class="fa-brands fa-instagram"></i></span>
+          <div>
+            <p class="contact-list__label">Instagram</p>
+            <a class="contact-list__value" href="https://www.instagram.com/nicotips27/" target="_blank" rel="noopener">@nicotips27</a>
           </div>
         </li>
         <li class="contact-list__item">
@@ -439,10 +452,11 @@
       <p class="site-footer__copy">Estalingrado Corp. © <span id="year"></span></p>
 
       <div class="site-footer__social">
-        <a href="https://www.youtube.com/@Estalingradocorp" target="_blank" rel="noopener" title="YouTube" aria-label="YouTube"><i class="fa-brands fa-youtube" aria-hidden="true"></i></a>
-        <a href="https://web.facebook.com/estalingradocorp" target="_blank" rel="noopener" title="Facebook" aria-label="Facebook"><i class="fa-brands fa-facebook" aria-hidden="true"></i></a>
-        <a href="https://x.com/estalingrado27" target="_blank" rel="noopener" title="X (Twitter)" aria-label="X (Twitter)"><i class="fa-brands fa-x-twitter" aria-hidden="true"></i></a>
-        <a href="https://t.me/estalingradocorp" target="_blank" rel="noopener" title="Telegram" aria-label="Telegram"><i class="fa-brands fa-telegram" aria-hidden="true"></i></a>
+        <a class="sf--yt" href="https://www.youtube.com/@Estalingradocorp" target="_blank" rel="noopener" title="YouTube" aria-label="YouTube"><i class="fa-brands fa-youtube" aria-hidden="true"></i></a>
+        <a class="sf--ig" href="https://www.instagram.com/nicotips27/" target="_blank" rel="noopener" title="Instagram" aria-label="Instagram"><i class="fa-brands fa-instagram" aria-hidden="true"></i></a>
+        <a class="sf--fb" href="https://web.facebook.com/estalingradocorp" target="_blank" rel="noopener" title="Facebook" aria-label="Facebook"><i class="fa-brands fa-facebook" aria-hidden="true"></i></a>
+        <a class="sf--x" href="https://x.com/estalingrado27" target="_blank" rel="noopener" title="X (Twitter)" aria-label="X (Twitter)"><i class="fa-brands fa-x-twitter" aria-hidden="true"></i></a>
+        <a class="sf--tg" href="https://t.me/estalingradocorp" target="_blank" rel="noopener" title="Telegram" aria-label="Telegram"><i class="fa-brands fa-telegram" aria-hidden="true"></i></a>
       </div>
 
       <p class="site-footer__status">

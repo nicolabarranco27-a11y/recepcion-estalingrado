@@ -66,6 +66,10 @@ la Etapa 1). Este proyecto no modifica ni depende de sus archivos.
 | 12 (20/10/2026) | **Escritura del hero** como la página institucional: pill, título y párrafo se escriben carácter por carácter (30 ms/char) con cursor `▌` que parpadea; el JS **vacía los textos síncronamente antes del primer pintado** (nunca se ve el texto completo para reescribirlo), el span `.tg` se conserva, los espacios del fuente se colapsan (sin pausas raras), se reserva el alto final (sin salto de layout) y con movimiento reducido no se anima. Ver §4.10. | Hecha y publicada |
 | 13 (20/10/2026) | **Orbes minimalistas**: el canvas de fondo ya no dibuja el aura difusa alrededor de cada orbe; quedan círculos de color puro con la misma red de líneas. Ver §4.10. | Hecha y publicada |
 | 14 (20/10/2026) | **Imágenes institucionales**: fotos agregadas por la empresa en `Imagenes/`, integradas en dos lugares distintos — `imagen.jpg` (cerebro con contraste azul y logo) como pieza visual del hero y `oficina.jpg` en el intro de `#soporte`, junto al título "Soporte al cliente", con pie minimalista "Oficinas" en blanco. Ver §4.11. | Hecha y publicada |
+| 15 (21/10/2026) | **Formulario por sección, Instagram y transiciones**: el formulario compartido se mueve entre slots — técnico y web en `#recepcion` (como antes) y soporte al final de `#soporte`, debajo de pasos y canales; se sumó **Instagram `@nicotips27`** a los canales y al pie; microanimaciones discretas (pasos, avisos, errores, menú móvil, nav, botones) con movimiento reducido respetado. Suites en 360 aserciones. Ver §4.12. | Hecha (local, pendiente de revisión del usuario) |
+| 16 (21/10/2026) | **Cerebro neuronal y sinapsis**: `cerebro-neuronal.png` (1672×940) reemplaza a `imagen.jpg` en el hero y se integra sin marco (`mix-blend-mode: screen` + máscara radial); una capa Canvas superpuesta dibuja pulsos que recorren **solo los píxeles luminosos reales** de la ilustración (muestreo único, sin unir puntos por cercanía), con brillo tenue del chip, hover con vuelta suave, pausa con pestaña oculta y estático con movimiento reducido. Suites en 369 aserciones. Ver §4.13. | Hecha (local) y **retirada del hero en la Etapa 18** |
+| 17 (21/10/2026) | **Composición del cerebro en el hero**: el asset se recorta (banda negra izquierda eliminada) y su fondo negro pasa a **alfa real**, con desvanecido de bordes, así que desaparece el rectángulo oscuro y el dibujo se funde con el fondo; el encuadre crece ~45 % en escritorio sin invadir el título ni generar scroll horizontal. Se conserva la capa de sinapsis (el canvas sigue alineado y los pulsos siguen las líneas). Suites en 370 aserciones. Ver §4.14. | Hecha (local) y **sin efecto visible desde la Etapa 18** |
+| 18 (22/10/2026) | **Hero limpio**: a pedido del usuario se retiran del hero la imagen del cerebro y la capa de sinapsis — `figure.hero__visual`, `img.hero__img` y `canvas.hero__neural` del HTML, sus reglas del CSS y la IIFE "Sinapsis del hero" de `js/main.js` (365 líneas). El hero queda minimalista: texto a la izquierda y columna derecha reservada como espacio negativo, con el fondo negro y la estética tecnológica intactos. **Se conservan** el fondo de partículas general (`#fondo-particulas`), la escritura del hero, el título, el párrafo, los botones, el encabezado, la navegación y el resto de las secciones; **no se borra ningún archivo de imagen**. Suites en 368 aserciones. Ver §4.15. | Hecha (local, pendiente de revisión del usuario) |
 
 ## 4. Recepción: diseño actual del flujo
 
@@ -81,7 +85,10 @@ la Etapa 1). Este proyecto no modifica ni depende de sus archivos.
    **paso 2 (Datos)**: el stepper de 3 ítems pasa a verse con el 01 completado
    (muestra el nombre del servicio elegido) y el 02 activo. Sin elementos
    intermedios ni indicadores agregados: el formulario es el mismo de antes,
-   sin el paso de selección duplicado.
+   sin el paso de selección duplicado. Desde la Etapa 15, si el servicio es
+   **soporte**, el formulario se muestra **al final de `#soporte`** (debajo de
+   pasos y canales) en lugar de en `#recepcion`; con técnico y web sigue en
+   `#recepcion` igual que siempre.
 3. Validación: campos comunes (nombre, medio de contacto, descripción) +
    campos del grupo del servicio elegido; los controles del grupo inactivo
    quedan `disabled`. Errores con `aria-invalid`, mensajes `err-*` y foco al
@@ -435,13 +442,13 @@ La empresa agregó la carpeta `Imagenes/` con dos fotos, integradas cada una
 en un lugar distinto y pensado (el usuario pidió no ponerlas juntas):
 
 - **`Imagenes/imagen.jpg` (1640×924, apaisada)** — imagen del cerebro con
-  contraste azul y el logo al centro. Vive en el hero: `figure.hero__visual`
-  como segunda columna de `.hero .container` (`grid` de `1.1fr / .9fr`,
-  centrado vertical), a la derecha del título. Estilo propio de la marca:
-  radio `--radius-card`, borde `--card-border` y doble sombra (negra +
-  resplandor azul). A ≤900 px la grilla pasa a una sola columna y la imagen
-  se apila debajo del texto con `max-width: 34rem`. El usuario la dejó
-  "como está": no se movió ni se retoquó en la revisión final.
+  contraste azul y el logo al centro. Vivió en el hero como segunda columna de
+  `.hero .container` (`grid` de `1.1fr / .9fr`, centrado vertical), a la
+  derecha del título, con estilo propio de la marca: radio
+  `--radius-card`, borde `--card-border` y doble sombra (negra + resplandor
+  azul); a ≤900 px la grilla pasaba a una sola columna y la imagen se apilaba
+  debajo del texto con `max-width: 34rem`. **Desde la Etapa 18 no se usa en el
+  hero** (ver §4.15): el archivo se conserva en el repo, sin borrar.
 - **`Imagenes/oficina.jpg` (640×800, vertical)** — foto de la oficina, en el
   **intro de la sección `#soporte`** (`.soporte__intro`, lugar elegido por
   el usuario: "por donde dice Soporte al cliente"). El intro es una grilla
@@ -473,26 +480,296 @@ desborde a 1440/390/360 y una revisión manual de layout con Playwright
 el encabezado, que los pasos del soporte quedan debajo y que no hay scroll
 horizontal.
 
-## 5. Pruebas (07/10 → 20/10/2026)
+### 4.12 Formulario por sección, Instagram y transiciones (Etapa 15)
+
+**Un solo formulario, dos lugares.** El formulario es el de siempre (vive en
+`#bloque-formulario`, junto con el stepper) y no se duplica:
+
+- `#slot-recepcion` (dentro de `#recepcion`): ubicación para técnico y web,
+  **igual que antes**.
+- `#slot-soporte` (al final del `container--narrow` de `#soporte`, después de
+  pasos y canales): destino cuando se elige soporte. El CTA
+  "Soporte al cliente" ahora apunta a `#slot-soporte`, así el navegador baja
+  solo al formulario sin pasar por `#recepcion`; el `scroll-padding-top` de
+  la navbar fija se respeta.
+- El JS (`ubicarFormulario(valor)` en `main.js`) **mueve el mismo nodo** al
+  slot que corresponde antes de desplegarlo: se conservan los datos ya
+  escritos y no hay ids duplicados. Técnico/web mueven el bloque de vuelta a
+  `#slot-recepcion` aunque el usuario esté abajo en Soporte.
+- `.slot-form:not(:empty)` da el aire superior solo cuando hay formulario; el
+  slot vacío no ocupa espacio. Al cambiar de sección, el bloque entra con
+  `fade-up` de .45 s (clase `.entrando`, que el JS reinicia).
+- En móvil el comportamiento es el mismo: el formulario queda debajo de los
+  canales, a una columna, sin desbordes (probado a 1440/768/390/360).
+
+**Instagram.** Se agregó `@nicotips27`
+(<https://www.instagram.com/nicotips27/>) como canal en `#contacto`
+(`fa-instagram`, `target="_blank"` + `rel="noopener"`) y como ícono en el pie.
+Los colores de hover del pie pasaron de `:nth-child()` a clases por red
+(`sf--yt`, `sf--ig`, `sf--fb`, `sf--x`, `sf--tg`) para no depender del orden,
+más un levantamiento de 2 px.
+
+**Transiciones.** Se incorporó un `fade-up` reutilizable (opacidad +
+desplazamiento de 8 px, .25–.45 s) para los pasos del formulario, los avisos
+de estado, los errores de campo y el bloque al cambiar de sección; el menú
+móvil entra con fade y sus enlaces con un leve desplazamiento; los enlaces del
+nav crecen un subrayado desde la izquierda; los botones responden al presionar
+(`scale(.98)`); las tarjetas de canales y los íconos del pie se elevan 2 px y
+el avatar del logo escala 1.06 al pasar el puntero; el skip link se desliza al
+recibir foco. Todo queda cubierto por la regla global de
+`prefers-reduced-motion`.
+
+**Pruebas (360 en verde).** `test-recepcion.js` (+5: Instagram en canales y
+pie, formulario en su slot inicial, desplazamiento a `#slot-soporte` y regreso
+a `#recepcion`), `etapa4-extra.js` (+2: ubicación real del formulario en
+Chromium al pedir soporte y al volver con la tarjeta técnica),
+`etapa4-visual.js` (+3 a 1440 px: formulario dentro de su sección, debajo de
+pasos y canales, y slot liberado al volver) y `verificar-soporte.js` (+2:
+Instagram y ubicación; pasa a 16 aserciones). Un sondeo de layout en
+1440/768/390/360 confirmó: sin scroll horizontal, formulario debajo de los
+canales, ancla sin quedar bajo la navbar, clase `.entrando` activa y consola
+limpia; al volver con técnico, el formulario regresa y el slot queda vacío.
+
+### 4.13 Cerebro neuronal y sinapsis animadas (Etapa 16) — en pausa
+
+> **Estado actual (Etapa 18):** esta implementación **ya no está en el hero**.
+> Se retiraron `figure.hero__visual`, `img.hero__img` y `canvas.hero__neural`
+> del HTML, sus reglas del CSS y la IIFE "Sinapsis del hero" de `js/main.js`.
+> El asset y el código quedan en el repositorio por si se quiere retomar la
+> integración. Ver §4.15.
+
+La empresa sumó `Imagenes/cerebro-neuronal.png` ("Cerebro neural de neón azul",
+1672×940, PNG opaco) para que sea la base visual principal del hero. El archivo
+se renombró desde "Cerebro neural de neón azul.png" para que la URL quede limpia
+(sin espacios ni acentos). `Imagenes/imagen.jpg` **no se borra**: queda en el
+repositorio, sin uso.
+
+**Integración visual.** El fondo de la ilustración es casi negro (esquinas
+R0–G1–B2/4, brillo medio 7.8/255), así que se quitó el marco de tarjeta
+(borde, radio y sombras) y se integró con `mix-blend-mode: screen` más una
+máscara radial (`mask-image`) que difumina los bordes antes del marco; un
+`filter` leve (saturación 1.05, brillo 1.03) mantiene los azules. La imagen
+original se mantiene intacta: no se retoqueó el chip ni se agregaron textos o
+logos. La figura sigue siendo la segunda columna de la grilla del hero
+(`1.1fr / .9fr`), a la derecha del título, y a ≤900 px se apila debajo del
+texto con `max-width: 34rem`.
+
+> En la **Etapa 17** se corrigió la composición de esta misma ilustración
+> (rectángulo oscuro y tamaño): el asset pasó a recortado y con alfa real, y la
+> figura creció. Ver §4.14.
+
+**Capa de sinapsis (`canvas.hero__neural`).** Canvas 2D superpuesto y alineado
+exactamente a la imagen (`position: absolute; inset: 0`), `aria-hidden` y con
+`pointer-events: none`: no bloquea clics, enlaces ni teclado.
+
+- **Los pulsos siguen las líneas reales, no la cercanía.** Al cargar se muestrea
+  la imagen **una sola vez** a 480 px de ancho y se arma una máscara binaria con
+  los píxeles más luminosos (umbral adaptativo sobre el máximo de la imagen,
+  corregido si la cobertura queda vacía o llena). Cada pulso avanza **solo a
+  píxeles encendidos vecinos**, prefiriendo mantener la dirección, con saltos de
+  hasta 3 px para tapar los huecos del antialiasing. No se une un punto con
+  otro por proximidad: si no hay línea encendida en el paso, la señal se
+  reinicia en otro punto de la red.
+- **Chip central**: los pulsos no nacen ni entran dentro de un radio del 10 % del
+  ancho alrededor del centro, así que su forma original se conserva; encima solo
+  se superpone un resplandor radial tenue (alfa ≈ 0.16 con oscilación suave),
+  sin deformarlo.
+- **Pulso**: estela de hasta 11 posiciones con sprites pre-renderizados (azul
+  `96,165,250` y cian `103,232,249`), composición `screen` y desvanecido
+  cuadrático. 11 pulsos base en escritorio, 7 en pantallas chicas, más 6
+  "extra" que solo se activan con el hover.
+- **Hover** (solo con `(hover: hover)`): la actividad sube a 1.55 con
+  interpolación suave (~0.045 por cuadro) y al salir el puntero vuelve sola a
+  1. Solo ajusta velocidad y alfa: no cambia la posición ni el tamaño de la
+  ilustración.
+- **Rendimiento**: `requestAnimationFrame`, sin crear nodos DOM ni gradientes
+  por cuadro, DPR limitado a 2, pausa real al ocultar la pestaña
+  (`visibilitychange`) y re-medición con debounce de 150 ms al redimensionar.
+- **Movimiento reducido**: no se dibuja nada; la imagen original queda como
+  alternativa visual estática (`data-sinapsis="estatica"`). Si el canvas no
+  está disponible, la imagen no se puede muestrear (por ejemplo, `file://`) o
+  falla el `getImageData`, queda solo la imagen (`data-sinapsis="sin-datos"`).
+- Marcadores de estado en `figure.hero__visual`: `data-sinapsis`
+  (`cargando` / `activa` / `estatica` / `sin-datos`) y `data-intensidad`
+  (1.00 en reposo).
+
+**Pruebas (370 en verde).** `etapa4-visual.js` pasa a 86/86: +4 a 1440 px
+(capa alineada y sin eventos, imagen con máscara y `screen`, pulsos dibujados,
+hover que sube y baja), +1 por viewport (alineación de la capa en 1440/390/360)
+y +2 en un contexto `reducedMotion: 'reduce'` (capa estática sin píxeles y hero
+completo sin escritura ni errores). `probe-sinapsis.js` (nuevo, fuera del
+conteo) verifica en 1440/768/390/360 que la capa está alineada y activa, que
+los pulsos caen sobre zonas 4–5× más luminosas que el promedio de la imagen y
+que el 65–76 % de lo dibujado está junto a líneas reales (12–13 % en puntos
+tomados al azar), más el ciclo de hover y el comportamiento con movimiento
+reducido. También midió la unión de la imagen con el fondo (banda de 200×80 px
+sobre el borde superior: diferencia de luminancia 0.1 entre adentro y afuera,
+sin costura ni rectángulo visible).
+
+### 4.14 Composición del cerebro en el hero (Etapa 17) — sin efecto visible
+
+> **Estado actual (Etapa 18):** el asset recortado y con alfa real
+> (`Imagenes/cerebro-neuronal.png`, 1299×853, 149 KB) se conserva en el
+> repositorio, pero **ya no se muestra en el hero** (ver §4.15). Las reglas de
+> CSS que lo componían (`.hero__visual`, `.hero__img`, `.hero__neural` y el
+> `transform: none` del reveal) se retiraron.
+
+**Diagnóstico (medido, no a ojo).** El modelo de trabajo no puede mirar
+imágenes, así que la revisión visual se hizo con medición de píxeles en
+Chromium real:
+
+- El archivo original (1672×940) **no estaba centrado**: la banda negra
+  izquierda ocupaba el 25 % del ancho (el dibujo empezaba en el 26 %) y el
+  motivo llegaba al borde derecho del archivo (el recorte original del dibujo).
+  Los bordes laterales y superior e inferior eran negro puro (brillo medio
+  0.5/255).
+- El **rectángulo oscuro** no era de la imagen sino del navegador: `.reveal`
+  deja `transform: translateY(0)`, y un transform crea **contexto de
+  apilamiento** → el `mix-blend-mode: screen` de la imagen se mezclaba solo
+  contra un fondo transparente y el negro del PNG se pintaba encima del
+  degradado azul del hero.
+- El núcleo brillante del motivo (brillo ≥ 45/255) ocupaba el 63 % del ancho
+  del archivo: con la caja anterior (582 px) se veían **365 px** de cerebro.
+
+**Solución (asset + CSS, sin tocar el dibujo).**
+
+- `Imagenes/Cerebro neural de neón azul.png` queda **intacto** (vuelve a su
+  nombre original) y `Imagenes/cerebro-neuronal.png` pasa a ser el asset de
+  trabajo: **recortado** (se elimina la banda negra izquierda, con 6 px de
+  margen) y **con alfa real**: el negro de fondo se vuelve transparente
+  (alfa según luminancia) y los bordes se desvanecen con una rampa suave.
+  Resultado: 1299×853, PNG con canal alfa, 149 KB (antes 1,46 MB). El chip, las
+  líneas y los colores **no se retocan**: solo cambia el canal alfa y el
+  recorte.
+- La imagen conserva `mix-blend-mode: screen` y la máscara radial (más suave:
+  `ellipse 84% 86%`), y `.hero__visual.visible` queda con `transform: none`
+  para que la mezcla alcance el fondo real del hero en lugar de quedar aislada
+  dentro de la figura. Con el alfa del asset, aunque la mezcla se aisle, ya no
+  aparece ningún rectángulo.
+- La figura **crece** por layout (nunca con `transform: scale`, que rompería el
+  mapeo del canvas): a ≥901 px la caja se ensancha `clamp(2rem, 5vw, 5rem)` y
+  se corre `clamp(1rem, 2.5vw, 2.5rem)` hacia la izquierda, dentro del hueco
+  de la grilla. A 1440 px la imagen pasa de 582×327 px a **654×430 px** y el
+  núcleo brillante de **365 px a ~528 px (+45 %)**. A ≤900 px se mantiene
+  `max-width: 34rem` apilado debajo del texto.
+
+**Resultado medido (1440/768/390/360).**
+
+| Medida | Antes | Ahora |
+|---|---|---|
+| Caja de la imagen (1440) | 582×327 px | 654×430 px |
+| Núcleo brillante del cerebro (1440) | 365 px | ~528 px (+45 %) |
+| Franja interna vs fondo del hero | — | diferencia **0,0–0,2/255** (sin rectángulo) |
+| Scroll horizontal | 0 | 0 |
+| Título invadido | no | no |
+| Canvas alineado a la imagen | sí | sí |
+
+**Pruebas (370 en verde).** `etapa4-visual.js` 86/86 (+1: composición del
+hero: fondo transparente en las esquinas, caja ≥ 640 px a 1440, natural
+1299×853 y sin invasión del título). `probe-sinapsis.js` todo en verde
+(70–72 % de lo dibujado junto a líneas reales contra 15–18 % al azar, con el
+mismo criterio de "píxel encendido" que usa el renderizador). `probe-hero.js`
+(nuevo, fuera del conteo) mide en los cuatro anchos: alineación de la capa,
+caja visible del cerebro, diferencia de luminancia entre la franja interna y
+el fondo (sin rectángulo), ausencia de invasión del título y de scroll
+horizontal, y deja capturas para revisión visual humana.
+
+**Pendiente de revisión humana.** El modelo no puede ver las imágenes: los
+números están medidos, pero el juicio estético final (si el cerebro se ve
+"pegado" o integrado, si el chip se percibe pequeño) lo tiene que hacer el
+usuario mirando las capturas en `pruebas/shots/hero-*.png`.
+
+### 4.15 Hero limpio (Etapa 18, 22/10/2026)
+
+**Pedido.** El usuario pidió simplificar el hero: quitar la imagen del cerebro
+y la capa de sinapsis, porque la integración visual no quedó como se esperaba.
+Restricciones del pedido: conservar el fondo negro y la estética tecnológica,
+no tocar el título, el texto, los botones, el encabezado, la navegación ni el
+resto de las secciones, **no borrar archivos de imagen** y no tocar
+funcionalidades ajenas.
+
+**Diagnóstico previo (qué era exclusivo y qué no).** Antes de editar se
+revisó `js/main.js` para separar los dos bloques de canvas:
+
+| Bloque | Dependencias | Decisión |
+|---|---|---|
+| IIFE "Fondo dinámico: red de orbes flotantes" (`canvas#fondo-particulas`, `position: fixed`, `aria-hidden`, `pointer-events: none`) | Solo el canvas general del fondo; no depende del hero ni de la imagen | **Se conserva**: es el fondo general de la página |
+| IIFE "Sinapsis del hero" (`canvas.hero__neural`) | `figure.hero__visual`, `img.hero__img`, `data-intensidad`, `data-sinapsis` | **Se elimina**: es exclusiva del cerebro (365 líneas) |
+
+También se conservaron la IIFE "Escritura del hero" (pill, título y párrafo con
+cursor) y el comportamiento de `reveal` del resto de las secciones.
+
+**Cambios.**
+
+- `index.html`: se eliminó `<figure class="hero__visual reveal" data-sinapsis="cargando">`
+  con `<img class="hero__img" src="Imagenes/cerebro-neuronal.png">` y
+  `<canvas class="hero__neural">`. El resto del hero (pill, título con
+  `span.tg`, párrafo, botones, indicadores) quedó intacto.
+- `css/styles.css`: el bloque del hero se reemplazó por uno de **composición
+  limpia**. Se retiraron `.hero__visual`, `.hero__img`,
+  `.hero__visual.visible`, el `@media (min-width: 901px)` que ampliaba la
+  figura, `.hero__neural` y el `max-width: 34rem` de la figura en el breakpoint
+  de ≤900 px.
+- `js/main.js`: se eliminó la IIFE "Sinapsis del hero" (365 líneas). El archivo
+  pasó de 1185 a 820 líneas; el resto del JS no se tocó.
+
+**Composición resultante.** `.hero .container` **mantiene la grilla de dos
+columnas** (`minmax(0, 1.1fr) minmax(0, .9fr)`): el texto ocupa la primera y
+la segunda queda **reservada como espacio negativo** sobre el fondo negro, con
+los orbes del fondo general detrás. A ≤900 px la grilla pasa a una sola
+columna (el texto ocupa todo el ancho) y a 1440 px el título ocupa el **53 %**
+del contenedor, es decir, la mitad izquierda. No se tocó la tipografía, los
+tamaños ni el espaciado del texto, así que la geometría de la columna
+izquierda es la misma que antes de sacar la imagen.
+
+**Archivos de imagen: ninguno se borró.** `Imagenes/cerebro-neuronal.png`
+(recortado con alfa), `Imagenes/Cerebro neural de neón azul.png` (original
+intacto) e `Imagenes/imagen.jpg` siguen en el repositorio, sin uso en el hero.
+
+**Pruebas (368 en verde).** `etapa4-visual.js` queda en 84/84: se retiraron las
+8 aserciones del cerebro y la de sinapsis (capa alineada, imagen con máscara,
+pulsos, hover, composición, capa estática) y se sustituyeron por 7 nuevas:
+3 a 1440 px (hero sin `img`/`canvas`/`.hero__visual`, botones y fondo general
+conservados, espacio negativo reservado con el título en menos del 60 % del
+contenedor), 1 por viewport (1440/390/360: hero sin decorativos y con
+`#fondo-particulas` presente) y 1 en el contexto `reducedMotion: 'reduce'` (hero
+sin decoración, con fondo general y texto completo sin escritura). `probe-hero.js`
+se reescribió como sonda del **hero limpio** (1440/768/390/360): sin
+decorativos en `#inicio`, título y botones intactos, fondo de partículas
+dibujando (`> 100` píxeles con alfa), navegación con sus enlaces, sin desborde
+horizontal, consola limpia y capturas en `pruebas/shots/hero-limpio-*.png`.
+`probe-sinapsis.js` se eliminó por obsoleto.
+
+**Pendiente de revisión humana.** El modelo no puede ver las imágenes: la
+composición está verificada por medición (posiciones, ausencia de decorativos,
+píxeles del fondo), pero el juicio estético final (si el hero se ve demasiado
+vacío o si conviene ampliar el título) lo tiene que hacer el usuario mirando
+las capturas.
+
+## 5. Pruebas (07/10 → 22/10/2026)
 
 Las suites viven **fuera del proyecto** (carpeta temporal de trabajo), porque
 el proyecto no usa Node/build. Son 6 suites (4 de recepción + 2 de Etapa 7):
 
-| Suite | Motor | Alcance | Resultado (20/10/2026) |
+| Suite | Motor | Alcance | Resultado (21/10/2026) |
 |---|---|---|---|
-| `test-recepcion.js` | jsdom | Estado inicial (formulario/stepper ocultos, sin duplicación, sin elementos agregados), estructura del soporte (2 tarjetas, sin `#servicio-soporte`, CTA "Soporte al cliente" con `btn--solid`/`fa-headset`, nav con 5 enlaces, mailto), despliegue por tarjeta/CTA, grupos alternados (3 servicios), validación, foco, corrección en línea, revisión, XSS literal, cambio de servicio desde revisión, motivo de soporte obligatorio, envío deshabilitado, menú móvil, canvas de fondo. | 86/86 PASS |
+| `test-recepcion.js` | jsdom | Estado inicial (formulario/stepper ocultos, sin duplicación, sin elementos agregados), estructura del soporte (2 tarjetas, sin `#servicio-soporte`, CTA "Soporte al cliente" con `btn--solid`/`fa-headset`, nav con 5 enlaces, mailto), despliegue por tarjeta/CTA, grupos alternados (3 servicios), validación, foco, corrección en línea, revisión, XSS literal, cambio de servicio desde revisión, motivo de soporte obligatorio, slots del formulario (soporte y regreso), Instagram en canales y pie, envío deshabilitado, menú móvil, canvas de fondo. | 91/91 PASS |
 | `test-tecnico.js` | jsdom | Camino del servicio técnico: validación de `tipo-problema`, dispositivo opcional, resumen y edición. | 11/11 PASS |
-| `etapa4-visual.js` | Chromium real | 1440/390/360 px: sin desborde horizontal, consola limpia, recursos locales OK, orbes (canvas fijo sin eventos, ajustado al viewport y **con píxeles dibujados**), **escritura del hero** (anti-flash: título no completo al load; cursor visible al cargar; pill/título/párrafo completos sin cursor; `span.tg` conservado y párrafo sin espacios raros), **imágenes institucionales** (hero y oficina en `#soporte` cargadas, título "Oficinas" blanco compacto y `alt` presentes), recorrido completo tarjeta→errores→revisión, caracteres especiales/emoji, XSS, editar conserva datos. | 73/73 PASS |
-| `etapa4-extra.js` | Chromium real | Anclas vs navbar (incluye `#soporte`), skip link, foco visible con teclado, Enter implícito, CTA de soporte (despliega el formulario con sus campos), cambio de servicio en vivo sin resumen obsoleto, campos de grupo preservados, texto >2000 chars, labels/`aria-describedby`, stepper coherente, `prefers-reduced-motion` (orbes estáticos: dos capturas idénticas, y hero completo sin escritura ni cursor), solapamientos @360. | 34/34 PASS |
+| `etapa4-visual.js` | Chromium real | 1440/390/360 px: sin desborde horizontal, consola limpia, recursos locales OK, orbes (canvas fijo sin eventos, ajustado al viewport y **con píxeles dibujados**), **escritura del hero** (anti-flash: título no completo al load; cursor visible al cargar; pill/título/párrafo completos sin cursor; `span.tg` conservado y párrafo sin espacios raros), **imágenes institucionales** (foto de oficina en `#soporte` cargada, título "Oficinas" blanco compacto y `alt` presente), **hero limpio** (sin `img`/`canvas`/`.hero__visual` en `#inicio`, botones y fondo general conservados, espacio negativo reservado a la derecha, en 1440/390/360 y con movimiento reducido), formulario de soporte desplegado al final de su sección y de regreso a recepción, recorrido completo tarjeta→errores→revisión, caracteres especiales/emoji, XSS, editar conserva datos. | 84/84 PASS |
+| `etapa4-extra.js` | Chromium real | Anclas vs navbar (incluye `#soporte`), skip link, foco visible con teclado, Enter implícito, CTA de soporte (despliega el formulario al final de `#soporte` y vuelve a `#recepcion` con la tarjeta técnica), cambio de servicio en vivo sin resumen obsoleto, campos de grupo preservados, texto >2000 chars, labels/`aria-describedby`, stepper coherente, `prefers-reduced-motion` (orbes estáticos: dos capturas idénticas, y hero completo sin escritura ni cursor), solapamientos @360. | 36/36 PASS |
 | `test-supabase.js` | jsdom | `CONFIG_SUPABASE` simulado: botón habilitado, POST a `/rest/v1/solicitudes`, URL/headers/`Prefer`, payload snake_case por servicio (técnico, web y **soporte**), motivo vacío sin POST, éxito + "Nueva solicitud", error de red con datos conservados y reintento, honeypot sin `fetch`, y respuesta anti-spam (título y texto específicos). | 66/66 PASS |
 | `test-admin.js` | Chromium real | Panel con API simulada por `page.route` (incluye preflight CORS): login inválido/válido, sesión, stats, lista (3 filas), XSS, filtros, filtro y detalle de **soporte** (motivo, producto, búsqueda), PATCH 204, **exportación a Excel** (firma ZIP, estructura del paquete, dos hojas, cabeceras, fechas, escapado, sin fórmulas, agrupado por servicio, exportación filtrada y nombre con filtros), recarga con sesión, logout y móvil 360 sin desborde. | 80/80 PASS |
 
-**Total: 350 aserciones en verde (0 fallos).**
+**Total: 368 aserciones en verde (0 fallos).**
 
 Además, verificadores puntuales de navegador real (fuera del conteo):
 `verificar-csp.js` (0 cortes de la política), `verificar-botones.js` (contraste
-y alto táctil) y `verificar-soporte.js` (flujo completo del soporte contra un
-servidor local, 14 aserciones, en verde el 20/10/2026).
+y alto táctil), `verificar-soporte.js` (flujo completo del soporte contra un
+servidor local: 3 aserciones fallan **por igual antes y después de la Etapa
+18**, verificado guardando los cambios en `git stash`; están atadas al
+formulario de soporte y no al hero) y los sondeos `probe-soporte.js` y
+`probe-hero.js` (sonda del hero limpio, 1440/768/390/360), todo en verde el
+22/10/2026.
 
 Las suites de Etapa 7 usan `window.fetch` / `page.route` simulados. Desde el
 19/10/2026 el proyecto real ya está conectado y probado a mano de punta a punta
