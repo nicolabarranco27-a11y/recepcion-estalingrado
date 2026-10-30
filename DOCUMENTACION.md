@@ -70,6 +70,8 @@ la Etapa 1). Este proyecto no modifica ni depende de sus archivos.
 | 16 (21/10/2026) | **Cerebro neuronal y sinapsis**: `cerebro-neuronal.png` (1672×940) reemplaza a `imagen.jpg` en el hero y se integra sin marco (`mix-blend-mode: screen` + máscara radial); una capa Canvas superpuesta dibuja pulsos que recorren **solo los píxeles luminosos reales** de la ilustración (muestreo único, sin unir puntos por cercanía), con brillo tenue del chip, hover con vuelta suave, pausa con pestaña oculta y estático con movimiento reducido. Suites en 369 aserciones. Ver §4.13. | Hecha (local) y **retirada del hero en la Etapa 18** |
 | 17 (21/10/2026) | **Composición del cerebro en el hero**: el asset se recorta (banda negra izquierda eliminada) y su fondo negro pasa a **alfa real**, con desvanecido de bordes, así que desaparece el rectángulo oscuro y el dibujo se funde con el fondo; el encuadre crece ~45 % en escritorio sin invadir el título ni generar scroll horizontal. Se conserva la capa de sinapsis (el canvas sigue alineado y los pulsos siguen las líneas). Suites en 370 aserciones. Ver §4.14. | Hecha (local) y **sin efecto visible desde la Etapa 18** |
 | 18 (22/10/2026) | **Hero limpio**: a pedido del usuario se retiran del hero la imagen del cerebro y la capa de sinapsis — `figure.hero__visual`, `img.hero__img` y `canvas.hero__neural` del HTML, sus reglas del CSS y la IIFE "Sinapsis del hero" de `js/main.js` (365 líneas). El hero queda minimalista: texto a la izquierda y columna derecha reservada como espacio negativo, con el fondo negro y la estética tecnológica intactos. **Se conservan** el fondo de partículas general (`#fondo-particulas`), la escritura del hero, el título, el párrafo, los botones, el encabezado, la navegación y el resto de las secciones; **no se borra ningún archivo de imagen**. Suites en 368 aserciones. Ver §4.15. | Hecha (local, pendiente de revisión del usuario) |
+| 19 (29/10/2026) | **Banner con la foto a pantalla completa**: `imagen/portada/Retrato corporativo con logo EC.png` (1535×1024) ocupa todo el hero (`100dvh`, `object-fit: cover`). Se retiran el botón "Conocer la empresa" y **todo el texto del hero** (pill, título y párrafo), su CSS, la escritura animada de `js/main.js` y la regla `.hero__actions`; queda un `h1.sr-only` para lectores de pantalla y SEO. Ver §4.16. | Hecha (pendiente de revisión visual del usuario) |
+| 20 (29/10/2026) | **Corrección: `[hidden]` respetado**: el stepper "01 Servicio / 02 Datos / 03 Revisión" se veía debajo del banner antes de iniciar una solicitud, porque `.stepper { display: flex }` y `.btn { display: inline-flex }` anulaban el `[hidden]` del navegador. Regla global `[hidden] { display: none !important; }`. Ver §4.17. | Hecha |
 
 ## 4. Recepción: diseño actual del flujo
 
@@ -745,6 +747,67 @@ composición está verificada por medición (posiciones, ausencia de decorativos
 píxeles del fondo), pero el juicio estético final (si el hero se ve demasiado
 vacío o si conviene ampliar el título) lo tiene que hacer el usuario mirando
 las capturas.
+
+### 4.16 Banner con la foto a pantalla completa (Etapa 19, 29/10/2026)
+
+A pedido del usuario, el hero deja de ser un bloque de texto y pasa a ser **solo
+la foto corporativa ocupando todo el banner**. La imagen la agregó la empresa en
+`imagen/portada/Retrato corporativo con logo EC.png` (PNG 1535×1024, ~1,8 MB,
+sin transparencia).
+
+- **Primer intento (descartado)**: se reemplazó solo el botón "Conocer la
+  empresa" por la foto en la columna derecha (texto a la izquierda). El usuario
+  lo rechazó: quería la imagen a todo el ancho y sin el mensaje.
+- **HTML (`index.html`)**: la sección queda con la imagen
+  (`img.hero__imagen`) como único contenido visible y un
+  `h1.sr-only` ("Servicio técnico y sitios web — Estalingrado Corp") para
+  conservar el título semántico y de SEO sin mostrarlo. Se eliminan la pill, el
+  título visible, el párrafo y el botón. La ruta se escribe codificada
+  (`Retrato%20corporativo%20con%20logo%20EC.png`) por los espacios del nombre;
+  la imagen declara `width`/`height`, `fetchpriority="high"`,
+  `decoding="async"` y `alt` descriptivo, y se precarga con
+  `<link rel="preload" as="image">` (es el LCP de la página).
+- **CSS (`css/styles.css`)**: `.hero` pasa a `height: 100vh/100dvh` +
+  `overflow: hidden` (sin padding); `.hero__imagen` va en `position: absolute`
+  con `inset: 0`, `width/height: 100%` y `object-fit: cover` (centrada), así la
+  foto llena el banner y se recorta sola en cualquier proporción. Se retiran
+  `.hero__actions`, `.hero__content`, `.pill`, `.pill__dot` (`pulse-glow`),
+  `.hero__title`, `.hero__lead`, `.hero__cursor` (`hero-parpadeo`), la grilla de
+  dos columnas del hero y su breakpoint de 900 px, y el `padding-top` del hero
+  en el breakpoint de 768 px. Se agrega la utilidad `.sr-only`. La clase `.bgh`
+  deja de aplicarse al hero (la foto lo cubre).
+- **JS (`js/main.js`)**: se elimina la IIFE de escritura del hero (138 líneas),
+  que quedaba sin efecto porque ya no existen `.hero__title`/`.hero__lead`. El
+  resto del archivo no se tocó (`node --check` OK).
+- **Sin cambios**: fondo de partículas, navbar (glass, legible sobre la foto),
+  secciones, formulario y envío a Supabase. El acceso al sitio institucional
+  sigue en el enlace "Inicio" de la navbar y del menú móvil.
+- **Verificación local**: la imagen responde `200 image/png` servida desde la
+  raíz del proyecto (ruta relativa correcta con espacios codificados). La
+  revisión visual fina (encuadre del recorte, especialmente en celular vertical)
+  queda para el usuario; si la carga resulta lenta, conviene exportar la foto a
+  ~1600 px de ancho en JPG/WebP (~200–400 KB).
+
+### 4.17 Corrección: el atributo `hidden` siempre se respeta (29/10/2026)
+
+Al dejar el banner a pantalla completa quedó a la vista, debajo de la foto, el
+stepper **"01 Servicio / 02 Datos / 03 Revisión"**, que debía estar oculto hasta
+elegir un servicio.
+
+- **Causa**: el `hidden` del HTML se apoya en el `display: none` del navegador,
+  que es la hoja de estilos de menor prioridad. `.stepper { display: flex }`
+  (y en el mismo caso `.btn { display: inline-flex }` para el botón "Nueva
+  solicitud") lo pisaba, así que el elemento se mostraba igual. Los demás
+  componentes ya tenían su propio `[hidden]` (`.flow__paso`, `.field-group`,
+  `.status`, `.field__error`, `.mobile-menu`); faltaban estos dos.
+- **Corrección (`css/styles.css`)**: regla global
+  `[hidden] { display: none !important; }` en la base, después de los resets.
+  Cubre el stepper, el botón "Nueva solicitud" y cualquier componente futuro sin
+  depender del orden de las reglas. El JS sigue igual: `stepper.hidden = false`
+  lo muestra al iniciar la solicitud.
+- **Efecto**: con el formulario cerrado, el bloque del formulario mide 0 px, así
+  que al banner lo sigue directamente la sección "Soporte al cliente" (sin
+  franjas vacías ni textos sueltos).
 
 ## 5. Pruebas (07/10 → 22/10/2026)
 

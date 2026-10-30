@@ -1116,3 +1116,106 @@ Sigue pendiente ejecutar supabase/migracion-soporte.sql (Etapa 9).
 
 - FIN DE LA SESIÓN: se detiene y se espera la revisión del usuario.
 
+
+
+SESIÓN 27 (29/10/2026) — Foto corporativa en el banner del hero (Etapa 19)
+---------------------------------------------------------------------------
+
+Pedido: en el banner del hero reemplazar el boton "Conocer la empresa" por la
+imagen que la empresa dejo en imagen/portada/Retrato corporativo con logo
+EC.png. Se consulto la ubicacion y el usuario eligio la columna derecha (la
+foto como protagonista, no debajo del parrafo).
+
+Hecho:
+- index.html (hero): se elimino div.hero__actions con el enlace externo al
+  sitio institucional y se agrego figure.hero__media.reveal como segunda
+  columna de la grilla, con la imagen (ruta con espacios codificados %20),
+  width/height 1535x1024, decoding=async, fetchpriority=high y alt
+  "Retrato corporativo de Estalingrado Corp".
+- css/styles.css: .hero__media con justify-self end y max-width 34rem; la
+  imagen al 100 % con aspect-ratio 3/2, object-fit cover, radio 16 px, borde
+  suave y sombra var(--shadow-card) mas halo azul tenue. A <=900 px una sola
+  columna con la figura centrada debajo del texto. Se retiro .hero__actions,
+  que quedo sin uso.
+- Sin cambios en la escritura del hero, el fondo de particulas, la navegacion
+  ni el resto de las secciones. El acceso al sitio institucional sigue en el
+  enlace "Inicio" de la navbar y del menu movil.
+- Verificacion local: servidor http.server en la raiz; la imagen responde
+  200 image/png (ruta relativa correcta). No se pudo hacer captura (no hay
+  Chromium/Edge en esta maquina y el modelo no puede ver imagenes).
+
+Documentacion actualizada: README (arbol con imagen/portada, seccion
+"Accesos del inicio y botones", seccion nueva "Imagen del banner del hero",
+checklist Etapa 19 e items 12 y 15 de la revision visual) y DOCUMENTACION
+(fila 19 y nueva 4.16).
+
+PENDIENTE: revision visual humana del banner. La foto pesa ~1,8 MB: si la
+carga en movil resulta lenta, exportarla a ~1200 px en JPG/WebP.
+Sin commit ni push.
+
+- FIN DE LA SESIÓN: se detiene y se espera la revisión del usuario.
+
+
+
+SESIÓN 28 (29/10/2026) — Ajuste: el banner queda solo con la foto a pantalla
+completa
+---------------------------------------------------------------------------
+
+Pedido del usuario tras ver la Etapa 19: la imagen debe ocupar TODO el banner
+y el mensaje (pill, titulo y parrafo) debe desaparecer; solo la imagen del
+tamano del banner.
+
+Hecho:
+- index.html (hero): la seccion queda con img.hero__imagen como unico contenido
+  visible. Se agrega h1.sr-only con el titulo para lectores de pantalla y SEO
+  (sin mostrarlo) y un <link rel=preload as=image> en el head porque la foto
+  es el LCP. Se quitan pill, titulo visible, parrafo y boton.
+- css/styles.css: .hero con height 100vh/100dvh, overflow hidden y sin
+  padding; .hero__imagen absoluta (inset 0, width/height 100 %) con
+  object-fit cover y object-position center. Se retiran .hero__actions,
+  .hero__content, .pill, .pill__dot y @keyframes pulse-glow, .hero__title,
+  .hero__lead, .hero__cursor y @keyframes hero-parpadeo, la grilla de dos
+  columnas del hero y su breakpoint de 900 px, y el padding-top del hero en
+  el breakpoint de 768 px. Se agrega la utilidad .sr-only.
+- js/main.js: se elimina la IIFE de escritura del hero (138 lineas), que ya no
+  tenia texto donde escribir. node --check OK.
+- La clase .bgh deja de aplicarse al hero (la foto cubre el fondo); la regla
+  CSS se conserva por si se reutiliza.
+- Verificacion local: la imagen responde 200 image/png en el servidor local
+(misma ruta codificada con %20).
+
+Documentacion actualizada: DOCUMENTACION (fila 19 y 4.16 reescritas con el
+primer intento descartado y el resultado final) y README (seccion "Banner con
+la foto a pantalla completa", checklist Etapa 19, items 11, 12, 14 y 15 de la
+revision visual, y nota de que la escritura del hero quedo retirada).
+
+PENDIENTE: revision visual humana, sobre todo el recorte en celular vertical
+(object-position se puede ajustar si las personas quedan fuera de cuadro).
+La foto pesa ~1,8 MB: conviene exportarla a ~1600 px en JPG/WebP.
+Sin commit ni push.
+
+- FIN DE LA SESIÓN: se detiene y se espera la revisión del usuario.
+
+SESIÓN 29 (29/10/2026) — Corrección: el stepper se veía debajo del banner
+---------------------------------------------------------------------------
+
+Pedido: "corrige esto que sale abajo 01 Servicio / 02 Datos / 03 Revisión".
+
+Diagnostico: el ol del stepper tiene el atributo hidden, pero .stepper define
+display: flex y el estilo de autor pisa el [hidden] del navegador (que es
+UA, la hoja de menor prioridad). Mismo caso en .btn (inline-flex) para el
+boton "Nueva solicitud". Los demas componentes ya tenian su [hidden]
+(.flow__paso, .field-group, .status, .field__error, .mobile-menu).
+
+Hecho:
+- css/styles.css: regla global [hidden] { display: none !important; } despues
+  de los resets. Cubre el stepper y cualquier componente futuro.
+- Sin cambios en el JS: stepper.hidden = false sigue mostrandolo al iniciar
+  la solicitud.
+- Efecto: con el formulario cerrado el bloque mide 0 px y despues del banner
+  sigue directamente "Soporte al cliente".
+
+Documentacion: DOCUMENTACION (fila 20 y nueva 4.17) y README (checklist,
+Etapa 20). Sin commit ni push.
+
+- FIN DE LA SESIÓN: se detiene y se espera la revisión del usuario.

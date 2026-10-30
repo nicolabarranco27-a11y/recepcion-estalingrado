@@ -77,6 +77,12 @@ h1, h2, h3 {
 
 p { margin: 0; }
 
+/* El atributo `hidden` siempre gana. Varios componentes definen su propio
+   `display` (.stepper es flex, .btn es inline-flex) y, por orden de reglas,
+   anulaban el `[hidden]` del navegador: el stepper se veía antes de iniciar
+   la solicitud y el botón "Nueva solicitud" quedaba a la vista. */
+[hidden] { display: none !important; }
+
 ::selection { background: var(--blue-600); color: #fff; }
 
 ::-webkit-scrollbar { width: 6px; }
@@ -115,6 +121,19 @@ p { margin: 0; }
 }
 
 .container--narrow { max-width: 960px; }
+
+/* Contenido solo para lectores de pantalla (título del hero sin texto visible) */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
 
 /* ---------- Utilidades visuales ---------- */
 
@@ -354,98 +373,27 @@ p { margin: 0; }
 
 .mobile-menu__link:hover { color: var(--blue-400); }
 
-/* ---------- Hero ---------- */
+/* ---------- Hero: banner con la foto a pantalla completa ---------- */
 
+/* Sin texto ni capas encima: la foto ocupa todo el banner (alto de la ventana)
+   y se recorta con object-fit: cover. La navbar glass queda flotando arriba. */
 .hero {
   position: relative;
+  height: 100vh;
+  height: 100dvh;
   min-height: 100vh;
   min-height: 100dvh;
-  display: flex;
-  align-items: center;
-  padding-block: calc(var(--nav-height) + 4rem) 5rem;
+  overflow: hidden;
+  background: var(--bg);
 }
 
-.hero__content { max-width: 56rem; }
-
-.pill {
-  display: inline-flex;
-  align-items: center;
-  gap: .65rem;
-  padding: .5rem 1rem;
-  margin-bottom: 2rem;
-  border: 1px solid rgba(59, 130, 246, .2);
-  border-radius: 999px;
-  background: rgba(59, 130, 246, .05);
-  color: var(--blue-400);
-  font-family: var(--font-mono);
-  font-size: .6875rem;
-  letter-spacing: .2em;
-  text-transform: uppercase;
-}
-
-.pill__dot {
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: var(--blue-500);
-  animation: pulse-glow 2s ease-in-out infinite;
-}
-
-@keyframes pulse-glow {
-  0%, 100% { box-shadow: 0 0 10px rgba(37, 99, 235, .2); }
-  50% { box-shadow: 0 0 22px rgba(37, 99, 235, .5); }
-}
-
-.hero__title {
-  font-size: clamp(2.75rem, 7vw, 5rem);
-  margin-bottom: 1.5rem;
-}
-
-.hero__lead {
-  max-width: 40rem;
-  margin-bottom: 3rem;
-  color: var(--text-muted);
-  font-size: clamp(1.05rem, 2vw, 1.25rem);
-  font-weight: 300;
-  line-height: 1.7;
-}
-
-/* Cursor de la escritura del hero (imita la página institucional) */
-.hero__cursor {
-  display: inline-block;
-  color: var(--blue-400);
-  font-family: var(--font-mono);
-  animation: hero-parpadeo 1s step-end infinite;
-}
-
-@keyframes hero-parpadeo {
-  50% { opacity: 0; }
-}
-
-/* En la pill el texto ya es azul: el cursor va en blanco para que se distinga */
-.pill .hero__cursor {
-  color: var(--text-strong);
-}
-
-.hero__actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 1rem;
-}
-
-/* ---------- Hero: composición limpia ---------- */
-
-/* Dos columnas: el texto ocupa la primera y la segunda queda reservada como
-   espacio negativo. Sin imágenes ni capas decorativas en el sector derecho. */
-.hero .container {
-  display: grid;
-  grid-template-columns: minmax(0, 1.1fr) minmax(0, .9fr);
-  gap: clamp(2rem, 4vw, 4rem);
-  align-items: center;
-}
-
-@media (max-width: 900px) {
-  .hero .container { grid-template-columns: 1fr; }
+.hero__imagen {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
 }
 
 /* ---------- Botones ---------- */
@@ -783,16 +731,13 @@ p { margin: 0; }
 
 /* ---------- Formulario compartido por sección ---------- */
 
-/* #recepcion (técnico y web) y #soporte comparten el mismo formulario:
-   el JS mueve el bloque entre sus slots. Con contenido, el slot de soporte
-   separa el formulario de los pasos y canales de arriba. */
+/* El formulario es uno solo: el JS lo mueve al slot de #soporte. Con
+   contenido, ese slot separa el formulario de los pasos y canales de arriba. */
 .slot-form:not(:empty) { margin-top: clamp(2rem, 4vw, 3rem); }
 
 .bloque-formulario.entrando { animation: fade-up .45s var(--ease); }
 
-/* ---------- Recepción: stepper ---------- */
-
-#recepcion .section__desc { font-size: 1.0625rem; }
+/* ---------- Solicitud: stepper ---------- */
 
 .stepper {
   display: flex;
@@ -1212,8 +1157,6 @@ select.field__control option { background: var(--surface); color: var(--text); }
 
   .nav-links { display: none; }
   .nav-toggle { display: block; }
-
-  .hero { padding-top: calc(var(--nav-height) + 3rem); }
 
   .soporte__intro { grid-template-columns: 1fr; }
   .oficinas__figura { margin-top: 0; }

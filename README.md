@@ -38,6 +38,9 @@ Servicio tecnico y paginas web/
 │   ├── Cerebro neural de neón azul.png  # Ilustración original, intacta
 │   ├── imagen.jpg    # Cerebro anterior con logo (se conserva, ya no se usa)
 │   └── oficina.jpg   # Foto de la oficina (intro de #soporte, Etapa 14)
+├── imagen/
+│   └── portada/
+│       └── Retrato corporativo con logo EC.png  # Foto del banner del hero (Etapa 19)
 ├── robots.txt        # Bloquea /admin.html para buscadores
 ├── DOCUMENTACION.md  # Historial completo: etapas, diseño del flujo, pruebas, sistema de gestión
 ├── bitacora.txt      # Cronología de sesiones de trabajo
@@ -112,12 +115,11 @@ de servicio o el botón "Soporte al cliente" de la sección `#soporte` (Etapa 11
 
 ## Accesos del inicio y botones (ajuste 19/10/2026)
 
-- El hero tiene dos botones. El primero, **"Servicios informáticos y web"**,
-  baja a `#servicios`, donde están las dos tarjetas con las que arranca la
-  recepción. El segundo, **"Conocer la empresa"**, abre el sitio institucional
-  (`https://estalingradocorp.github.io/EstalingradoCorp/`) en otra pestaña
-  (`target="_blank"` + `rel="noopener noreferrer"`). Antes ambos llevaban al
-  mismo lugar del formulario.
+- El hero ya no tiene botones. El que abría el sitio institucional
+  (**"Conocer la empresa"**, `https://estalingradocorp.github.io/EstalingradoCorp/`,
+  en otra pestaña) se reemplazó por la foto del banner en la Etapa 19 (ver
+  "Imagen del banner del hero"). El acceso al sitio institucional sigue
+  disponible en el enlace "Inicio" de la navbar y del menú móvil.
 - Los botones (`Editar datos`, `Enviar solicitud`, `Nueva solicitud`, y los del
   panel) se repasaron para ganar presencia y contraste: alto mínimo de 52 px
   (44 px en los chicos del panel), radio de 10 px (8 px en los chicos), texto en
@@ -127,20 +129,13 @@ de servicio o el botón "Soporte al cliente" de la sección `#soporte` (Etapa 11
 
 ## Escritura del hero y orbes minimalistas (Etapas 12 y 13)
 
-- **Escritura del hero (Etapa 12)**: al cargar la página, la pill "Recepción
-  de clientes · en línea", el título ("Servicio técnico y *sitios web*.") y el
-  párrafo principal se escriben carácter por carácter con el mismo ritmo de la
-  página institucional (30 ms por carácter) y un cursor `▌` que parpadea mientras
-  escriben (blanco en la pill, azul en los textos grandes). El texto vive
-  completo en el HTML (bueno para SEO y accesibilidad) pero el JS
-  (`js/main.js`) lo **vacía de forma síncrona antes del primer pintado**, así
-  que el texto nunca aparece escrito para después reescribirse: se ve vacío y
-  se escribe desde cero. Al reescribir respeta los nodos originales: el span
-  `.tg` del degradado se conserva, y los saltos de línea del fuente se colapsan
-  en un solo espacio para que la escritura no se pause en caracteres en blanco.
-  Se reserva el alto final de cada texto para que el hero no salte, y con
-  **movimiento reducido** del sistema no se anima: el texto aparece completo de
-  entrada, sin cursor.
+- **Escritura del hero (Etapa 12) — retirada en la Etapa 19**: al cargar la
+  página, la pill "Recepción de clientes · en línea", el título ("Servicio
+  técnico y *sitios web*.") y el párrafo principal se escribían carácter por
+  carácter con el mismo ritmo de la página institucional (30 ms por carácter) y
+  un cursor `▌` que parpadeaba mientras escribían. **Desde la Etapa 19 el hero es
+  solo la foto del banner**: se quitó el texto y el código de escritura; se
+  conserva esta descripción como historial.
 - **Orbes minimalistas (Etapa 13)**: el canvas de fondo conserva la red de
   puntos y líneas, pero los orbes ya no tienen el halo difuso externo: son
   círculos de color puro, más limpios y minimalistas, como pidió la empresa.
@@ -150,11 +145,11 @@ de servicio o el botón "Soporte al cliente" de la sección `#soporte` (Etapa 11
 Dos fotos agregadas por la empresa en `Imagenes/`, integradas cada una en un
 lugar pensado (nunca juntas):
 
-- **Hero**: desde la **Etapa 18** el hero **no usa ninguna imagen decorativa**
-  (se retiró la ilustración del cerebro). Queda un diseño limpio: el texto a la
-  izquierda y la columna derecha reservada como espacio negativo.
-  `Imagenes/imagen.jpg` y `Imagenes/cerebro-neuronal.png` se conservan en el
-  repo, sin uso.
+- **Hero**: desde la **Etapa 19** el banner es solo la foto corporativa
+  `imagen/portada/Retrato corporativo con logo EC.png`, a pantalla completa
+  (ver "Banner con la foto a pantalla completa"). La ilustración del cerebro se
+  había retirado en la Etapa 18; `Imagenes/imagen.jpg` y
+  `Imagenes/cerebro-neuronal.png` se conservan en el repo, sin uso.
 - **Sección `#soporte`** (`Imagenes/oficina.jpg`, 640×800): foto vertical de
   la oficina en el intro de la sección de soporte (`.soporte__intro`), a la
   derecha del título "Soporte al cliente", que es donde la pidió el usuario.
@@ -174,7 +169,8 @@ espacio negativo reservado y el fondo negro y la estética tecnológica intactos
 - **Se conservaron**: el fondo de partículas general (`#fondo-particulas`, red
   de orbes con líneas, fijo detrás del contenido), el fondo negro, la escritura
   del hero (pill, título y párrafo con cursor), el título, el párrafo, los dos
-  botones, el encabezado, la navegación y todas las demás secciones.
+  botones (hoy reemplazados por la foto del banner, Etapa 19), el encabezado, la
+  navegación y todas las demás secciones.
 - **Se eliminaron**: `figure.hero__visual`, `img.hero__img` y
   `canvas.hero__neural` del HTML; las reglas `.hero__visual`, `.hero__img`,
   `.hero__neural` y el `transform: none` del reveal en el CSS; y la IIFE
@@ -185,7 +181,32 @@ espacio negativo reservado y el fondo negro y la estética tecnológica intactos
   se quiere retomar la integración más adelante.
 - La grilla del hero mantiene dos columnas: el texto ocupa la primera y la
   segunda queda reservada como espacio negativo (a 1440 px el título ocupa el
-  53 % del contenedor).
+  53 % del contenedor). Desde la Etapa 19 esa columna la ocupa la foto del
+  banner.
+
+### Banner con la foto a pantalla completa (Etapa 19, 29/10/2026)
+
+La foto **`imagen/portada/Retrato corporativo con logo EC.png`** (1535×1024,
+agregada por la empresa) ocupa **todo el banner**: no queda texto ni botón a la
+vista, solo la imagen al tamaño de la ventana.
+
+- **HTML**: el hero es `<section class="hero">` + `<img class="hero__imagen">`
+  (`width`/`height` declarados, `decoding="async"`, `fetchpriority="high"`,
+  `alt` presente) y un `h1.sr-only` con el título, para lectores de pantalla y
+  SEO sin mostrarlo. La ruta con espacios se escribe codificada (`%20`) y la
+  imagen se precarga con `<link rel="preload" as="image">`.
+- **CSS**: `.hero` mide `100vh/100dvh` con `overflow: hidden` y sin padding;
+  `.hero__imagen` va en `position: absolute` con `inset: 0` y
+  `object-fit: cover`, así llena el banner en cualquier proporción y se recorta
+  sola. Se retiraron `.hero__actions`, `.pill` (y `pulse-glow`),
+  `.hero__title`, `.hero__lead`, `.hero__cursor` (y `hero-parpadeo`), la grilla
+  de dos columnas del hero y su breakpoint. Se agregó la utilidad `.sr-only`.
+- **JS**: se quitó la escritura animada del hero, que ya no tenía texto donde
+  escribir. El resto del JS no cambió.
+- **Sin cambios** en el fondo de partículas, la navegación (el navbar glass
+  queda legible sobre la foto) ni el resto de las secciones.
+- **Peso**: la foto pesa ~1,8 MB. Si la carga en móvil resulta lenta, conviene
+  exportarla a ~1600 px de ancho en JPG/WebP (quedaría en ~200–400 KB).
 
 ### Cerebro neuronal y sinapsis (Etapas 16 y 17, en pausa)
 
@@ -479,6 +500,17 @@ institucional.
       párrafo, los botones, el encabezado, la navegación y el resto de las
       secciones, y **no se borró ningún archivo de imagen**. Local, pendiente de
       revisión del usuario.
+- [x] Etapa 19 (29/10/2026): **banner con la foto a pantalla completa**:
+      `imagen/portada/Retrato corporativo con logo EC.png` ocupa todo el hero
+      (`100dvh`, `object-fit: cover`). Se quitaron el botón "Conocer la empresa"
+      y todo el texto visible del hero (pill, título y párrafo), su CSS y la
+      escritura animada del JS; queda un `h1.sr-only` para lectores de pantalla.
+      Pendiente de revisión visual del usuario.
+- [x] Etapa 20 (29/10/2026): **corrección del `[hidden]`**: el stepper
+      "01 Servicio / 02 Datos / 03 Revisión" aparecía debajo del banner porque
+      `.stepper { display: flex }` (y `.btn { display: inline-flex }`) anulaban
+      el `[hidden]` del navegador. Se agregó `[hidden] { display: none
+      !important; }` en la base del CSS.
 - [x] **Configurar Supabase (19/10/2026):** proyecto `estalingrado-corp` (São
       Paulo) creado, URL + anon key en `js/config.js`, `supabase/schema.sql`
       ejecutado, usuario admin `nbmn38@gmail.com` (Auto Confirm) e insertado su
@@ -535,18 +567,15 @@ Con el sitio servido localmente (`npx http-server . -p 8080`):
 10. Envío real (cuando Supabase esté configurado): confirmación verde con
     "Nueva solicitud", error rojo con datos conservados si se corta internet,
     y la fila visible en el panel y en el Table Editor de Supabase.
-11. Al cargar la página: el hero aparece **vacío** (nunca se ve el texto
-    completo primero) y la pill "Recepción de clientes · en línea" se escribe
-    carácter por carácter con un cursor que parpadea, después el título del
-    hero y por último el párrafo, sin pausas raras en medio de las frases; al
-    terminar no queda ningún cursor. Con movimiento reducido del sistema, el
-    texto aparece completo de entrada (sin escritura).
-12. Hero (Etapa 18): a la derecha del título **no hay ninguna imagen ni capa
-    animada**: el sector derecho queda como **espacio negativo** sobre el fondo
-    negro, el texto se mantiene legible y centrado verticalmente, y el fondo de
-    partículas general sigue animándose detrás. Al bajar a "Soporte al cliente",
-    el encabezado acompaña con la foto de la oficina, su pie "Oficinas" en
-    blanco y "Salta Capital, Argentina"; sin cortes ni desbordes en ningún ancho.
+11. Al cargar la página: el banner muestra la **foto corporativa a pantalla
+    completa**, sin texto encima ni animación de escritura (desde la Etapa 19).
+12. Banner (Etapa 19): la **foto corporativa**
+    (`imagen/portada/Retrato corporativo con logo EC.png`) ocupa todo el alto de
+    la ventana y todo el ancho, recortándose sin deformarse (`object-fit:
+    cover`), sin texto encima ni scroll horizontal; el navbar glass se lee sobre
+    la parte superior. Al bajar a "Soporte al cliente", el encabezado acompaña
+    con la foto de la oficina, su pie "Oficinas" en blanco y "Salta Capital,
+    Argentina"; sin cortes ni desbordes en ningún ancho.
 13. Canales: se ve **Instagram `@nicotips27`** en `#contacto` (ícono + enlace
     a <https://www.instagram.com/nicotips27/>, abre en otra pestaña) y también
     en los íconos del pie. Formulario de soporte: al tocar "Soporte al cliente"
@@ -556,13 +585,15 @@ Con el sitio servido localmente (`npx http-server . -p 8080`):
 14. Fondo del hero (Etapa 18): la red de orbes del fondo general sigue
     dibujándose detrás del contenido (círculos de color puro y líneas de
     conexión), los enlaces siguen funcionando con normalidad y la consola queda
-    sin errores. Con movimiento reducido del sistema el fondo queda estático y el
-    hero completo, sin escritura.
-15. Espacio negativo (Etapa 18): en escritorio el título ocupa solo la mitad
-    izquierda del contenedor (a 1440 px, el 53 %), la columna derecha queda
-    libre de imágenes y el hero no se ve "vacío" ni descentrado; en móvil
-    (390 y 360 px) el texto ocupa todo el ancho y **debajo** quedan los botones,
-    sin taparlos. Al mover la ventana no aparece scroll horizontal.
+    sin errores. Con movimiento reducido del sistema el fondo queda estático.
+    Desde la Etapa 19 el banner es la foto, así que los orbes solo se ven al
+    bajar a las demás secciones.
+15. Recorte de la foto (Etapa 19): al cambiar el ancho de la ventana la foto
+    sigue llenando el banner (se recorta, no se deforma ni deja franjas). En
+    celular vertical el recorte es más agresivo a los costados: conviene mirar
+    que las personas de la foto queden dentro del encuadre y, si no, ajustar
+    `object-position`. El `alt` está presente y la página no tiene scroll
+    horizontal.
 
 ## Accesibilidad
 

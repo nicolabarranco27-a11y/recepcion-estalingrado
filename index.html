@@ -9,6 +9,7 @@
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src 'self' data:; style-src 'self' https://cdnjs.cloudflare.com https://fonts.googleapis.com; font-src https://cdnjs.cloudflare.com https://fonts.gstatic.com; script-src 'self'; connect-src 'self' https://*.supabase.co; object-src 'none'; frame-src 'none'; base-uri 'self'; form-action 'self'; upgrade-insecure-requests">
 <link rel="icon" type="image/jpeg" href="assets/favicon.jpg">
+<link rel="preload" as="image" href="imagen/portada/Retrato%20corporativo%20con%20logo%20EC.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400;500;600;700&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet">
@@ -25,7 +26,7 @@
 <!-- NAVBAR -->
 <header class="navbar glass" id="navbar">
   <div class="container navbar__inner">
-    <a href="#inicio" class="brand" aria-label="Estalingrado Corp — Inicio">
+    <a href="https://estalingradocorp.github.io/EstalingradoCorp/index.html" class="brand" aria-label="Estalingrado Corp — Sitio oficial">
       <span class="brand__avatar">
         <img src="assets/logo.jpg" alt="" width="40" height="40">
       </span>
@@ -36,9 +37,7 @@
     </a>
 
     <nav class="nav-links" aria-label="Navegación principal">
-      <a href="#inicio" class="nav-links__item">Inicio</a>
-      <a href="#servicios" class="nav-links__item">Servicios</a>
-      <a href="#recepcion" class="nav-links__item">Recepción</a>
+      <a href="https://estalingradocorp.github.io/EstalingradoCorp/index.html" class="nav-links__item">Inicio</a>
       <a href="#soporte" class="nav-links__item">Soporte</a>
       <a href="#contacto" class="nav-links__item">Contacto</a>
     </nav>
@@ -55,9 +54,7 @@
     <i class="fa-solid fa-xmark" aria-hidden="true"></i>
   </button>
   <nav class="mobile-menu__links" aria-label="Navegación móvil">
-    <a href="#inicio" class="mobile-menu__link">Inicio</a>
-    <a href="#servicios" class="mobile-menu__link">Servicios</a>
-    <a href="#recepcion" class="mobile-menu__link">Recepción</a>
+    <a href="https://estalingradocorp.github.io/EstalingradoCorp/index.html" class="mobile-menu__link">Inicio</a>
     <a href="#soporte" class="mobile-menu__link">Soporte</a>
     <a href="#contacto" class="mobile-menu__link">Contacto</a>
   </nav>
@@ -65,93 +62,21 @@
 
 <main id="contenido">
 
-  <!-- HERO -->
-  <section class="hero bgh" id="inicio">
-    <div class="container">
-      <div class="hero__content">
-        <p class="pill reveal">
-          <span class="pill__dot" aria-hidden="true"></span>
-          <span>Recepción de clientes · en línea</span>
-        </p>
-
-        <h1 class="hero__title reveal">Servicio técnico y <span class="tg">sitios web</span>.</h1>
-
-        <p class="hero__lead reveal">
-          Estalingrado Corp recibe tus solicitudes. Elegí el servicio que necesitás
-          y comenzá tu atención con nuestro equipo.
-        </p>
-
-        <div class="hero__actions reveal">
-          <a href="#servicios" class="btn btn--outline">
-            Servicios informáticos y web
-            <i class="fa-solid fa-chevron-right btn__arrow" aria-hidden="true"></i>
-          </a>
-          <a href="https://estalingradocorp.github.io/EstalingradoCorp/" class="btn btn--outline" target="_blank" rel="noopener noreferrer">
-            Conocer la empresa
-            <i class="fa-solid fa-arrow-up-right-from-square btn__arrow" aria-hidden="true"></i>
-          </a>
-        </div>
-      </div>
-    </div>
+  <!-- HERO: banner con la foto corporativa a pantalla completa -->
+  <section class="hero" id="inicio" aria-label="Estalingrado Corp">
+    <h1 class="sr-only">Servicio técnico y sitios web — Estalingrado Corp</h1>
+    <img
+      class="hero__imagen"
+      src="imagen/portada/Retrato%20corporativo%20con%20logo%20EC.png"
+      alt="Retrato corporativo de Estalingrado Corp"
+      width="1535" height="1024"
+      fetchpriority="high"
+      decoding="async">
   </section>
 
-  <!-- SERVICIOS -->
-  <section class="section section--grid" id="servicios" aria-labelledby="servicios-title">
-    <div class="container">
-      <div class="section__head reveal">
-        <p class="section__label"><span class="section__line" aria-hidden="true"></span>Recepción · Servicios</p>
-        <h2 class="section__title" id="servicios-title">¿Cómo podemos <span class="tg">ayudarte</span>?</h2>
-        <p class="section__desc">Servicio técnico y sitios web, una misma recepción. Seleccioná el que corresponda a tu solicitud; si ya sos cliente, el soporte está más abajo.</p>
-      </div>
-
-      <div class="cards">
-        <article class="card reveal" id="servicio-tecnico">
-          <div class="card__icon" aria-hidden="true">
-            <i class="fa-solid fa-screwdriver-wrench"></i>
-          </div>
-          <h3 class="card__title">Servicio técnico informático</h3>
-          <p class="card__text">
-            Diagnóstico, reparación y mantenimiento de equipos. Atención personalizada
-            para particulares y negocios.
-          </p>
-          <a href="#recepcion" class="card__link" data-servicio="tecnico">
-            Iniciar solicitud
-            <i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
-          </a>
-        </article>
-
-        <article class="card reveal" id="servicio-web">
-          <div class="card__icon" aria-hidden="true">
-            <i class="fa-solid fa-code"></i>
-          </div>
-          <h3 class="card__title">Creación de sitios web</h3>
-          <p class="card__text">
-            Diseño y desarrollo de sitios web a medida, con identidad propia,
-            velocidad y presencia profesional en internet.
-          </p>
-          <a href="#recepcion" class="card__link" data-servicio="web">
-            Iniciar solicitud
-            <i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
-          </a>
-        </article>
-      </div>
-    </div>
-  </section>
-
-  <!-- RECEPCIÓN -->
-  <section class="section" id="recepcion" aria-labelledby="recepcion-title">
-    <div class="container container--narrow">
-      <div class="section__head reveal">
-        <p class="section__label"><span class="section__line" aria-hidden="true"></span>Recepción · Solicitud</p>
-        <h2 class="section__title" id="recepcion-title">Iniciá tu <span class="tg">solicitud</span></h2>
-        <p class="section__desc">Elegí el servicio, completá tus datos y revisá todo antes de dejarla lista para el envío.</p>
-      </div>
-
-      <!-- El formulario es uno solo y se comparte: las tarjetas de técnico/web
-           lo ubican en #slot-recepcion; el botón de soporte lo mueve a
-           #slot-soporte, al final de la sección Soporte. -->
-      <div class="slot-form" id="slot-recepcion">
-      <div class="bloque-formulario" id="bloque-formulario">
+  <!-- FORMULARIO (oculto hasta pedir "Soporte al cliente"; el JS lo mueve
+       al slot de la sección Soporte) -->
+  <div class="bloque-formulario" id="bloque-formulario">
       <ol class="stepper reveal" id="stepper" aria-label="Pasos de la solicitud" hidden>
         <li class="stepper__item is-done" data-paso="1"><span class="stepper__num" aria-hidden="true">01</span> <span id="stepper-servicio">Servicio</span></li>
         <li class="stepper__item" data-paso="2"><span class="stepper__num" aria-hidden="true">02</span> Datos</li>
@@ -296,9 +221,6 @@
 
       </form>
       </div>
-      </div>
-    </div>
-  </section>
 
   <!-- SOPORTE -->
   <section class="section" id="soporte" aria-labelledby="soporte-title">
@@ -373,8 +295,8 @@
         </a>
       </div>
 
-      <!-- Acá se despliega el formulario de soporte (el JS lo trae desde
-           #recepcion al elegir "Soporte al cliente"). -->
+      <!-- Acá se despliega el formulario de soporte (el JS lo trae al elegir
+           "Soporte al cliente"). -->
       <div class="slot-form" id="slot-soporte"></div>
     </div>
   </section>
@@ -392,8 +314,8 @@
 
       <!-- Teléfono oficial: pendiente de que nos lo pase la empresa.
            El correo de soporte sí está verificado y publicado arriba. -->
-      <!-- El formulario compartido vive en #recepcion; al pedir soporte se
-           despliega al final de la sección #soporte (ver js/main.js). -->
+      <!-- El formulario compartido se despliega al final de la sección
+           #soporte (ver js/main.js). -->
 
       <ul class="contact-list reveal">
         <li class="contact-list__item">
